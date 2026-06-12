@@ -1,9 +1,9 @@
 emailjs.init('PR1yiM-fDVGYx5wCo');
 
 // ── ROUTING ──
-const pages = ['p0','p1','p2','p3','p4','p5','p6'];
+const pages = ['p0','p1','p2','p3','p4','p5','p6','p7'];
 const authPages = ['p-login','p-signup','p-inquiry','p-brochure'];
-const navMap = { p0:'nav-p0', p1:'nav-p1', p2:'nav-p2', p3:'nav-p1', p4:'nav-p2', p5:'nav-p2', p6:'nav-p6' };
+const navMap = { p0:'nav-p0', p1:'nav-p1', p2:'nav-p2', p3:'nav-p1', p4:'nav-p2', p5:'nav-p2', p6:'nav-p6', p7:'nav-p7' };
 const ctaPages = ['p1','p3','p4'];
 
 function goTo(id) {
@@ -12,7 +12,7 @@ function goTo(id) {
   document.getElementById(id).classList.add('active');
   Object.values(navMap).forEach(n => document.getElementById(n)?.classList.remove('active'));
   document.getElementById(navMap[id])?.classList.add('active');
-  document.body.classList.toggle('p0-active', id === 'p0');
+  document.body.classList.toggle('p0-active', id === 'p0' || id === 'p6' || id === 'p7');
   window.scrollTo(0,0);
 
   const bar = document.getElementById('ctaBar');

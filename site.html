@@ -58,7 +58,7 @@ body.p0-active .p0-grain { opacity: 0.22; }
 
 /* ── GNB ── */
 .gnb {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 400;
   height: 64px; background: var(--white); border-bottom: 1px solid var(--border);
   display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 40px;
   transition: background 0.35s ease, border-color 0.35s ease;
@@ -623,6 +623,12 @@ body.p0-active .p7-cta-sub { color: rgba(255,255,255,0.4); }
 .platform-badge.tt { background:#f0f0f0; border-color:#d0d0d0; color:#1a1a1a; }
 .card-meta-goal { font-size: 14px; font-weight: 700; color: var(--gray-dark); }
 .card-meta-goal span { color: var(--orange); }
+.card-internal-row { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.view-toggle { display:flex; background:var(--card-bg); border:1px solid var(--border); border-radius:8px; padding:3px; gap:3px; flex-shrink:0; }
+.view-toggle-btn { padding:6px 16px; border-radius:6px; border:none; background:transparent; color:var(--gray-light); font-size:13px; font-weight:500; cursor:pointer; transition:all .15s; }
+.view-toggle-btn.active { background:var(--orange); color:#fff; }
+.card-internal-item { font-size: 12px; color: var(--gray-light); }
+.card-internal-item strong { color: var(--gray-dark); font-weight: 600; }
 .meta-item { font-size: 12px; color: var(--gray-light); }
 .meta-item strong { color: var(--gray-dark); font-weight: 600; }
 .progress-bar { height: 6px; background: var(--gray-bg); border-radius: 100px; overflow: hidden; }
@@ -749,6 +755,12 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
 .cd-header { display:flex; align-items:center; gap:12px; background:var(--white); border:1px solid var(--border); border-radius:14px; padding:18px 22px; margin-bottom:14px; }
 .cd-back { background:none; border:none; cursor:pointer; color:var(--gray-light); padding:4px 6px; border-radius:6px; display:flex; align-items:center; flex-shrink:0; transition:color .15s; }
 .cd-back:hover { color:var(--black); }
+.cd-internal-bar { display:flex; flex-wrap:wrap; background:var(--card-bg); border:1px solid var(--border); border-radius:14px; margin-bottom:14px; overflow:hidden; }
+.cd-internal-item { flex:1; min-width:130px; padding:16px 20px; border-right:1px solid var(--border); }
+.cd-internal-item:last-child { border-right:none; }
+.cd-internal-lbl { font-size:11px; color:var(--gray-light); font-weight:500; letter-spacing:0.4px; text-transform:uppercase; margin-bottom:6px; }
+.cd-internal-val { font-size:15px; font-weight:600; color:var(--black); }
+.cd-internal-val.orange { color:var(--orange); }
 .cd-thumb { width:44px; height:44px; border-radius:10px; object-fit:cover; border:1px solid var(--border); flex-shrink:0; background:var(--gray-bg); display:grid; place-items:center; font-size:20px; }
 .cd-info { flex:1; min-width:0; }
 .cd-name-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:3px; }
@@ -1223,13 +1235,13 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
 }
 .auth-page.fullpage::before {
   content: '';
-  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
   mix-blend-mode: overlay; opacity: 0.18;
   background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='256' height='256' filter='url(%23n)'/></svg>");
   background-repeat: repeat; background-size: 180px 180px;
 }
-.auth-page.fullpage.active { display: flex; }
-.auth-page.fullpage > * { position: relative; z-index: 1; }
+.auth-page.fullpage.active { display: flex; pointer-events: auto; }
+.auth-page.fullpage > * { position: relative; z-index: 1; pointer-events: auto; }
 body.p0-active .auth-page.fullpage { background: transparent; }
 .auth-top { text-align: center; margin-bottom: 48px; }
 .auth-top-logo {
@@ -1260,6 +1272,7 @@ body.p0-active .auth-page.fullpage { background: transparent; }
 .inq-card {
   background: var(--white); border-radius: 22px; padding: 44px 48px;
   box-shadow: 0 24px 80px rgba(0,0,0,0.45);
+  position: relative; z-index: 2; pointer-events: auto;
 }
 .inq-section { margin-bottom: 32px; }
 .inq-section:last-of-type { margin-bottom: 0; }
@@ -1360,6 +1373,97 @@ body.p0-active .auth-page.fullpage { background: transparent; }
 .wp-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .wp-legend-dot.common { background: rgba(255,255,255,0.2); }
 .wp-legend-dot.c-excl { background: var(--orange); }
+
+/* ── p5 캠페인 수정 모달 ── */
+.p5-modal-overlay { display:none; position:fixed; inset:0; z-index:600; background:rgba(0,0,0,0.65); align-items:center; justify-content:center; }
+.p5-modal-overlay.active { display:flex; }
+.p5-modal { background:var(--white); border-radius:18px; padding:32px 36px; width:540px; max-width:92vw; max-height:88vh; overflow-y:auto; }
+.p5-modal-title { font-size:18px; font-weight:700; color:var(--black); margin-bottom:24px; }
+.p5-modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px 20px; }
+.p5-modal-field { display:flex; flex-direction:column; gap:6px; }
+.p5-modal-field.full { grid-column:1/-1; }
+.p5-modal-label { font-size:12px; font-weight:600; color:var(--gray-light); letter-spacing:0.3px; }
+.p5-modal-input { height:40px; padding:0 14px; border:1px solid var(--border); border-radius:8px; font-size:14px; background:var(--card-bg); color:var(--black); outline:none; font-family:'Noto Sans KR',sans-serif; transition:border-color .15s; box-sizing:border-box; width:100%; }
+.p5-modal-input:focus { border-color:var(--orange); }
+.p5-modal-select { height:40px; padding:0 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; background:var(--card-bg); color:var(--black); outline:none; cursor:pointer; width:100%; font-family:'Noto Sans KR',sans-serif; }
+.p5-modal-check { display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--black); cursor:pointer; }
+.p5-modal-check input { accent-color:var(--orange); width:15px; height:15px; cursor:pointer; flex-shrink:0; }
+.p5-modal-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:24px; padding-top:20px; border-top:1px solid var(--border); }
+.p5-modal-btn-cancel { height:40px; padding:0 22px; border:1px solid var(--border); border-radius:8px; background:transparent; color:var(--gray-dark); font-size:14px; font-weight:600; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
+.p5-modal-btn-cancel:hover { border-color:var(--gray-dark); }
+.p5-modal-btn-save { height:40px; padding:0 26px; border:none; border-radius:8px; background:var(--orange); color:#fff; font-size:14px; font-weight:700; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
+.p5-modal-btn-save:hover { background:var(--orange-light); }
+.p5-plat-row { display:flex; gap:8px; flex-wrap:wrap; }
+.p5-plat-btn { height:36px; padding:0 16px; border:1.5px solid var(--border); border-radius:20px; background:var(--card-bg); color:var(--gray-dark); font-size:13px; font-weight:600; cursor:pointer; font-family:'Noto Sans KR',sans-serif; transition:all .15s; }
+.p5-plat-btn.active { background:var(--orange); border-color:var(--orange); color:#fff; }
+.p5-input-suffix-wrap { position:relative; display:flex; align-items:center; }
+.p5-input-suffix-wrap .p5-modal-input { padding-right:28px; }
+.p5-input-suffix { position:absolute; right:12px; font-size:13px; color:var(--gray-light); pointer-events:none; }
+.p5-goal-row { display:flex; align-items:center; gap:10px; }
+.p5-goal-row .p5-modal-input { flex:1; min-width:0; }
+.p5-goal-unit { font-size:14px; color:var(--gray-light); white-space:nowrap; min-width:16px; }
+.p5-radio-group { display:flex; gap:16px; }
+.p5-date-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+/* ── 유튜브 댓글 분석기 (prefix: yca-) ── */
+.yca-wrap { background:var(--white); border-radius:14px; padding:20px; max-width:100%; color:var(--black); font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Apple SD Gothic Neo',sans-serif; margin-top:14px; }
+.yca-head-row { display:flex; align-items:baseline; gap:10px; margin-bottom:4px; }
+.yca-title { font-size:16px; font-weight:700; }
+.yca-subtitle { font-size:12px; color:var(--gray-light); margin-bottom:16px; }
+.yca-key-row { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.yca-key-label { font-size:12px; color:var(--gray-light); white-space:nowrap; min-width:48px; }
+.yca-key-row input { flex:1; height:36px; padding:0 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; font-family:monospace; background:var(--card-bg); color:var(--black); outline:none; transition:border-color .15s; }
+.yca-key-row input:focus { border-color:#aaa; }
+.yca-input-row { display:flex; gap:8px; margin-bottom:10px; }
+.yca-input-row input[type="text"] { flex:1; height:40px; padding:0 14px; border:1px solid var(--border); border-radius:8px; font-size:14px; background:var(--card-bg); color:var(--black); outline:none; transition:border-color .15s; }
+.yca-input-row input[type="text"]:focus { border-color:#aaa; }
+.yca-input-row select { height:40px; padding:0 10px; border:1px solid var(--border); border-radius:8px; font-size:13px; background:var(--card-bg); color:var(--black); outline:none; cursor:pointer; }
+.yca-btn-fetch { height:40px; padding:0 20px; font-size:14px; font-weight:600; border:none; border-radius:8px; background:var(--black); color:#fff; cursor:pointer; white-space:nowrap; transition:background .15s; }
+.yca-btn-fetch:hover { background:#333; }
+.yca-btn-fetch:disabled { background:#ccc; cursor:not-allowed; }
+.yca-status { font-size:13px; color:var(--gray-light); margin-bottom:14px; min-height:18px; }
+.yca-status.err { color:#c0392b; }
+.yca-stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+.yca-stat-card { background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+.yca-stat-label { font-size:11px; color:var(--gray-light); margin-bottom:4px; }
+.yca-stat-val { font-size:22px; font-weight:600; color:var(--black); }
+.yca-tab-row { display:flex; gap:4px; margin-bottom:14px; border-bottom:1px solid var(--border); }
+.yca-tab { font-size:14px; padding:8px 16px; border:none; background:transparent; color:var(--gray-light); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; font-weight:500; }
+.yca-tab.active { color:var(--black); border-bottom-color:var(--black); }
+.yca-panel { display:none; }
+.yca-panel.active { display:block; }
+.yca-sort-row { display:flex; gap:6px; align-items:center; margin-bottom:10px; }
+.yca-sort-row span { font-size:12px; color:var(--gray-light); }
+.yca-sort-btn { font-size:12px; padding:4px 12px; border:1px solid var(--border); border-radius:20px; background:transparent; color:var(--gray-light); cursor:pointer; }
+.yca-sort-btn.on { background:var(--black); color:#fff; border-color:var(--black); }
+.yca-comment-list { max-height:320px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; margin-bottom:16px; }
+.yca-comment-item { padding:12px 16px; border-bottom:1px solid var(--border); }
+.yca-comment-item:last-child { border-bottom:none; }
+.yca-comment-meta { display:flex; justify-content:space-between; margin-bottom:4px; }
+.yca-comment-author { font-size:12px; font-weight:600; color:var(--gray-dark); }
+.yca-comment-likes { font-size:11px; color:var(--gray-light); }
+.yca-comment-text { font-size:13px; color:var(--black); line-height:1.6; }
+.yca-btn-analyze { width:100%; height:42px; font-size:14px; font-weight:600; border:1.5px solid var(--border); border-radius:8px; background:var(--card-bg); color:var(--black); cursor:pointer; margin-bottom:16px; transition:background .15s; }
+.yca-btn-analyze:hover { background:var(--border); }
+.yca-btn-analyze:disabled { opacity:.4; cursor:not-allowed; }
+.yca-sentiment-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+.yca-sent-card { border-radius:10px; padding:14px 16px; border:1px solid var(--border); }
+.yca-sent-pos { background:#f0faf0; }
+.yca-sent-neu { background:var(--card-bg); }
+.yca-sent-neg { background:#fff5f5; }
+.yca-sent-label { font-size:11px; margin-bottom:4px; }
+.yca-sent-pos .yca-sent-label { color:#2e7d32; }
+.yca-sent-neu .yca-sent-label { color:var(--gray-light); }
+.yca-sent-neg .yca-sent-label { color:#c62828; }
+.yca-sent-val { font-size:24px; font-weight:700; }
+.yca-sent-pos .yca-sent-val { color:#2e7d32; }
+.yca-sent-neu .yca-sent-val { color:var(--black); }
+.yca-sent-neg .yca-sent-val { color:#c62828; }
+.yca-section-label { font-size:11px; font-weight:600; color:var(--gray-light); letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px; }
+.yca-keyword-grid { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+.yca-kw-tag { font-size:12px; padding:4px 12px; border-radius:20px; background:var(--card-bg); border:1px solid var(--border); color:var(--black); }
+.yca-analysis-box { border:1px solid var(--border); border-radius:10px; padding:14px 16px; background:var(--card-bg); margin-bottom:14px; }
+.yca-analysis-box p { font-size:14px; color:var(--black); line-height:1.8; white-space:pre-wrap; margin:0; }
 </style>
 </head>
 <body>
@@ -1371,21 +1475,20 @@ body.p0-active .auth-page.fullpage { background: transparent; }
 <!-- ── GNB ── -->
 <nav class="gnb">
   <div class="gnb-left">
-    <button id="nav-p0" data-fn="goTo" data-args="p0">커넥트 스튜디오</button>
-    <button id="nav-p6" data-fn="goTo" data-args="p6">서비스 안내</button>
-    <button id="nav-p7" data-fn="goTo" data-args="p7">서비스 안내 v2</button>
-    <button id="nav-p1" data-fn="goToAuth" data-args="p-login">캠페인 시작</button>
+    <button id="nav-p1" data-fn="goTo" data-args="p1">커넥트 스튜디오</button>
+    <button id="nav-p2" data-fn="goTo" data-args="p2">서비스 안내</button>
+    <button id="nav-p3" data-fn="goTo" data-args="p3">캠페인 문의하기</button>
+    <button id="nav-p7" data-fn="goTo" data-args="p7" style="display:none">서비스 안내 v2</button>
   </div>
-  <div class="gnb-logo" data-fn="goTo" data-args="p0">CRE<span>;</span>ABLE</div>
+  <div class="gnb-logo" data-fn="goTo" data-args="p1">CRE<span>;</span>ABLE</div>
   <div class="gnb-right">
-    <button class="gnb-btn-login" data-fn="goToAuth" data-args="p-login">Login</button>
-    <button class="gnb-btn-join" data-fn="goToAuth" data-args="p-signup">Join</button>
-    <button class="gnb-btn-text" data-fn="goToAuth" data-args="p-inquiry">문의하기</button>
+    <button class="gnb-btn-login" data-fn="goTo" data-args="p4">Login</button>
+    <button class="gnb-btn-join" data-fn="goToAuth" data-args="p-signup" style="display:none">Join</button>
   </div>
 </nav>
 
 <!-- ════ PAGE 0 — 서비스 소개 ════ -->
-<div class="page-wrapper" id="p0">
+<div class="page-wrapper" id="p1">
 
   <!-- 섹션1: 히어로 -->
   <div class="p0-display-hero">
@@ -1395,7 +1498,7 @@ body.p0-active .auth-page.fullpage { background: transparent; }
       <p class="p0-hero-en-sub">브랜드와 크리에이터가 연결되는 공간</p>
       <p class="p0-display-sub">숏폼 바이럴 마케팅 전문 플랫폼<br>캠페인 오픈부터 <em>성과 리포트</em>까지, 한 곳에서 관리하세요.</p>
       <div class="p0-display-btns">
-        <button class="p0-btn-start" data-fn="goToAuth" data-args="p-inquiry">캠페인 문의하기 →</button>
+        <button class="p0-btn-start" data-fn="goTo" data-args="p3">캠페인 문의하기 →</button>
         <button class="p0-btn-case" data-fn="goToAuth" data-args="p-brochure">상품소개서 요청</button>
       </div>
     </div>
@@ -1696,14 +1799,14 @@ body.p0-active .auth-page.fullpage { background: transparent; }
   <div class="p0-cta">
     <h2>쉽고 빠르게,<br><em>효과적인 광고</em>를 시작하세요</h2>
     <p>라이브 희망 일정을 공유해 주시면 일정에 맞춘 상세 안내드리겠습니다.</p>
-    <button class="p0-btn-start" data-fn="goToAuth" data-args="p-login">캠페인 시작하기 →</button>
+    <button class="p0-btn-start" data-fn="goTo" data-args="p4">캠페인 시작하기 →</button>
     <div class="p0-cta-contact">또는 직접 문의 — contact@ai-company.co.kr</div>
   </div>
 
 </div>
 
 <!-- ════ PAGE 6 — 서비스 안내 ════ -->
-<div class="page-wrapper" id="p6">
+<div class="page-wrapper" id="p2">
   <div class="page-header">
     <h1>서비스 안내</h1>
     <p>캠페인 목표에 맞는 상품을 확인하고, 전체 진행 흐름을 파악하세요</p>
@@ -1770,41 +1873,6 @@ body.p0-active .auth-page.fullpage { background: transparent; }
   <div class="notice-row">
     <span>📌</span>
     <p>콘텐츠 라이브 희망일 기준 최소 <strong>2주 전</strong> 캠페인 오픈이 필요합니다. 참여 채널 리스트 및 상세 정보는 진행 확정 이후 제공됩니다. 패키지 단위로 진행되며 개별 채널 단독 진행은 불가합니다.</p>
-  </div>
-
-  <!-- 02 진행 프로세스 -->
-  <div class="p6-section-title">캠페인은 이렇게 진행됩니다</div>
-  <div class="p6-process-flow">
-    <div class="p6-step">
-      <div class="p6-step-num">STEP 01</div>
-      <div class="p6-step-box">📋</div>
-      <div class="p6-step-title">상담 · 오픈 확정</div>
-      <div class="p6-step-desc">목표 조회수 / 영상 수<br>예산 · 일정 협의</div>
-    </div>
-    <div class="p6-step">
-      <div class="p6-step-num">STEP 02</div>
-      <div class="p6-step-box">📢</div>
-      <div class="p6-step-title">캠페인 오픈</div>
-      <div class="p6-step-desc">50K+ 크리에이터에게<br>실시간 알림 발송</div>
-    </div>
-    <div class="p6-step">
-      <div class="p6-step-num">STEP 03</div>
-      <div class="p6-step-box">✅</div>
-      <div class="p6-step-title">채널 선정</div>
-      <div class="p6-step-desc">참여 채널 확인<br>광고주 직접 선정</div>
-    </div>
-    <div class="p6-step">
-      <div class="p6-step-num">STEP 04</div>
-      <div class="p6-step-box">🎬</div>
-      <div class="p6-step-title">콘텐츠 집행</div>
-      <div class="p6-step-desc">크리에이터 라이브 배포<br>실시간 모니터링</div>
-    </div>
-    <div class="p6-step">
-      <div class="p6-step-num">STEP 05</div>
-      <div class="p6-step-box">📊</div>
-      <div class="p6-step-title">성과 리포트</div>
-      <div class="p6-step-desc">최종 조회수 · 채널 수<br>상세 리포트 제공</div>
-    </div>
   </div>
 
   <!-- 03 Work Process -->
@@ -1979,13 +2047,13 @@ body.p0-active .auth-page.fullpage { background: transparent; }
 
   <!-- CTA -->
   <div class="p6-cta-row">
-    <button class="btn-primary" data-fn="goToAuth" data-args="p-inquiry">캠페인 문의하기 →</button>
+    <button class="btn-primary" data-fn="goTo" data-args="p3">캠페인 문의하기 →</button>
     <button class="btn-secondary" data-fn="goToAuth" data-args="p-brochure">상품소개서 요청</button>
   </div>
 </div>
 
 <!-- ════ PAGE 7 — 서비스 안내 v2 (테스트) ════ -->
-<div class="page-wrapper wide" id="p7">
+<div class="page-wrapper wide" id="p7" style="display:none">
 
   <!-- 다크 히어로 -->
   <div class="p7-hero">
@@ -2050,59 +2118,12 @@ body.p0-active .auth-page.fullpage { background: transparent; }
 
   </div>
 
-  <!-- 02 진행 프로세스 -->
-  <div class="p7-block gray">
-    <div class="p7-block-title">캠페인은 이렇게 진행됩니다</div>
-    <div class="p7-process-list">
-      <div class="p7-pitem">
-        <div class="p7-pitem-num">01</div>
-        <div class="p7-pitem-content">
-          <div class="p7-pitem-title">상담 · 오픈 확정</div>
-          <div class="p7-pitem-desc">목표 조회수 / 영상 수, 예산·일정 협의 후 캠페인 오픈 확정</div>
-        </div>
-        <div class="p7-pitem-duration">D-14 이전</div>
-      </div>
-      <div class="p7-pitem">
-        <div class="p7-pitem-num">02</div>
-        <div class="p7-pitem-content">
-          <div class="p7-pitem-title">캠페인 오픈</div>
-          <div class="p7-pitem-desc">50K+ 크리에이터에게 실시간 알림 발송, 자율 신청 시작</div>
-        </div>
-        <div class="p7-pitem-duration">D-14</div>
-      </div>
-      <div class="p7-pitem">
-        <div class="p7-pitem-num">03</div>
-        <div class="p7-pitem-content">
-          <div class="p7-pitem-title">채널 선정</div>
-          <div class="p7-pitem-desc">신청 채널 확인 후 광고주 직접 선정 (프리미엄) 또는 자동 배정</div>
-        </div>
-        <div class="p7-pitem-duration">D-14 ~ D-3</div>
-      </div>
-      <div class="p7-pitem">
-        <div class="p7-pitem-num">04</div>
-        <div class="p7-pitem-content">
-          <div class="p7-pitem-title">콘텐츠 집행</div>
-          <div class="p7-pitem-desc">선정 채널 라이브 배포, 실시간 조회수·업로드 모니터링</div>
-        </div>
-        <div class="p7-pitem-duration">D-Day</div>
-      </div>
-      <div class="p7-pitem">
-        <div class="p7-pitem-num">05</div>
-        <div class="p7-pitem-content">
-          <div class="p7-pitem-title">성과 리포트</div>
-          <div class="p7-pitem-desc">최종 조회수, 참여 채널 수, 광고비 절감률 상세 리포트 제공</div>
-        </div>
-        <div class="p7-pitem-duration">D+7</div>
-      </div>
-    </div>
-  </div>
-
   <!-- CTA -->
   <div class="p7-cta-block">
     <div class="p7-cta-title">지금 바로 캠페인을 시작하세요</div>
     <div class="p7-cta-sub">영업일 기준 1일 내 담당자가 연락드립니다</div>
     <div class="p7-cta-btns">
-      <button class="btn-primary" data-fn="goToAuth" data-args="p-inquiry">캠페인 문의하기 →</button>
+      <button class="btn-primary" data-fn="goTo" data-args="p3">캠페인 문의하기 →</button>
       <button class="btn-secondary" data-fn="goToAuth" data-args="p-brochure">상품소개서 요청</button>
     </div>
   </div>
@@ -2110,9 +2131,9 @@ body.p0-active .auth-page.fullpage { background: transparent; }
 </div>
 
 <!-- ════ PAGE 1 — 상품 선택 ════ -->
-<div class="page-wrapper" id="p1">
+<div class="page-wrapper" id="p-shop">
   <div class="breadcrumb">
-    <button data-fn="goTo" data-args="p2">내 캠페인</button> / <span>캠페인 시작</span>
+    <button data-fn="goTo" data-args="p-list">내 캠페인</button> / <span>캠페인 시작</span>
   </div>
   <div class="page-header">
     <h1>상품 선택</h1>
@@ -2189,13 +2210,16 @@ body.p0-active .auth-page.fullpage { background: transparent; }
 </div>
 
 <!-- ════ PAGE 2 — 내 캠페인 ════ -->
-<div class="page-wrapper active" id="p2">
+<div class="page-wrapper" id="p-list">
   <div class="page-header-row">
     <div>
       <h1 style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;margin-bottom:4px">내 캠페인</h1>
       <p style="font-size:13px;color:var(--gray-light);font-weight:300">진행 중인 캠페인의 현황을 확인하세요</p>
     </div>
-    <button class="btn-primary" data-fn="goTo" data-args="p1">+ 새 캠페인 시작</button>
+    <div class="view-toggle">
+      <button class="view-toggle-btn active" data-fn="goTo" data-args="p-list">외부용</button>
+      <button class="view-toggle-btn" data-fn="goTo" data-args="p5">내부용</button>
+    </div>
   </div>
 
   <div class="summary-grid">
@@ -2217,7 +2241,7 @@ body.p0-active .auth-page.fullpage { background: transparent; }
   <div class="campaign-list">
 
     <!-- 완료 -->
-    <div class="campaign-card" data-fn="goTo" data-args="p5">
+    <div class="campaign-card" data-fn="goTo" data-args="p-detail">
       <div class="card-thumb">
         <img src="img/toy_story5.jpg" alt="토이 스토리 5">
       </div>
@@ -2238,12 +2262,12 @@ body.p0-active .auth-page.fullpage { background: transparent; }
         </div>
       </div>
       <div class="card-right">
-        <button class="card-btn primary" data-fn="goTo" data-args="p5" data-stop="1">상세 보기 →</button>
+        <button class="card-btn primary" data-fn="goTo" data-args="p-detail" data-stop="1">상세 보기 →</button>
       </div>
     </div>
 
     <!-- 채널 선정 -->
-    <div class="campaign-card" data-fn="goTo" data-args="p4">
+    <div class="campaign-card" data-fn="goTo" data-args="p-channels">
       <div class="card-thumb" style="background:linear-gradient(160deg,#1a0828,#3d1060)">
       </div>
       <div class="card-left">
@@ -2267,12 +2291,12 @@ body.p0-active .auth-page.fullpage { background: transparent; }
         </div>
       </div>
       <div class="card-right">
-        <button class="card-btn primary" data-fn="goTo" data-args="p4" data-stop="1">채널 선정하기 →</button>
+        <button class="card-btn primary" data-fn="goTo" data-args="p-channels" data-stop="1">채널 선정하기 →</button>
       </div>
     </div>
 
     <!-- 오픈 준비중 -->
-    <div class="campaign-card" data-fn="goTo" data-args="p5">
+    <div class="campaign-card" data-fn="goTo" data-args="p-detail">
       <div class="card-thumb" style="background:linear-gradient(160deg,#0a1628,#1a3060)">
       </div>
       <div class="card-left">
@@ -2296,18 +2320,41 @@ body.p0-active .auth-page.fullpage { background: transparent; }
         </div>
       </div>
       <div class="card-right">
-        <button class="card-btn primary" data-fn="goTo" data-args="p5" data-stop="1">상세 보기 →</button>
+        <button class="card-btn primary" data-fn="goTo" data-args="p-detail" data-stop="1">상세 보기 →</button>
       </div>
     </div>
 
   </div>
+
+</div>
+
+<!-- ════ PAGE 5 — 내 캠페인 (내부용) ════ -->
+<div class="page-wrapper" id="p5">
+  <div class="page-header-row">
+    <div>
+      <div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:4px">
+        <h1 style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;margin:0">내 캠페인</h1>
+        <span style="background:var(--orange);color:#fff;border-radius:6px;font-size:11px;font-weight:700;padding:3px 10px;letter-spacing:0.5px">내부용</span>
+      </div>
+      <p style="font-size:13px;color:var(--gray-light);font-weight:300">전체 캠페인 운영 현황 — 내부 열람 전용</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="view-toggle">
+        <button class="view-toggle-btn" data-fn="goTo" data-args="p-list">외부용</button>
+        <button class="view-toggle-btn active" data-fn="goTo" data-args="p5">내부용</button>
+      </div>
+      <button class="btn-primary" data-fn="goTo" data-args="p-shop">+ 새 캠페인 시작</button>
+    </div>
+  </div>
+
+  <div class="campaign-list" id="p5CampaignList"></div>
 </div>
 
 <!-- ════ PAGE 3 — 캠페인 정보 입력 ════ -->
-<div class="page-wrapper" id="p3">
+<div class="page-wrapper" id="p-form">
   <div class="breadcrumb">
-    <button data-fn="goTo" data-args="p2">내 캠페인</button> /
-    <button data-fn="goTo" data-args="p1">상품 선택</button> /
+    <button data-fn="goTo" data-args="p-list">내 캠페인</button> /
+    <button data-fn="goTo" data-args="p-shop">상품 선택</button> /
     <span>캠페인 정보 입력</span>
   </div>
   <div class="page-header"><h1>캠페인 정보 입력</h1><p>캠페인 진행에 필요한 정보를 입력해 주세요</p></div>
@@ -2427,7 +2474,7 @@ body.p0-active .auth-page.fullpage { background: transparent; }
             <div class="s-amount-vat">VAT 별도</div>
           </div>
           <div class="s-notice"><p>📌 라이브 희망일 기준 최소 <strong>2주 전</strong> 오픈 필요<br>참여 채널 리스트는 진행 확정 이후 제공</p></div>
-          <button data-fn="goTo" data-args="p1" style="font-size:12px;color:var(--gray-light);background:none;border:none;cursor:pointer;display:block;width:100%;text-align:center;">← 상품 변경</button>
+          <button data-fn="goTo" data-args="p-shop" style="font-size:12px;color:var(--gray-light);background:none;border:none;cursor:pointer;display:block;width:100%;text-align:center;">← 상품 변경</button>
         </div>
       </div>
     </div>
@@ -2435,8 +2482,8 @@ body.p0-active .auth-page.fullpage { background: transparent; }
 </div>
 
 <!-- ════ PAGE 4 — 채널 선정 ════ -->
-<div class="page-wrapper wide" id="p4">
-  <div class="breadcrumb"><button data-fn="goTo" data-args="p2">내 캠페인</button> / <span>시리즈 〈다 이루어질지니〉 — 채널 선정</span></div>
+<div class="page-wrapper wide" id="p-channels">
+  <div class="breadcrumb"><button data-fn="goTo" data-args="p-list">내 캠페인</button> / <span>시리즈 〈다 이루어질지니〉 — 채널 선정</span></div>
   <div class="page4-header">
     <div class="page4-header-left">
       <h1>채널 선정</h1>
@@ -2485,11 +2532,11 @@ body.p0-active .auth-page.fullpage { background: transparent; }
 </div>
 
 <!-- ════ PAGE 5 — 캠페인 상세 리포트 ════ -->
-<div class="page-wrapper" id="p5">
+<div class="page-wrapper" id="p-detail">
 
   <!-- 헤더 -->
   <div class="cd-header">
-    <button class="cd-back" data-fn="goTo" data-args="p2">
+    <button class="cd-back" data-fn="goBackToList">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
     </button>
     <div class="cd-thumb">🎬</div>
@@ -2711,10 +2758,439 @@ body.p0-active .auth-page.fullpage { background: transparent; }
 
 </div>
 
+<!-- ════ PAGE — 캠페인 상세 (내부용) ════ -->
+<div class="page-wrapper" id="p-detail-internal">
+
+  <!-- 헤더 -->
+  <div class="cd-header">
+    <button class="cd-back" data-fn="goBackToList">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+    </button>
+    <div class="cd-thumb">🎬</div>
+    <div class="cd-info">
+      <div class="cd-name-row">
+        <span class="cd-name">디즈니 &lt;토이 스토리 5&gt;</span>
+        <span class="cd-badge done">완료</span>
+        <span style="background:var(--orange);color:#fff;border-radius:6px;font-size:11px;font-weight:700;padding:3px 10px;letter-spacing:0.5px;flex-shrink:0">내부용</span>
+      </div>
+      <div class="cd-meta">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>
+        <span>유튜브</span><span>·</span><span>프리엠컴퍼니</span>
+      </div>
+    </div>
+    <div class="cd-actions">
+      <button class="cd-btn cd-btn-excel">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
+        Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- 내부 정보 바 -->
+  <div class="cd-internal-bar">
+    <div class="cd-internal-item">
+      <div class="cd-internal-lbl">클라이언트</div>
+      <div class="cd-internal-val">월트디즈니 코리아</div>
+    </div>
+    <div class="cd-internal-item">
+      <div class="cd-internal-lbl">담당 AE</div>
+      <div class="cd-internal-val">박지원</div>
+    </div>
+    <div class="cd-internal-item">
+      <div class="cd-internal-lbl">총 예산</div>
+      <div class="cd-internal-val">45,000,000원</div>
+    </div>
+    <div class="cd-internal-item">
+      <div class="cd-internal-lbl">마진율</div>
+      <div class="cd-internal-val orange">22%</div>
+    </div>
+    <div class="cd-internal-item">
+      <div class="cd-internal-lbl">마진금액</div>
+      <div class="cd-internal-val orange">9,900,000원</div>
+    </div>
+  </div>
+
+  <!-- 목표 달성 카드 -->
+  <div class="cd-achieve">
+    <div class="cd-achieve-inner">
+      <div class="cd-achieve-head">
+        <div class="cd-achieve-label">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"/><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"/><path d="M18 9h1.5a1 1 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/><path d="M6 9H4.5a1 1 0 0 1 0-5H6"/></svg>
+          조회수 목표 초과 달성!
+        </div>
+        <div class="cd-achieve-pct">🎉 115%</div>
+      </div>
+      <div class="cd-prog-wrap">
+        <div class="cd-prog-fill" style="width:100%"></div>
+        <div class="cd-prog-dot"></div>
+      </div>
+      <div class="cd-stats3">
+        <div class="cd-stat3">
+          <div class="cd-stat3-lbl">목표</div>
+          <div class="cd-stat3-val">500,000 회</div>
+        </div>
+        <div class="cd-stat3 accent">
+          <div class="cd-stat3-lbl">달성</div>
+          <div class="cd-stat3-val orange">574,260 회</div>
+        </div>
+        <div class="cd-stat3">
+          <div class="cd-stat3-lbl">초과</div>
+          <div class="cd-stat3-val">+74,260 회</div>
+        </div>
+      </div>
+      <div class="cd-achieve-period">캠페인 기간: 2026-05-26 ~ 2026-06-08</div>
+    </div>
+  </div>
+
+  <!-- 리포트 타임라인 -->
+  <div class="rpt-card">
+    <div class="rpt-card-head">
+      <span class="rpt-card-title">리포트 타임라인</span>
+    </div>
+    <div class="rpt-list">
+      <div class="rpt-vline"></div>
+      <div class="rpt-row">
+        <div class="rpt-dot amber">1</div>
+        <div class="rpt-body amber">
+          <div class="rpt-item-top">
+            <div class="rpt-item-left">
+              <div class="rpt-title-row">
+                <span class="rpt-title">1차 — 121,554 회</span>
+                <span class="rpt-pct amber">24%</span>
+              </div>
+              <div class="rpt-date">2026. 05. 29 10:00 기준 · 참여 영상 116개</div>
+              <div class="rpt-mini-prog"><div class="rpt-mini-fill amber" style="width:24%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rpt-row">
+        <div class="rpt-dot amber">2</div>
+        <div class="rpt-body amber">
+          <div class="rpt-item-top">
+            <div class="rpt-item-left">
+              <div class="rpt-title-row">
+                <span class="rpt-title">2차 — 355,305 회</span>
+                <span class="rpt-pct amber">71%</span>
+              </div>
+              <div class="rpt-date">2026. 06. 01 10:00 기준 · 참여 영상 138개</div>
+              <div class="rpt-mini-prog"><div class="rpt-mini-fill amber" style="width:71%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rpt-row">
+        <div class="rpt-dot amber">3</div>
+        <div class="rpt-body amber">
+          <div class="rpt-item-top">
+            <div class="rpt-item-left">
+              <div class="rpt-title-row">
+                <span class="rpt-title">3차 — 421,727 회</span>
+                <span class="rpt-pct amber">84%</span>
+              </div>
+              <div class="rpt-date">2026. 06. 05 기준 · 참여 영상 135개</div>
+              <div class="rpt-mini-prog"><div class="rpt-mini-fill amber" style="width:84%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rpt-row">
+        <div class="rpt-dot final">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"/><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"/><path d="M18 9h1.5a1 1 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/><path d="M6 9H4.5a1 1 0 0 1 0-5H6"/></svg>
+        </div>
+        <div class="rpt-body final">
+          <div class="rpt-item-top">
+            <div class="rpt-item-left">
+              <div class="rpt-title-row">
+                <span class="rpt-title">최종 — 574,260 회</span>
+                <span class="rpt-pct green">115%</span>
+              </div>
+              <div class="rpt-date">2026. 06. 08 10:00 기준 · 참여 영상 147개</div>
+              <div class="rpt-mini-prog"><div class="rpt-mini-fill green" style="width:100%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 참여 영상 -->
+  <div class="vid-card">
+    <div class="vid-card-head">
+      <button class="vid-toggle-btn">
+        <span>참여 영상 (147개)</span>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+    </div>
+    <div class="vid-summary-row">
+      <span>총 조회수 <strong>574,260</strong></span>
+      <span>총 좋아요 <strong>7,014</strong></span>
+      <span>총 댓글 <strong>310</strong></span>
+      <span>참여 채널 <strong>147</strong></span>
+    </div>
+    <div class="vid-table-wrap">
+      <table class="vid-table">
+        <colgroup>
+          <col style="width:74px"><col style="width:100px"><col style="width:60px">
+          <col style="width:auto"><col style="width:64px"><col style="width:64px">
+          <col style="width:54px"><col style="width:48px"><col style="width:58px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th><button class="vid-sort-btn">업로드일 ↓</button></th>
+            <th><button class="vid-sort-btn">채널명 ↕</button></th>
+            <th><button class="vid-sort-btn">구독자 ↕</button></th>
+            <th><button class="vid-sort-btn">영상 제목 ↕</button></th>
+            <th>영상 길이</th>
+            <th><button class="vid-sort-btn">조회수 ↕</button></th>
+            <th><button class="vid-sort-btn">좋아요 ↕</button></th>
+            <th><button class="vid-sort-btn">댓글 ↕</button></th>
+            <th style="text-align:center">유료광고</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>26/06/06</td>
+            <td title="NOT NORMAL">NOT NORMAL</td>
+            <td>367</td>
+            <td><a class="vid-table-link" href="#" target="_blank">망했다고요? 근데 이미 예매했어요. 나는 픽사에게 30년째 속는 중입니다. #토이스토리5</a></td>
+            <td>1분 13초</td>
+            <td>1,424</td><td>6</td><td>0</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
+          </tr>
+          <tr>
+            <td>26/06/05</td>
+            <td title="하봄">하봄</td>
+            <td>292K</td>
+            <td><a class="vid-table-link" href="#" target="_blank">[토이 스토리 5] 네일하기🤠💅🏻</a></td>
+            <td>1분 11초</td>
+            <td>97,376</td><td>1,740</td><td>37</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
+          </tr>
+          <tr>
+            <td>26/06/05</td>
+            <td title="하씨네 CINE">하씨네 CINE</td>
+            <td>210K</td>
+            <td><a class="vid-table-link" href="#" target="_blank">디테일 장인 픽사의 레전드 걸작 "토이 스토리 5" 6월 17일 극장 대개봉</a></td>
+            <td>47초</td>
+            <td>2,441</td><td>24</td><td>2</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
+          </tr>
+          <tr>
+            <td>26/06/04</td>
+            <td title="예고공식">예고공식</td>
+            <td>10.6K</td>
+            <td><a class="vid-table-link" href="#" target="_blank">첫시리즈 그땐 아이였는데, 이젠 부모가 되어 만나는 우디</a></td>
+            <td>27초</td>
+            <td>18,434</td><td>215</td><td>2</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
+          </tr>
+          <tr>
+            <td>26/06/03</td>
+            <td title="포브스튜디오">포브스튜디오</td>
+            <td>1.4M</td>
+            <td><a class="vid-table-link" href="#" target="_blank">인생 애니 귀환-토이 스토리 5</a></td>
+            <td>38초</td>
+            <td>5,950</td><td>21</td><td>3</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 유튜브 댓글 분석기 -->
+  <div class="yca-wrap">
+    <div class="yca-head-row">
+      <div class="yca-title">유튜브 댓글 분석기</div>
+    </div>
+    <div class="yca-subtitle">YouTube Data API v3로 댓글을 수집하고 AI로 요약합니다</div>
+
+
+    <div class="yca-input-row">
+      <input type="text" id="yca-urlInput" placeholder="유튜브 쇼츠 또는 영상 URL 붙여넣기">
+      <select id="yca-maxCount">
+        <option value="50">50개</option>
+        <option value="100" selected>100개</option>
+        <option value="200">200개</option>
+        <option value="500">500개</option>
+      </select>
+      <button class="yca-btn-fetch" id="yca-fetchBtn" data-fn="ycaFetchComments">수집</button>
+    </div>
+
+    <div class="yca-status" id="yca-status"></div>
+
+    <div id="yca-statsArea" style="display:none">
+      <div class="yca-stats-row">
+        <div class="yca-stat-card">
+          <div class="yca-stat-label">수집된 댓글</div>
+          <div class="yca-stat-val" id="yca-s-total">0</div>
+        </div>
+        <div class="yca-stat-card">
+          <div class="yca-stat-label">총 좋아요</div>
+          <div class="yca-stat-val" id="yca-s-likes">0</div>
+        </div>
+        <div class="yca-stat-card">
+          <div class="yca-stat-label">평균 좋아요</div>
+          <div class="yca-stat-val" id="yca-s-avg">0</div>
+        </div>
+      </div>
+
+      <div class="yca-tab-row">
+        <button class="yca-tab active" data-fn="ycaSwitchTab" data-args="yca-tab-comments">댓글 목록</button>
+        <button class="yca-tab" data-fn="ycaSwitchTab" data-args="yca-tab-analysis">AI 분석</button>
+      </div>
+
+      <div class="yca-panel active" id="yca-tab-comments">
+        <div class="yca-sort-row">
+          <span>정렬:</span>
+          <button class="yca-sort-btn on" data-fn="ycaSortComments" data-args="top">인기순</button>
+          <button class="yca-sort-btn" data-fn="ycaSortComments" data-args="new">최신순</button>
+          <button class="yca-sort-btn" data-fn="ycaSortComments" data-args="long">긴 댓글순</button>
+        </div>
+        <div class="yca-comment-list" id="yca-commentList"></div>
+      </div>
+
+      <div class="yca-panel" id="yca-tab-analysis">
+        <button class="yca-btn-analyze" id="yca-analyzeBtn" data-fn="ycaAnalyzeComments">AI로 댓글 분석하기</button>
+        <div id="yca-analysisResult" style="display:none">
+          <div class="yca-sentiment-row">
+            <div class="yca-sent-card yca-sent-pos">
+              <div class="yca-sent-label">긍정</div>
+              <div class="yca-sent-val" id="yca-a-pos">-</div>
+            </div>
+            <div class="yca-sent-card yca-sent-neu">
+              <div class="yca-sent-label">중립</div>
+              <div class="yca-sent-val" id="yca-a-neu">-</div>
+            </div>
+            <div class="yca-sent-card yca-sent-neg">
+              <div class="yca-sent-label">부정</div>
+              <div class="yca-sent-val" id="yca-a-neg">-</div>
+            </div>
+          </div>
+          <div class="yca-section-label">주요 키워드</div>
+          <div class="yca-keyword-grid" id="yca-a-keywords"></div>
+          <div class="yca-section-label">종합 요약</div>
+          <div class="yca-analysis-box"><p id="yca-a-summary"></p></div>
+          <div class="yca-section-label">인사이트 &amp; 시사점</div>
+          <div class="yca-analysis-box"><p id="yca-a-insight"></p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════ p5 캠페인 수정 모달 ════ -->
+<div class="p5-modal-overlay" id="p5EditModal">
+  <div class="p5-modal">
+    <div class="p5-modal-title">캠페인 수정</div>
+    <div class="p5-modal-grid">
+
+      <!-- 1. 캠페인명 -->
+      <div class="p5-modal-field full">
+        <label class="p5-modal-label">캠페인명</label>
+        <input class="p5-modal-input" type="text" id="p5e-title">
+      </div>
+
+      <!-- 2-1. 플랫폼 -->
+      <div class="p5-modal-field">
+        <label class="p5-modal-label">플랫폼</label>
+        <select class="p5-modal-select" id="p5e-platform">
+          <option value="yt">유튜브</option>
+          <option value="ig">인스타그램</option>
+          <option value="tt">틱톡</option>
+        </select>
+      </div>
+
+      <!-- 2-2. 캠페인 유형 -->
+      <div class="p5-modal-field">
+        <label class="p5-modal-label">캠페인 유형</label>
+        <select class="p5-modal-select" id="p5e-product">
+          <option value="조회수당">조회수당</option>
+          <option value="업로드당">업로드당</option>
+          <option value="프리미엄">프리미엄</option>
+        </select>
+      </div>
+
+      <!-- 3-1. 클라이언트 -->
+      <div class="p5-modal-field">
+        <label class="p5-modal-label">클라이언트</label>
+        <input class="p5-modal-input" type="text" id="p5e-client">
+      </div>
+
+      <!-- 3-2. 담당자 -->
+      <div class="p5-modal-field">
+        <label class="p5-modal-label">담당자</label>
+        <select class="p5-modal-select" id="p5e-assignee">
+          <option value="박건우">박건우</option>
+          <option value="김현묵">김현묵</option>
+        </select>
+      </div>
+
+      <!-- 4. 목표 -->
+      <div class="p5-modal-field full">
+        <label class="p5-modal-label">목표</label>
+        <div class="p5-goal-row">
+          <div class="p5-radio-group">
+            <label class="p5-modal-check"><input type="radio" name="p5e-goaltype" value="조회수" id="p5e-goal-views" data-change="updateP5GoalUnit"> 조회수</label>
+            <label class="p5-modal-check"><input type="radio" name="p5e-goaltype" value="영상수" id="p5e-goal-vids" data-change="updateP5GoalUnit"> 영상수</label>
+          </div>
+          <input class="p5-modal-input" type="text" id="p5e-goal-val" placeholder="500,000">
+          <span class="p5-goal-unit" id="p5e-goal-unit">회</span>
+        </div>
+      </div>
+
+      <!-- 5. 집행 금액 / 단가 -->
+      <div class="p5-modal-field">
+        <label class="p5-modal-label">집행 금액</label>
+        <div class="p5-input-suffix-wrap">
+          <input class="p5-modal-input" type="text" id="p5e-budget" placeholder="0">
+          <span class="p5-input-suffix">원</span>
+        </div>
+      </div>
+      <div class="p5-modal-field">
+        <label class="p5-modal-label" id="p5e-unitprice-label">단가 (조회당)</label>
+        <div class="p5-input-suffix-wrap">
+          <input class="p5-modal-input" type="text" id="p5e-unitprice" placeholder="0">
+          <span class="p5-input-suffix">원</span>
+        </div>
+      </div>
+
+      <!-- 6. 시작일 / 종료일 -->
+      <div class="p5-modal-field">
+        <label class="p5-modal-label">시작일</label>
+        <input class="p5-modal-input" type="date" id="p5e-start">
+      </div>
+      <div class="p5-modal-field">
+        <label class="p5-modal-label">종료일</label>
+        <input class="p5-modal-input" type="date" id="p5e-end">
+      </div>
+
+      <!-- 6. 상태 -->
+      <div class="p5-modal-field full">
+        <label class="p5-modal-label">상태</label>
+        <select class="p5-modal-select" id="p5e-status">
+          <option value="recruiting">모집 중</option>
+          <option value="channel">채널 선정 중</option>
+          <option value="ready">오픈 준비중</option>
+          <option value="active">진행 중</option>
+          <option value="done">완료</option>
+        </select>
+      </div>
+
+    </div>
+    <div class="p5-modal-footer">
+      <button class="p5-modal-btn-cancel" data-fn="closeP5Edit">취소</button>
+      <button class="p5-modal-btn-save" data-fn="saveP5Edit">저장</button>
+    </div>
+  </div>
+</div>
+
 <!-- ════ AUTH — 로그인 ════ -->
-<div class="auth-page fullpage" id="p-login">
+<div class="auth-page fullpage" id="p4">
   <div class="auth-top">
-    <div class="auth-top-logo" data-fn="goTo" data-args="p0">CRE<em>;</em>ABLE</div>
+    <div class="auth-top-logo" data-fn="goTo" data-args="p1">CRE<em>;</em>ABLE</div>
     <h2>브랜드와 크리에이터가 연결되는<br><em>광고 플랫폼</em></h2>
     <p>커넥트 스튜디오로 숏폼 바이럴 마케팅을 더 쉽고 빠르게 시작하세요.</p>
   </div>
@@ -2746,7 +3222,7 @@ body.p0-active .auth-page.fullpage { background: transparent; }
 <!-- ════ AUTH — 회원가입 ════ -->
 <div class="auth-page fullpage" id="p-signup">
   <div class="auth-top">
-    <div class="auth-top-logo" data-fn="goTo" data-args="p0">CRE<em>;</em>ABLE</div>
+    <div class="auth-top-logo" data-fn="goTo" data-args="p1">CRE<em>;</em>ABLE</div>
     <h2>지금 가입하고 첫 캠페인을<br><em>무료 상담</em>으로 시작하세요</h2>
     <p>회원가입 후 전담 플래너의 1:1 상담을 통해 최적의 캠페인을 설계해 드립니다.</p>
   </div>
@@ -2818,14 +3294,13 @@ body.p0-active .auth-page.fullpage { background: transparent; }
     </div>
     <button class="btn-auth" data-fn="doLogin">회원가입 완료</button>
     <div class="auth-footer">
-      이미 계정이 있으신가요? <button data-fn="goToAuth" data-args="p-login">로그인</button>
+      이미 계정이 있으신가요? <button data-fn="goTo" data-args="p4">로그인</button>
     </div>
   </div>
 </div>
 
 <!-- ════ INQUIRY — 캠페인 문의하기 ════ -->
-<div class="auth-page fullpage" id="p-inquiry">
-  <div class="auth-top-logo" data-fn="goTo" data-args="p0" style="margin-bottom:32px">CRE<em style="color:var(--orange);font-style:normal">;</em>ABLE</div>
+<div class="auth-page fullpage" id="p3">
   <div class="inq-wrap">
     <div class="inq-header">
       <h1>캠페인 문의하기</h1>
@@ -2933,14 +3408,14 @@ body.p0-active .auth-page.fullpage { background: transparent; }
     </div>
 
     <div style="margin-top:20px; text-align:center; font-size:12px; color:rgba(255,255,255,0.3)">
-      이미 계정이 있으신가요? <button data-fn="goToAuth" data-args="p-login" style="background:none;border:none;color:rgba(255,180,100,0.8);font-size:12px;cursor:pointer;font-family:inherit;font-weight:600">로그인</button>
+      이미 계정이 있으신가요? <button data-fn="goTo" data-args="p4" style="background:none;border:none;color:rgba(255,180,100,0.8);font-size:12px;cursor:pointer;font-family:inherit;font-weight:600">로그인</button>
     </div>
   </div>
 </div>
 
 <!-- ════ BROCHURE — 상품소개서 요청 ════ -->
 <div class="auth-page fullpage" id="p-brochure">
-  <div class="auth-top-logo" data-fn="goTo" data-args="p0" style="margin-bottom:32px">CRE<em style="color:var(--orange);font-style:normal">;</em>ABLE</div>
+  <div class="auth-top-logo" data-fn="goTo" data-args="p1" style="margin-bottom:32px">CRE<em style="color:var(--orange);font-style:normal">;</em>ABLE</div>
   <div class="inq-wrap" style="max-width:560px">
     <div class="inq-header">
       <h1>상품소개서 요청</h1>
@@ -2991,7 +3466,7 @@ body.p0-active .auth-page.fullpage { background: transparent; }
 
     <button class="inq-submit" data-fn="submitBrochure">소개서 받기 →</button>
     <div style="margin-top:16px; text-align:center; font-size:12px; color:rgba(255,255,255,0.3)">
-      캠페인 문의는 <button data-fn="goToAuth" data-args="p-inquiry" style="background:none;border:none;color:rgba(255,180,100,0.8);font-size:12px;cursor:pointer;font-family:inherit;font-weight:600">여기</button>에서
+      캠페인 문의는 <button data-fn="goTo" data-args="p3" style="background:none;border:none;color:rgba(255,180,100,0.8);font-size:12px;cursor:pointer;font-family:inherit;font-weight:600">여기</button>에서
     </div>
   </div>
 </div>

@@ -1316,6 +1316,50 @@ body.p0-active .auth-page.fullpage { background: transparent; }
   transition: all 0.2s; box-shadow: 0 4px 20px rgba(255,69,0,0.3);
 }
 .inq-submit:hover { background: var(--orange-light); transform: translateY(-1px); box-shadow: 0 6px 28px rgba(255,69,0,0.4); }
+
+/* ── Work Process ── */
+.wp-radio { display: none; }
+.wp-section { margin: 48px -40px 0; background: var(--black); padding: 52px 40px 48px; border-radius: 20px; }
+.wp-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 40px; }
+.wp-main-title { font-family: 'Bebas Neue', sans-serif; font-size: 52px; letter-spacing: 3px; color: var(--white); line-height: 1; }
+.wp-tabs { display: flex; background: rgba(255,255,255,0.07); border-radius: 9px; padding: 4px; gap: 3px; }
+.wp-tab-lbl { padding: 10px 24px; border-radius: 7px; font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.38); cursor: pointer; transition: all 0.2s; user-select: none; display: inline-block; }
+#wp-tab-ab:checked ~ .wp-header label[for="wp-tab-ab"] { background: var(--orange); color: var(--white); }
+#wp-tab-c:checked ~ .wp-header label[for="wp-tab-c"] { background: var(--orange); color: var(--white); }
+.wp-panel { display: none; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+#wp-tab-ab:checked ~ .wp-panel-ab { display: grid; }
+#wp-tab-c:checked ~ .wp-panel-c { display: grid; }
+.wp-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 32px 28px 36px; display: flex; flex-direction: column; min-height: 380px; transition: border-color 0.2s, background 0.2s; }
+.wp-card:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.15); }
+.wp-card.c-only { border-color: rgba(255,69,0,0.25); }
+.wp-card.c-only:hover { border-color: rgba(255,69,0,0.55); background: rgba(255,69,0,0.04); }
+.wp-step-badge { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 2px; color: rgba(255,255,255,0.28); background: rgba(255,255,255,0.07); border-radius: 6px; padding: 5px 11px; display: inline-block; margin-bottom: 26px; width: fit-content; }
+.wp-card.c-only .wp-step-badge { background: rgba(255,69,0,0.18); color: var(--orange); }
+.wp-card-icon { font-size: 42px; margin-bottom: 20px; line-height: 1; }
+.wp-card-title { font-size: 19px; font-weight: 900; color: var(--white); margin-bottom: 5px; letter-spacing: -0.5px; line-height: 1.3; }
+.wp-card-duration { font-size: 12px; color: rgba(255,255,255,0.25); margin-bottom: 22px; }
+.wp-card-divider { height: 1px; background: rgba(255,255,255,0.07); margin-bottom: 20px; }
+.wp-checklist { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.wp-checklist li { font-size: 13px; color: rgba(255,255,255,0.48); display: flex; align-items: flex-start; gap: 9px; line-height: 1.55; font-weight: 300; }
+.wp-checklist li::before { content: ''; width: 17px; height: 17px; min-width: 17px; border-radius: 50%; background-color: var(--orange); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'%3E%3Cpath d='M1 5l3 3.5L11 1' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-size: 9px; background-repeat: no-repeat; background-position: center; margin-top: 1px; flex-shrink: 0; }
+.wp-diff-wrap { margin-top: 40px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.08); }
+.wp-diff-label { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.55); margin-bottom: 14px; letter-spacing: 0.3px; }
+.wp-diff-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.wp-diff-card { border-radius: 16px; padding: 28px 32px; text-align: center; }
+.wp-diff-card.ab-type { background: rgba(255,69,0,0.1); border: 1px solid rgba(255,69,0,0.22); }
+.wp-diff-card.c-type { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09); }
+.wp-diff-card-title { font-size: 16px; font-weight: 900; margin-bottom: 14px; }
+.wp-diff-card.ab-type .wp-diff-card-title { color: var(--orange); }
+.wp-diff-card.c-type .wp-diff-card-title { color: var(--white); }
+.wp-diff-feats { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.wp-diff-feats li { font-size: 13px; line-height: 1.65; font-weight: 300; }
+.wp-diff-card.ab-type .wp-diff-feats li { color: rgba(255,150,80,0.85); }
+.wp-diff-card.c-type .wp-diff-feats li { color: rgba(255,255,255,0.42); }
+.wp-legend { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 20px; }
+.wp-legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: rgba(255,255,255,0.3); }
+.wp-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.wp-legend-dot.common { background: rgba(255,255,255,0.2); }
+.wp-legend-dot.c-excl { background: var(--orange); }
 </style>
 </head>
 <body>
@@ -1356,9 +1400,9 @@ body.p0-active .auth-page.fullpage { background: transparent; }
       </div>
     </div>
     <div class="p0-why-stats-grid">
-      <div class="p0-why-stat"><div class="p0-why-stat-num"><em>1,200</em>+</div><div class="p0-why-stat-lbl">누적 캠페인</div><div class="p0-why-stat-sub">2021년 이후 집행</div></div>
-      <div class="p0-why-stat"><div class="p0-why-stat-num"><em>4억</em>+</div><div class="p0-why-stat-lbl">누적 조회수</div><div class="p0-why-stat-sub">종료 후 지속 발생</div></div>
-      <div class="p0-why-stat"><div class="p0-why-stat-num"><em>50K</em>+</div><div class="p0-why-stat-lbl">파트너 채널</div><div class="p0-why-stat-sub">국내 크리에이터</div></div>
+      <div class="p0-why-stat"><div class="p0-why-stat-num"><em>150K</em>+</div><div class="p0-why-stat-lbl">크리에이터</div></div>
+      <div class="p0-why-stat"><div class="p0-why-stat-num"><em>60M</em>+</div><div class="p0-why-stat-lbl">누적 조회수</div></div>
+      <div class="p0-why-stat"><div class="p0-why-stat-num"><em>470</em>%</div><div class="p0-why-stat-lbl">재집행률</div></div>
     </div>
   </div>
 
@@ -1367,6 +1411,10 @@ body.p0-active .auth-page.fullpage { background: transparent; }
     <div class="p0-process-inner">
     <div class="p0-process-label">HOW IT WORKS</div>
     <div class="p0-process-title">광고주와 크리에이터를 연결하는 구조</div>
+    <p style="text-align:center; font-size:26px; color:#ffffff; line-height:1.7; font-weight:700; max-width:700px; margin:0 auto 52px;">
+      커넥트 스튜디오는 마케팅 대행사로 시작하여 성장의 한계를 두지 않고 끊임없이 도전하고 있습니다.<br>
+      또한 저희는 끊임없이 고객의 만족을 위해 성장할 것입니다.
+    </p>
 
     <div class="p0-process-map">
 
@@ -1757,6 +1805,176 @@ body.p0-active .auth-page.fullpage { background: transparent; }
       <div class="p6-step-title">성과 리포트</div>
       <div class="p6-step-desc">최종 조회수 · 채널 수<br>상세 리포트 제공</div>
     </div>
+  </div>
+
+  <!-- 03 Work Process -->
+  <div class="wp-section">
+    <input type="radio" id="wp-tab-ab" name="wp-tab" class="wp-radio" checked>
+    <input type="radio" id="wp-tab-c" name="wp-tab" class="wp-radio">
+
+    <div class="wp-header">
+      <div class="wp-main-title">WORK PROCESS</div>
+      <div class="wp-tabs">
+        <label for="wp-tab-ab" class="wp-tab-lbl">A · B 상품</label>
+        <label for="wp-tab-c" class="wp-tab-lbl">C 상품</label>
+      </div>
+    </div>
+
+    <!-- A·B 패널 -->
+    <div class="wp-panel wp-panel-ab">
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 1</div>
+        <div class="wp-card-icon">📋</div>
+        <div class="wp-card-title">상담 · 오픈 확정</div>
+        <div class="wp-card-duration">D-14 이전</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>목표 · 예산 · 일정 협의</li>
+          <li>캠페인 상품 선택 (A / B)</li>
+          <li>계약 및 비용 확정</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 2</div>
+        <div class="wp-card-icon">📢</div>
+        <div class="wp-card-title">캠페인 오픈 · 자율 참여</div>
+        <div class="wp-card-duration">D-14 ~ D-1</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>50K+ 크리에이터 알림 발송</li>
+          <li>크리에이터 자율 신청 · 제작</li>
+          <li>콘텐츠 가이드 전달</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 3</div>
+        <div class="wp-card-icon">🎬</div>
+        <div class="wp-card-title">영상 제작 · 업로드</div>
+        <div class="wp-card-duration">D-Day</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>크리에이터 자율 업로드</li>
+          <li>실시간 조회수 집계</li>
+          <li>실시간 모니터링</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 4</div>
+        <div class="wp-card-icon">🏆</div>
+        <div class="wp-card-title">KPI 달성 확인</div>
+        <div class="wp-card-duration">D+</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>목표 조회수 / 영상 수 도달</li>
+          <li>KPI 달성 시 자동 종료</li>
+          <li>종료 후 조회수 지속 발생</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 5</div>
+        <div class="wp-card-icon">📊</div>
+        <div class="wp-card-title">성과 리포트</div>
+        <div class="wp-card-duration">종료 후</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>최종 조회수 · 채널 수 집계</li>
+          <li>참여 영상 목록 제공</li>
+          <li>상세 결과 리포트 전달</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- C 패널 -->
+    <div class="wp-panel wp-panel-c">
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 1</div>
+        <div class="wp-card-icon">📋</div>
+        <div class="wp-card-title">상담 · 오픈 확정</div>
+        <div class="wp-card-duration">D-14 이전</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>목표 · 예산 · 일정 협의</li>
+          <li>채널 선정 기준 협의</li>
+          <li>계약 및 비용 확정</li>
+        </ul>
+      </div>
+      <div class="wp-card c-only">
+        <div class="wp-step-badge">STEP. 2</div>
+        <div class="wp-card-icon">📢</div>
+        <div class="wp-card-title">캠페인 오픈 · 크리에이터 선정</div>
+        <div class="wp-card-duration">D-14 ~ D-3 · C 상품 전용</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>크리에이터 신청 접수</li>
+          <li>광고주 직접 채널 선정</li>
+          <li>카테고리 · 규모 필터링</li>
+        </ul>
+      </div>
+      <div class="wp-card c-only">
+        <div class="wp-step-badge">STEP. 3</div>
+        <div class="wp-card-icon">🎬</div>
+        <div class="wp-card-title">영상 제작 · 검수</div>
+        <div class="wp-card-duration">D-7 ~ D-3 · C 상품 전용</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>콘텐츠 제작 가이드 전달</li>
+          <li>제작 후 광고주 검수</li>
+          <li>피드백 반영 후 확정</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 4</div>
+        <div class="wp-card-icon">🚀</div>
+        <div class="wp-card-title">일정 맞춰 배포</div>
+        <div class="wp-card-duration">D-Day</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>확정 일정에 순차 업로드</li>
+          <li>실시간 모니터링</li>
+          <li>업로드 현황 공유</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 5</div>
+        <div class="wp-card-icon">📊</div>
+        <div class="wp-card-title">성과 리포트</div>
+        <div class="wp-card-duration">종료 후</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>최종 채널 수 · 조회수 집계</li>
+          <li>참여 영상 목록 제공</li>
+          <li>상세 결과 리포트 전달</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 핵심 차이점 -->
+    <div class="wp-diff-wrap">
+      <div class="wp-diff-label">핵심 차이점</div>
+      <div class="wp-diff-grid">
+        <div class="wp-diff-card ab-type">
+          <div class="wp-diff-card-title">A · B 상품</div>
+          <ul class="wp-diff-feats">
+            <li>크리에이터가 자율적으로 참여</li>
+            <li>검수 없이 바로 업로드</li>
+            <li>빠른 집행, KPI로 성과 구분</li>
+          </ul>
+        </div>
+        <div class="wp-diff-card c-type">
+          <div class="wp-diff-card-title">C 상품</div>
+          <ul class="wp-diff-feats">
+            <li>담당자가 크리에이터 직접 선정</li>
+            <li>영상 검수 후 일정에 맞춰 업로드</li>
+            <li>높은 품질 관리, 일정 통제 가능</li>
+          </ul>
+        </div>
+      </div>
+      <div class="wp-legend">
+        <div class="wp-legend-item"><div class="wp-legend-dot common"></div>공통 단계</div>
+        <div class="wp-legend-item"><div class="wp-legend-dot c-excl"></div>C 상품 전용 단계</div>
+      </div>
+    </div>
+
   </div>
 
   <!-- CTA -->

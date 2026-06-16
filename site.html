@@ -763,6 +763,9 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
 .cd-btn-edit:hover { background:var(--gray-bg); }
 .cd-btn-excel { background:var(--orange); color:var(--white); }
 .cd-btn-excel:hover { background:var(--orange-light); }
+.card-internal-row { display:flex; gap:24px; align-items:center; padding:12px 20px; background:var(--gray-bg); border:1px solid var(--border); border-radius:10px; margin-bottom:14px; flex-wrap:wrap; }
+.card-internal-item { font-size:13px; color:var(--gray-mid); }
+.card-internal-item strong { color:var(--black); font-weight:700; margin-left:4px; }
 
 /* ─ 목표 달성 카드 ─ */
 .cd-achieve { border:1px solid rgba(255,69,0,0.25); border-radius:14px; overflow:hidden; margin-bottom:14px; background:var(--white); }
@@ -1656,9 +1659,15 @@ body.p0-active .auth-page.fullpage { background: transparent; }
 
 <!-- ════ PAGE 6 — 서비스 안내 ════ -->
 <div class="page-wrapper" id="p6">
-  <div class="page-header">
-    <h1>서비스 안내</h1>
-    <p>캠페인 목표에 맞는 상품을 확인하고, 전체 진행 흐름을 파악하세요</p>
+  <div class="p7-hero">
+    <div class="p7-hero-tag">숏폼 바이럴 마케팅</div>
+    <h2 class="p7-hero-title">브랜드의 성장 여정을<br>함께하는 캠페인 파트너</h2>
+    <p class="p7-hero-desc">크리에이터 자율 참여 방식으로 광고비를 95% 절감하고,<br>캠페인 종료 후에도 조회수가 지속 발생합니다.</p>
+    <div class="p7-hero-stats">
+      <div class="p7-hstat"><strong>1,200+</strong><span>누적 캠페인</span></div>
+      <div class="p7-hstat"><strong>4억+</strong><span>누적 조회수</span></div>
+      <div class="p7-hstat"><strong>50K+</strong><span>파트너 채널</span></div>
+    </div>
   </div>
 
   <!-- 01 상품 소개 -->
@@ -2291,6 +2300,12 @@ body.p0-active .auth-page.fullpage { background: transparent; }
         Excel
       </button>
     </div>
+  </div>
+
+  <div class="card-internal-row">
+    <span class="card-internal-item">클라이언트 <strong>월트디즈니 코리아</strong></span>
+    <span class="card-internal-item">담당자 <strong>박건우</strong></span>
+    <span class="card-internal-item">집행 금액 <strong>45,000,000원</strong></span>
   </div>
 
   <!-- 목표 달성 카드 -->

@@ -12,6 +12,8 @@
   },
   "permissions": ["tabs"],
   "host_permissions": [
-    "https://api.emailjs.com/*"
+    "https://api.emailjs.com/*",
+    "https://www.googleapis.com/*",
+    "https://api.anthropic.com/*"
   ]
 }

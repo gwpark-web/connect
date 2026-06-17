@@ -574,6 +574,11 @@ body.p0-active .p7-cta-sub { color: rgba(255,255,255,0.4); }
 .filter-tab { font-size: 12px; font-weight: 600; color: var(--gray-mid); padding: 6px 14px; border-radius: 100px; border: 1px solid var(--border); background: var(--white); cursor: pointer; transition: all 0.2s; }
 .filter-tab:hover { border-color: var(--orange); color: var(--orange); }
 .filter-tab.active { background: var(--black); color: var(--white); border-color: var(--black); }
+.p5-filter-section { margin-bottom: 20px; display: flex; flex-direction: row; gap: 12px; align-items: center; flex-wrap: wrap; }
+.p5-filter-row { display: flex; align-items: center; gap: 8px; }
+.p5-filter-label { font-size: 11px; font-weight: 700; color: var(--gray-light); letter-spacing: 0.5px; white-space: nowrap; }
+.p5-filter-select { appearance: none; -webkit-appearance: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 28px 6px 10px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; color: var(--black); background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E") no-repeat right 10px center; background-size: 10px 6px; cursor: pointer; outline: none; min-width: 120px; }
+.p5-filter-select:focus { border-color: var(--orange); }
 .search-input { padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none; transition: border-color 0.2s; margin-left: auto; }
 .search-input:focus { border-color: var(--orange); }
 .search-input::placeholder { color: var(--gray-light); }
@@ -1082,38 +1087,9 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
 .p0-process-inner { display: flex; flex-direction: column; align-items: center; flex: 1; justify-content: center; padding-bottom: 60px; }
 .p0-process-label { font-size: 11px; color: rgba(255,150,70,0.75); font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 16px; }
 .p0-process-title { font-family: 'Noto Sans KR', sans-serif; font-size: 26px; font-weight: 900; color: var(--white); letter-spacing: -0.5px; margin-bottom: 52px; }
-.p0-process-map {
-  display: flex; align-items: center; justify-content: center; gap: 0; position: relative;
-}
-.p0-pnode {
-  display: flex; flex-direction: column; align-items: center; gap: 14px; position: relative; z-index: 2;
-}
-.p0-pnode-hex {
-  width: 148px; height: 148px; position: relative; display: flex; align-items: center; justify-content: center;
-}
-.p0-pnode-hex svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.p0-pnode-inner { position: relative; z-index: 1; text-align: center; }
-.p0-pnode-en { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 2px; margin-bottom: 3px; }
-.p0-pnode-kr { font-size: 18px; font-weight: 900; letter-spacing: -0.5px; }
-.p0-pnode-desc { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.7; font-weight: 300; }
-
-/* side nodes */
-.p0-pnode.side .p0-pnode-en { color: rgba(255,255,255,0.6); }
-.p0-pnode.side .p0-pnode-kr { color: var(--white); }
-/* center node (orange) */
-.p0-pnode.center .p0-pnode-en { color: rgba(255,180,100,0.9); }
-.p0-pnode.center .p0-pnode-kr { color: var(--white); font-size: 20px; }
-
-/* connector line */
-.p0-pconnect {
-  flex: 1; max-width: 120px; display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 1;
-}
-.p0-pconnect-line {
-  width: 100%; height: 1px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,120,40,0.6), rgba(255,255,255,0.15));
-}
-.p0-pconnect-arrow { font-size: 11px; color: rgba(255,120,40,0.7); letter-spacing: 1px; font-weight: 700; }
-.p0-pconnect-lbl { font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: 1px; text-transform: uppercase; }
+/* ── p0 MINDMAP (SVG) ── */
+.p0-mindmap { width: 100%; }
+.p0-mindmap-svg { display: block; width: 100%; height: auto; }
 
 /* ── P0 FEATURE SECTION ── */
 .p0-feature-section { min-height: 100vh; margin: 0; padding: 80px 0; display: flex; flex-direction: column; justify-content: center; }
@@ -1428,6 +1404,21 @@ body.p0-active .auth-page.fullpage { background: transparent; }
 .yca-stat-label { font-size:11px; color:var(--gray-light); margin-bottom:4px; }
 .yca-stat-val { font-size:22px; font-weight:600; color:var(--black); }
 .yca-tab-row { display:flex; gap:4px; margin-bottom:14px; border-bottom:1px solid var(--border); }
+.pdp-tab-nav { display:flex; gap:4px; margin:20px 0 0; border-bottom:1px solid var(--border); }
+.pdp-tab { font-size:14px; padding:10px 18px; border:none; background:transparent; color:var(--gray-light); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; font-weight:500; }
+.pdp-tab.active { color:var(--black); border-bottom-color:var(--orange); font-weight:700; }
+.pdp-pane { display:none; padding-top:20px; }
+.pdp-pane.active { display:block; }
+.pdp-status-card { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:16px; }
+.pdp-status-row { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.pdp-status-dot { width:10px; height:10px; border-radius:50%; background:var(--orange); animation:pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.pdp-status-label { font-size:14px; font-weight:700; color:var(--black); }
+.pdp-goal-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.pdp-goal-item { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 16px; }
+.pdp-goal-lbl { font-size:11px; color:var(--gray-light); font-weight:600; letter-spacing:0.4px; margin-bottom:6px; }
+.pdp-goal-val { font-size:18px; font-weight:700; color:var(--black); }
+.pdp-goal-val.orange { color:var(--orange); }
 .yca-tab { font-size:14px; padding:8px 16px; border:none; background:transparent; color:var(--gray-light); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; font-weight:500; }
 .yca-tab.active { color:var(--black); border-bottom-color:var(--black); }
 .yca-panel { display:none; }
@@ -1513,70 +1504,107 @@ body.p0-active .auth-page.fullpage { background: transparent; }
   <div class="p0-process">
     <div class="p0-process-inner">
     <div class="p0-process-label">HOW IT WORKS</div>
-    <div class="p0-process-title">광고주와 크리에이터를 연결하는 구조</div>
-    <p style="text-align:center; font-size:26px; color:#ffffff; line-height:1.7; font-weight:700; max-width:700px; margin:0 auto 52px;">
-      커넥트 스튜디오는 마케팅 대행사로 시작하여 성장의 한계를 두지 않고 끊임없이 도전하고 있습니다.<br>
-      또한 저희는 끊임없이 고객의 만족을 위해 성장할 것입니다.
+    <div class="p0-process-title">소통, 광고 집행, 관리까지<br>전문 매니저 지원</div>
+    <p style="text-align:center; font-size:15px; color:rgba(255,255,255,0.55); line-height:1.8; font-weight:400; max-width:480px; margin:0 auto 48px;">
+      광고주 니즈에 맞는 크리에이터 섭외 및 소통<br>예산에 맞는 광고를 함께 관리합니다.
     </p>
 
-    <div class="p0-process-map">
+    <div class="p0-mindmap">
+      <svg class="p0-mindmap-svg" viewBox="0 0 860 380" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="mm-sh" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="2" stdDeviation="5" flood-opacity="0.13"/>
+          </filter>
+          <linearGradient id="mm-g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fda085"/><stop offset="100%" stop-color="#f6d365"/></linearGradient>
+          <linearGradient id="mm-g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c3a4ff"/><stop offset="100%" stop-color="#e6b8f5"/></linearGradient>
+          <linearGradient id="mm-g3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#84fab0"/><stop offset="100%" stop-color="#8fd3f4"/></linearGradient>
+          <linearGradient id="mm-g4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a0c4ff"/><stop offset="100%" stop-color="#bde0fe"/></linearGradient>
+        </defs>
 
-      <!-- 광고주 -->
-      <div class="p0-pnode side">
-        <div class="p0-pnode-hex">
-          <svg viewBox="0 0 148 148" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="74,4 140,38 140,110 74,144 8,110 8,38" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
-          </svg>
-          <div class="p0-pnode-inner">
-            <div class="p0-pnode-en">ADVERTISER</div>
-            <div class="p0-pnode-kr">광고주</div>
-          </div>
-        </div>
-        <div class="p0-pnode-desc">캠페인 목표 설정<br>예산·일정 입력</div>
-      </div>
+        <!-- 연결선 -->
+        <path d="M 200 102 C 280 102 280 190 360 190" stroke="#fdc99a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M 200 190 L 360 190"                 stroke="#fdc99a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M 166 278 C 260 278 280 190 360 190" stroke="#fdc99a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M 500 190 C 535 190 535 62  570 62"  stroke="#fdc99a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M 500 190 C 555 190 555 142 620 142" stroke="#fdc99a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M 500 190 C 535 190 535 242 570 242" stroke="#fdc99a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M 500 190 C 555 190 555 322 620 322" stroke="#fdc99a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
 
-      <!-- 연결선 좌 -->
-      <div class="p0-pconnect">
-        <div class="p0-pconnect-line"></div>
-        <div class="p0-pconnect-lbl">캠페인 오픈</div>
-      </div>
+        <!-- 말풍선 -->
+        <rect x="90" y="20" width="70" height="30" rx="8" fill="#ff6200"/>
+        <polygon points="100,46 88,60 114,52" fill="#ff6200"/>
+        <text x="125" y="41" text-anchor="middle" fill="white" font-size="16" font-weight="700" letter-spacing="3">···</text>
 
-      <!-- 커넥트 (중앙) -->
-      <div class="p0-pnode center">
-        <div class="p0-pnode-hex">
-          <svg viewBox="0 0 148 148" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="74,4 140,38 140,110 74,144 8,110 8,38" fill="rgba(255,80,0,0.22)" stroke="rgba(255,100,30,0.7)" stroke-width="1.5"/>
-            <polygon points="74,14 132,45 132,103 74,134 16,103 16,45" fill="rgba(255,80,0,0.12)" stroke="rgba(255,120,50,0.3)" stroke-width="1"/>
-          </svg>
-          <div class="p0-pnode-inner">
-            <div class="p0-pnode-en">PLATFORM</div>
-            <div class="p0-pnode-kr">커넥트</div>
-          </div>
-        </div>
-        <div class="p0-pnode-desc">자동 매칭 · 채널 선정<br>성과 리포트 제공</div>
-      </div>
+        <!-- Pill 1: 크리에이터 섭외 -->
+        <rect x="18" y="80" width="182" height="44" rx="22" fill="#ff6200" filter="url(#mm-sh)"/>
+        <circle cx="44" cy="97" r="6" fill="white" opacity="0.9"/>
+        <path d="M 36 115 a 8 8 0 0 1 16 0" stroke="white" stroke-width="1.8" fill="none" opacity="0.9"/>
+        <text x="62" y="108" fill="white" font-family="'Noto Sans KR',sans-serif" font-size="13" font-weight="600">크리에이터 섭외</text>
 
-      <!-- 연결선 우 -->
-      <div class="p0-pconnect">
-        <div class="p0-pconnect-line"></div>
-        <div class="p0-pconnect-lbl">콘텐츠 배포</div>
-      </div>
+        <!-- Pill 2: 광고 운영 -->
+        <rect x="18" y="168" width="182" height="44" rx="22" fill="white" stroke="#ff6200" stroke-width="1.5" filter="url(#mm-sh)"/>
+        <path d="M 38 183 a 7 7 0 0 1 12 5" stroke="#ff6200" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <path d="M 50 197 a 7 7 0 0 1 -12 -5" stroke="#ff6200" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <text x="68" y="196" fill="#ff6200" font-family="'Noto Sans KR',sans-serif" font-size="13" font-weight="600">광고 운영</text>
 
-      <!-- 크리에이터 -->
-      <div class="p0-pnode side">
-        <div class="p0-pnode-hex">
-          <svg viewBox="0 0 148 148" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="74,4 140,38 140,110 74,144 8,110 8,38" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
-          </svg>
-          <div class="p0-pnode-inner">
-            <div class="p0-pnode-en">CREATOR</div>
-            <div class="p0-pnode-kr">크리에이터</div>
-          </div>
-        </div>
-        <div class="p0-pnode-desc">자발적 참여·제작<br>숏폼 콘텐츠 업로드</div>
-      </div>
+        <!-- Pill 3: 계약 -->
+        <rect x="18" y="256" width="148" height="44" rx="22" fill="white" stroke="#d0d0d0" stroke-width="1.5" filter="url(#mm-sh)"/>
+        <rect x="35" y="266" width="13" height="17" rx="2" fill="none" stroke="#888" stroke-width="1.5"/>
+        <line x1="38" y1="272" x2="46" y2="272" stroke="#888" stroke-width="1"/>
+        <line x1="38" y1="276" x2="46" y2="276" stroke="#888" stroke-width="1"/>
+        <text x="58" y="284" fill="#666" font-family="'Noto Sans KR',sans-serif" font-size="13" font-weight="600">계약</text>
 
-    </div>
+        <!-- 중앙 아이콘 -->
+        <rect x="360" y="148" width="140" height="84" rx="20" fill="#ff6200" filter="url(#mm-sh)"/>
+        <text x="430" y="197" text-anchor="middle" fill="white" font-family="'Bebas Neue',sans-serif" font-size="26" letter-spacing="3">CRE<tspan fill="rgba(255,255,255,0.7)">;</tspan>ABLE</text>
+
+        <!-- 카드 1 -->
+        <rect x="570" y="34" width="160" height="56" rx="12" fill="white" filter="url(#mm-sh)"/>
+        <circle cx="594" cy="62" r="16" fill="url(#mm-g1)"/>
+        <text x="616" y="54" fill="#999" font-family="'Noto Sans KR',sans-serif" font-size="10">라이프스타일</text>
+        <text x="616" y="72" fill="#1a1a1a" font-family="'Noto Sans KR',sans-serif" font-size="13" font-weight="700">크리에이터A</text>
+
+        <!-- 카드 2 -->
+        <rect x="620" y="114" width="160" height="56" rx="12" fill="white" filter="url(#mm-sh)"/>
+        <circle cx="644" cy="142" r="16" fill="url(#mm-g2)"/>
+        <text x="666" y="134" fill="#999" font-family="'Noto Sans KR',sans-serif" font-size="10">뷰티</text>
+        <text x="666" y="152" fill="#1a1a1a" font-family="'Noto Sans KR',sans-serif" font-size="13" font-weight="700">크리에이터B</text>
+
+        <!-- 카드 3 -->
+        <rect x="570" y="214" width="160" height="56" rx="12" fill="white" filter="url(#mm-sh)"/>
+        <circle cx="594" cy="242" r="16" fill="url(#mm-g3)"/>
+        <text x="616" y="234" fill="#999" font-family="'Noto Sans KR',sans-serif" font-size="10">영화</text>
+        <text x="616" y="252" fill="#1a1a1a" font-family="'Noto Sans KR',sans-serif" font-size="13" font-weight="700">크리에이터C</text>
+
+        <!-- 카드 4 -->
+        <rect x="620" y="294" width="160" height="56" rx="12" fill="white" filter="url(#mm-sh)"/>
+        <circle cx="644" cy="322" r="16" fill="url(#mm-g4)"/>
+        <text x="666" y="314" fill="#999" font-family="'Noto Sans KR',sans-serif" font-size="10">패션</text>
+        <text x="666" y="332" fill="#1a1a1a" font-family="'Noto Sans KR',sans-serif" font-size="13" font-weight="700">크리에이터D</text>
+
+        <!-- 플랫폼 아이콘 -->
+        <circle cx="562" cy="20" r="14" fill="#03C75A"/>
+        <text x="562" y="25" text-anchor="middle" fill="white" font-family="sans-serif" font-size="13" font-weight="900">N</text>
+
+        <rect x="752" y="24" width="30" height="30" rx="8" fill="#FF0035"/>
+        <polygon points="761,30 776,39 761,48" fill="white"/>
+
+        <circle cx="820" cy="100" r="14" fill="#1877F2"/>
+        <text x="820" y="105" text-anchor="middle" fill="white" font-family="sans-serif" font-size="14">∞</text>
+
+        <circle cx="558" cy="202" r="14" fill="#010101"/>
+        <text x="558" y="208" text-anchor="middle" fill="white" font-family="sans-serif" font-size="14">♫</text>
+
+        <rect x="750" y="252" width="30" height="30" rx="8" fill="#C13584"/>
+        <rect x="754" y="256" width="22" height="22" rx="5" fill="none" stroke="white" stroke-width="2"/>
+        <circle cx="765" cy="267" r="5" fill="none" stroke="white" stroke-width="2"/>
+        <circle cx="772" cy="260" r="1.5" fill="white"/>
+
+        <rect x="808" y="278" width="32" height="22" rx="5" fill="#FF0000"/>
+        <polygon points="816,283 828,289 816,295" fill="white"/>
+      </svg>
+    </div><!-- /p0-mindmap -->
+
     </div><!-- /p0-process-inner -->
 
     <!-- 집행 사례 갤러리 (자동 스크롤) -->
@@ -2347,6 +2375,37 @@ body.p0-active .auth-page.fullpage { background: transparent; }
     </div>
   </div>
 
+  <!-- 필터 바 -->
+  <div class="p5-filter-section">
+    <div class="p5-filter-row">
+      <label class="p5-filter-label" for="p5FilterClient">클라이언트</label>
+      <select class="p5-filter-select" id="p5FilterClient" data-filter-type="client">
+        <option value="ALL">전체</option>
+        <option value="월트디즈니 코리아">월트디즈니 코리아</option>
+        <option value="카카오엔터테인먼트">카카오엔터테인먼트</option>
+        <option value="SM엔터테인먼트">SM엔터테인먼트</option>
+      </select>
+    </div>
+    <div class="p5-filter-row">
+      <label class="p5-filter-label" for="p5FilterProduct">상품</label>
+      <select class="p5-filter-select" id="p5FilterProduct" data-filter-type="product">
+        <option value="ALL">전체</option>
+        <option value="조회수당">조회수당</option>
+        <option value="업로드당">업로드당</option>
+        <option value="프리미엄">프리미엄</option>
+      </select>
+    </div>
+    <div class="p5-filter-row">
+      <label class="p5-filter-label" for="p5FilterPlatform">플랫폼</label>
+      <select class="p5-filter-select" id="p5FilterPlatform" data-filter-type="platform">
+        <option value="ALL">전체</option>
+        <option value="yt">유튜브</option>
+        <option value="ig">인스타그램</option>
+        <option value="tt">틱톡</option>
+      </select>
+    </div>
+  </div>
+
   <div class="campaign-list" id="p5CampaignList"></div>
 </div>
 
@@ -2793,20 +2852,12 @@ body.p0-active .auth-page.fullpage { background: transparent; }
       <div class="cd-internal-val">월트디즈니 코리아</div>
     </div>
     <div class="cd-internal-item">
-      <div class="cd-internal-lbl">담당 AE</div>
+      <div class="cd-internal-lbl">담당자</div>
       <div class="cd-internal-val">박지원</div>
     </div>
     <div class="cd-internal-item">
-      <div class="cd-internal-lbl">총 예산</div>
+      <div class="cd-internal-lbl">집행 금액</div>
       <div class="cd-internal-val">45,000,000원</div>
-    </div>
-    <div class="cd-internal-item">
-      <div class="cd-internal-lbl">마진율</div>
-      <div class="cd-internal-val orange">22%</div>
-    </div>
-    <div class="cd-internal-item">
-      <div class="cd-internal-lbl">마진금액</div>
-      <div class="cd-internal-val orange">9,900,000원</div>
     </div>
   </div>
 
@@ -3076,6 +3127,150 @@ body.p0-active .auth-page.fullpage { background: transparent; }
           <div class="yca-analysis-box"><p id="yca-a-insight"></p></div>
         </div>
       </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════ PAGE — 프리미엄 캠페인 상세 (탭형) ════ -->
+<div class="page-wrapper" id="p-detail-premium">
+
+  <!-- 헤더 -->
+  <div class="cd-header">
+    <button class="cd-back" data-fn="goBackToList">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+    </button>
+    <div class="cd-thumb">🎵</div>
+    <div class="cd-info">
+      <div class="cd-name-row">
+        <span class="cd-name">시리즈 〈다 이루어질지니〉</span>
+        <span class="cd-badge channel">채널 선정 중</span>
+        <span style="background:#7c3aed;color:#fff;border-radius:6px;font-size:11px;font-weight:700;padding:3px 10px;letter-spacing:0.5px;flex-shrink:0">프리미엄</span>
+        <span style="background:var(--orange);color:#fff;border-radius:6px;font-size:11px;font-weight:700;padding:3px 10px;letter-spacing:0.5px;flex-shrink:0">내부용</span>
+      </div>
+      <div class="cd-meta">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>
+        <span>유튜브</span><span>·</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#e1306c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+        <span>인스타그램</span><span>·</span><span>카카오엔터테인먼트</span>
+      </div>
+    </div>
+    <div class="cd-actions">
+      <button class="cd-btn cd-btn-excel">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
+        Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- 내부 정보 바 -->
+  <div class="cd-internal-bar">
+    <div class="cd-internal-item">
+      <div class="cd-internal-lbl">클라이언트</div>
+      <div class="cd-internal-val">카카오엔터테인먼트</div>
+    </div>
+    <div class="cd-internal-item">
+      <div class="cd-internal-lbl">담당자</div>
+      <div class="cd-internal-val">김현묵</div>
+    </div>
+    <div class="cd-internal-item">
+      <div class="cd-internal-lbl">집행 금액</div>
+      <div class="cd-internal-val">32,000,000원</div>
+    </div>
+  </div>
+
+  <!-- 탭 네비게이션 -->
+  <div class="pdp-tab-nav">
+    <button class="pdp-tab active" data-fn="switchPremiumTab" data-args="1">캠페인 개요</button>
+    <button class="pdp-tab" data-fn="switchPremiumTab" data-args="2">채널 선정</button>
+  </div>
+
+  <!-- ── 탭 1: 캠페인 개요 ── -->
+  <div class="pdp-pane active" id="pdp-pane-1">
+
+    <div class="pdp-status-card">
+      <div class="pdp-status-row">
+        <div class="pdp-status-dot"></div>
+        <span class="pdp-status-label">채널 선정 진행 중 — 최종 30개 선정 완료 후 라이브 예정</span>
+      </div>
+      <div class="pdp-goal-grid">
+        <div class="pdp-goal-item">
+          <div class="pdp-goal-lbl">캠페인 기간</div>
+          <div class="pdp-goal-val" style="font-size:14px">2026.05.01 ~ 06.30</div>
+        </div>
+        <div class="pdp-goal-item">
+          <div class="pdp-goal-lbl">조회수 목표</div>
+          <div class="pdp-goal-val orange">300,000 회</div>
+        </div>
+        <div class="pdp-goal-item">
+          <div class="pdp-goal-lbl">선정 채널 목표</div>
+          <div class="pdp-goal-val">30 개</div>
+        </div>
+        <div class="pdp-goal-item">
+          <div class="pdp-goal-lbl">참여 신청</div>
+          <div class="pdp-goal-val">142 개</div>
+        </div>
+        <div class="pdp-goal-item">
+          <div class="pdp-goal-lbl">라이브 희망일</div>
+          <div class="pdp-goal-val" style="font-size:14px">2026.06.14</div>
+        </div>
+        <div class="pdp-goal-item">
+          <div class="pdp-goal-lbl">모집 기간</div>
+          <div class="pdp-goal-val" style="font-size:14px">05.04 ~ 05.06</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rpt-card">
+      <div class="rpt-card-head"><span class="rpt-card-title">리포트 타임라인</span></div>
+      <div style="padding:40px;text-align:center;color:var(--gray-light);font-size:13px">
+        캠페인 라이브 이후 리포트가 업데이트됩니다.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 탭 2: 채널 선정 ── -->
+  <div class="pdp-pane" id="pdp-pane-2">
+    <div class="page4-header" style="padding:0 0 16px">
+      <div class="page4-header-left">
+        <p style="margin:0;font-size:13px;color:var(--gray-light)">최종 30개를 선정해 주세요</p>
+      </div>
+      <div class="counter-box">
+        <div class="counter-num" id="pdpCNum">0 / 30</div>
+        <div class="counter-label">선정된 채널</div>
+      </div>
+    </div>
+    <div class="info-bar">
+      <div class="info-bar-item">상품 <strong>커넥트 (프리미엄)</strong></div>
+      <div class="info-bar-item">모집 기간 <strong>25.05.04 ~ 05.06</strong></div>
+      <div class="info-bar-item">참여 신청 <strong class="orange">142개</strong></div>
+      <div class="info-bar-item">선정 목표 <strong>30개</strong></div>
+      <div class="info-bar-item">라이브 희망일 <strong>25.06.14</strong></div>
+    </div>
+    <div class="filter-row">
+      <input class="search-input" style="margin-left:0;width:200px" type="text" placeholder="채널명 검색">
+      <select class="filter-select"><option>전체 카테고리</option><option>엔터테인먼트</option><option>커뮤니티·썰</option><option>음악</option><option>패션·뷰티</option></select>
+      <select class="filter-select"><option>전체 플랫폼</option><option>유튜브 쇼츠</option><option>인스타그램 릴스</option><option>틱톡</option></select>
+      <select class="filter-select"><option>전체 규모</option><option>10만 이상</option><option>5만~10만</option><option>1만~5만</option><option>1만 미만</option></select>
+      <span class="result-count">142개 채널</span>
+      <select class="sort-select"><option>구독자 많은 순</option><option>조회수 많은 순</option><option>참여율 높은 순</option></select>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:28px">#</th>
+            <th>채널 정보</th>
+            <th class="c">카테고리</th>
+            <th class="c">플랫폼</th>
+            <th class="c">구독자</th>
+            <th class="c">평균 조회수</th>
+            <th class="c">참여율</th>
+            <th class="c">선정</th>
+          </tr>
+        </thead>
+        <tbody id="pdpChTable"></tbody>
+      </table>
     </div>
   </div>
 

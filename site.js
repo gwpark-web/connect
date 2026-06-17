@@ -1,7 +1,7 @@
 try { emailjs.init('PR1yiM-fDVGYx5wCo'); } catch(e) { console.warn('EmailJS init failed', e); }
 
 // ── ROUTING ──
-const pages = ['p1','p2','p3','p4','p5','p-shop','p-list','p-form','p-channels','p-detail','p-detail-internal','p7'];
+const pages = ['p1','p2','p3','p4','p5','p-shop','p-list','p-form','p-channels','p-detail','p-detail-internal','p-detail-premium','p7'];
 const authPages = ['p-signup','p-brochure'];
 const navMap = { p1:'nav-p1', p2:'nav-p2', p3:'nav-p3', p7:'nav-p7' };
 const ctaPages = ['p-shop','p-form','p-channels'];
@@ -11,7 +11,7 @@ let campaignOrigin = 'p-list';
 function goBackToList() { goTo(campaignOrigin); }
 
 function goTo(id) {
-  if (id === 'p-detail' || id === 'p-detail-internal') {
+  if (id === 'p-detail' || id === 'p-detail-internal' || id === 'p-detail-premium') {
     const cur = pages.find(p => document.getElementById(p)?.classList.contains('active'));
     if (cur === 'p5' || cur === 'p-list') campaignOrigin = cur;
   }
@@ -31,7 +31,8 @@ function goTo(id) {
     bar.classList.remove('visible');
   }
 
-  if (id === 'p-channels') renderChannels();
+  if (id === 'p-channels') renderChannels('chTable');
+  if (id === 'p-detail-premium') renderChannels('pdpChTable');
 }
 
 function goToAuth(id) {
@@ -96,8 +97,9 @@ const channels = [
 ];
 let selected4 = new Set();
 
-function renderChannels() {
-  const tbody = document.getElementById('chTable');
+function renderChannels(tbodyId = 'chTable') {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
   tbody.innerHTML = channels.map((ch, i) => `
     <tr class="${selected4.has(i)?'sel-row':''}" id="tr${i}">
       <td style="color:var(--gray-light);font-size:12px;text-align:center">${i+1}</td>
@@ -115,8 +117,13 @@ function renderChannels() {
 function toggleCh(i) {
   if (selected4.has(i)) { selected4.delete(i); }
   else { if (selected4.size >= 30) { alert('최대 30개까지 선정 가능합니다.'); return; } selected4.add(i); }
-  renderChannels();
-  document.getElementById('cNum').textContent = `${selected4.size} / 30`;
+  renderChannels('chTable');
+  renderChannels('pdpChTable');
+  const cnt = `${selected4.size} / 30`;
+  const cNum = document.getElementById('cNum');
+  const pdpCNum = document.getElementById('pdpCNum');
+  if (cNum) cNum.textContent = cnt;
+  if (pdpCNum) pdpCNum.textContent = cnt;
   updateCta('p-channels');
 }
 
@@ -222,25 +229,43 @@ const P5_SVG = {
 const P5_PLATFORM_LABEL = { yt:'유튜브 쇼츠', ig:'인스타그램 릴스', tt:'틱톡' };
 const P5_STATUS_LABEL   = { recruiting:'모집 중', channel:'채널 선정 중', ready:'오픈 준비중', active:'진행 중', done:'완료' };
 
+const p5Filter = { client: 'ALL', product: 'ALL', platform: 'ALL' };
+
+function switchPremiumTab(tab) {
+  document.querySelectorAll('.pdp-tab').forEach((el, i) => el.classList.toggle('active', String(i+1) === String(tab)));
+  document.querySelectorAll('.pdp-pane').forEach((el, i) => el.classList.toggle('active', String(i+1) === String(tab)));
+  if (String(tab) === '2') renderChannels('pdpChTable');
+}
+
+function setP5Filter(type, value) {
+  p5Filter[type] = value;
+  renderP5();
+}
+
 let p5Campaigns = [
   { title:'영화 〈토이 스토리 5〉',              product:'조회수당', status:'done',    thumb:'img/toy_story5.jpg', thumbBg:'',                                           platforms:['yt'],      goalType:'조회수', goalValue:'500000', client:'월트디즈니 코리아',  assignee:'박건우', startDate:'2026-05-26', endDate:'2026-06-08', budget:'45000000', unitPrice:'90',    detailPage:'p-detail-internal' },
-  { title:'시리즈 〈다 이루어질지니〉',            product:'프리미엄', status:'channel', thumb:'',                   thumbBg:'background:linear-gradient(160deg,#1a0828,#3d1060)', platforms:['yt','ig'], goalType:'조회수', goalValue:'300000', client:'카카오엔터테인먼트', assignee:'김현묵', startDate:'2026-05-01', endDate:'2026-06-30', budget:'32000000', unitPrice:'0',     detailPage:'p-channels'        },
+  { title:'시리즈 〈다 이루어질지니〉',            product:'프리미엄', status:'channel', thumb:'',                   thumbBg:'background:linear-gradient(160deg,#1a0828,#3d1060)', platforms:['yt','ig'], goalType:'조회수', goalValue:'300000', client:'카카오엔터테인먼트', assignee:'김현묵', startDate:'2026-05-01', endDate:'2026-06-30', budget:'32000000', unitPrice:'0',     detailPage:'p-detail-premium'  },
   { title:'EPEX — UNIVERSE 음원 바이럴 캠페인',  product:'업로드당', status:'ready',   thumb:'',                   thumbBg:'background:linear-gradient(160deg,#0a1628,#1a3060)', platforms:['yt','tt'], goalType:'영상수', goalValue:'2500',   client:'SM엔터테인먼트',      assignee:'박건우', startDate:'2026-06-15', endDate:'2026-07-15', budget:'18000000', unitPrice:'7200',  detailPage:'p-detail-internal' }
 ];
 
 function renderP5() {
   const list = document.getElementById('p5CampaignList');
   if (!list) return;
-  list.innerHTML = p5Campaigns.map((c, i) => {
+  const filtered = p5Campaigns.filter(c =>
+    (p5Filter.client  === 'ALL' || c.client  === p5Filter.client) &&
+    (p5Filter.product === 'ALL' || c.product === p5Filter.product) &&
+    (p5Filter.platform === 'ALL' || c.platforms.includes(p5Filter.platform))
+  );
+  if (!filtered.length) { list.innerHTML = '<div style="padding:40px;text-align:center;color:var(--gray-light);font-size:13px">조건에 맞는 캠페인이 없습니다.</div>'; return; }
+  list.innerHTML = filtered.map((c, i) => {
+    const i_orig = p5Campaigns.indexOf(c);
     const thumbHtml = c.thumb ? `<img src="${c.thumb}" alt="${c.title}">` : '';
     const thumbAttr = c.thumbBg ? ` style="${c.thumbBg}"` : '';
     const badges    = c.platforms.map(p => `<span class="platform-badge ${p}">${P5_SVG[p]} ${P5_PLATFORM_LABEL[p]}</span>`).join('');
     const goalStr   = Number(c.goalValue).toLocaleString() + (c.goalType === '조회수' ? '회' : '개');
     const budgetFmt = Number(c.budget).toLocaleString();
     const marginAmt = Math.round(Number(c.budget) * Number(c.margin) / 100).toLocaleString();
-    const actionBtn = c.detailPage === 'p-channels'
-      ? `<button class="card-btn primary" data-fn="goTo" data-args="p-channels" data-stop="1">채널 선정하기 →</button>`
-      : `<button class="card-btn primary" data-fn="goTo" data-args="p-detail-internal" data-stop="1">상세 보기 →</button>`;
+    const actionBtn = `<button class="card-btn primary" data-fn="goTo" data-args="${c.detailPage}" data-stop="1">상세 보기 →</button>`;
     return `
       <div class="campaign-card" data-fn="goTo" data-args="${c.detailPage}">
         <div class="card-thumb"${thumbAttr}>${thumbHtml}</div>
@@ -256,13 +281,12 @@ function renderP5() {
           </div>
           <div class="card-internal-row">
             <span class="card-internal-item">클라이언트 <strong>${c.client}</strong></span>
-            <span class="card-internal-item">담당 <strong>${c.assignee}</strong></span>
-            <span class="card-internal-item">예산 <strong>${budgetFmt}원</strong></span>
-            <span class="card-internal-item">마진 <strong style="color:var(--orange)">${c.margin}%</strong> <span style="color:var(--gray-light);font-size:11px">(${marginAmt}원)</span></span>
+            <span class="card-internal-item">담당자 <strong>${c.assignee}</strong></span>
+            <span class="card-internal-item">집행 금액 <strong>${budgetFmt}원</strong></span>
           </div>
         </div>
         <div class="card-right">
-          <button class="card-btn secondary" data-fn="openP5Edit" data-args="${i}" data-stop="1">수정</button>
+          <button class="card-btn secondary" data-fn="openP5Edit" data-args="${i_orig}" data-stop="1">수정</button>
           ${actionBtn}
         </div>
       </div>`;
@@ -516,9 +540,15 @@ document.body.classList.add('p0-active');
     goTo, goToAuth, goBackToList, doLogin, handleCta,
     selectProduct, toggleCh,
     submitInquiry, submitBrochure,
-    openP5Edit, closeP5Edit, saveP5Edit,
+    openP5Edit, closeP5Edit, saveP5Edit, setP5Filter, switchPremiumTab,
     ycaFetchComments, ycaSortComments, ycaSwitchTab, ycaAnalyzeComments
   };
+
+  document.addEventListener('change', function(e) {
+    const el = e.target.closest('select[data-filter-type]');
+    if (!el) return;
+    setP5Filter(el.dataset.filterType, el.value);
+  });
 
   document.addEventListener('click', function(e) {
     const el = e.target.closest('[data-fn],[data-toggle],[data-fileinput]');

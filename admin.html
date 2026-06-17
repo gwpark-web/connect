@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>커넥트 스튜디오 — 운영자</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- ── 운영자 상단 바 ── -->
+<nav class="gnb">
+  <div class="gnb-left"></div>
+  <div class="gnb-logo" data-fn="goTo" data-args="p5">CRE<span>;</span>ABLE <span style="font-size:11px;color:var(--gray-light);font-weight:400;letter-spacing:0;margin-left:6px;vertical-align:middle">운영자</span></div>
+  <div class="gnb-right"></div>
+</nav>
+
+<!-- ════ PAGE 5 — 내 캠페인 (내부용) ════ -->
+<div class="page-wrapper" id="p5">
+  <div class="page-header-row">
+    <div>
+      <div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:4px">
+        <h1 style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;margin:0">내 캠페인</h1>
+        <span style="background:var(--orange);color:#fff;border-radius:6px;font-size:11px;font-weight:700;padding:3px 10px;letter-spacing:0.5px">내부용</span>
+      </div>
+      <p style="font-size:13px;color:var(--gray-light);font-weight:300">전체 캠페인 운영 현황 — 내부 열람 전용</p>
+    </div>
+  </div>
+
+  <!-- 필터 바 -->
+  <div class="p5-filter-section">
+    <div class="p5-filter-row">
+      <label class="p5-filter-label" for="p5FilterClient">클라이언트</label>
+      <select class="p5-filter-select" id="p5FilterClient" data-filter-type="client">
+        <option value="ALL">전체</option>
+        <option value="월트디즈니 코리아">월트디즈니 코리아</option>
+        <option value="카카오엔터테인먼트">카카오엔터테인먼트</option>
+        <option value="SM엔터테인먼트">SM엔터테인먼트</option>
+      </select>
+    </div>
+    <div class="p5-filter-row">
+      <label class="p5-filter-label" for="p5FilterProduct">상품</label>
+      <select class="p5-filter-select" id="p5FilterProduct" data-filter-type="product">
+        <option value="ALL">전체</option>
+        <option value="조회수당">조회수당</option>
+        <option value="업로드당">업로드당</option>
+        <option value="프리미엄">프리미엄</option>
+      </select>
+    </div>
+    <div class="p5-filter-row">
+      <label class="p5-filter-label" for="p5FilterPlatform">플랫폼</label>
+      <select class="p5-filter-select" id="p5FilterPlatform" data-filter-type="platform">
+        <option value="ALL">전체</option>
+        <option value="yt">유튜브</option>
+        <option value="ig">인스타그램</option>
+        <option value="tt">틱톡</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="campaign-list" id="p5CampaignList"></div>
+</div>
+
+<!-- ════ PAGE — 캠페인 상세 (내부용) ════ -->
+<div class="page-wrapper" id="p-detail-internal">
+
+  <!-- 헤더 -->
+  <div class="cd-header">
+    <button class="cd-back" data-fn="goBackToList">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+    </button>
+    <div class="cd-thumb">🎬</div>
+    <div class="cd-info">
+      <div class="cd-name-row">
+        <span class="cd-name">디즈니 &lt;토이 스토리 5&gt;</span>
+        <span class="cd-badge done">완료</span>
+        <span style="background:var(--orange);color:#fff;border-radius:6px;font-size:11px;font-weight:700;padding:3px 10px;letter-spacing:0.5px;flex-shrink:0">내부용</span>
+      </div>
+      <div class="cd-meta">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>
+        <span>유튜브</span><span>·</span><span>프리엠컴퍼니</span>
+      </div>
+    </div>
+    <div class="cd-actions">
+      <button class="cd-btn cd-btn-excel">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
+        Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- 내부 정보 바 -->
+  <div class="cd-internal-bar">
+    <div class="cd-internal-item">
+      <div class="cd-internal-lbl">클라이언트</div>
+      <div class="cd-internal-val">월트디즈니 코리아</div>
+    </div>
+    <div class="cd-internal-item">
+      <div class="cd-internal-lbl">담당자</div>
+      <div class="cd-internal-val">박지원</div>
+    </div>
+    <div class="cd-internal-item">
+      <div class="cd-internal-lbl">집행 금액</div>
+      <div class="cd-internal-val">45,000,000원</div>
+    </div>
+  </div>
+
+  <!-- 목표 달성 카드 -->
+  <div class="cd-achieve">
+    <div class="cd-achieve-inner">
+      <div class="cd-achieve-head">
+        <div class="cd-achieve-label">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"/><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"/><path d="M18 9h1.5a1 1 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/><path d="M6 9H4.5a1 1 0 0 1 0-5H6"/></svg>
+          조회수 목표 초과 달성!
+        </div>
+        <div class="cd-achieve-pct">🎉 115%</div>
+      </div>
+      <div class="cd-prog-wrap">
+        <div class="cd-prog-fill" style="width:100%"></div>
+        <div class="cd-prog-dot"></div>
+      </div>
+      <div class="cd-stats3">
+        <div class="cd-stat3">
+          <div class="cd-stat3-lbl">목표</div>
+          <div class="cd-stat3-val">500,000 회</div>
+        </div>
+        <div class="cd-stat3 accent">
+          <div class="cd-stat3-lbl">달성</div>
+          <div class="cd-stat3-val orange">574,260 회</div>
+        </div>
+        <div class="cd-stat3">
+          <div class="cd-stat3-lbl">초과</div>
+          <div class="cd-stat3-val">+74,260 회</div>
+        </div>
+      </div>
+      <div class="cd-achieve-period">캠페인 기간: 2026-05-26 ~ 2026-06-08</div>
+    </div>
+  </div>
+
+  <!-- 리포트 타임라인 -->
+  <div class="rpt-card">
+    <div class="rpt-card-head">
+      <span class="rpt-card-title">리포트 타임라인</span>
+    </div>
+    <div class="rpt-list">
+      <div class="rpt-vline"></div>
+      <div class="rpt-row">
+        <div class="rpt-dot amber">1</div>
+        <div class="rpt-body amber">
+          <div class="rpt-item-top">
+            <div class="rpt-item-left">
+              <div class="rpt-title-row">
+                <span class="rpt-title">1차 — 121,554 회</span>
+                <span class="rpt-pct amber">24%</span>
+              </div>
+              <div class="rpt-date">2026. 05. 29 10:00 기준 · 참여 영상 116개</div>
+              <div class="rpt-mini-prog"><div class="rpt-mini-fill amber" style="width:24%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rpt-row">
+        <div class="rpt-dot amber">2</div>
+        <div class="rpt-body amber">
+          <div class="rpt-item-top">
+            <div class="rpt-item-left">
+              <div class="rpt-title-row">
+                <span class="rpt-title">2차 — 355,305 회</span>
+                <span class="rpt-pct amber">71%</span>
+              </div>
+              <div class="rpt-date">2026. 06. 01 10:00 기준 · 참여 영상 138개</div>
+              <div class="rpt-mini-prog"><div class="rpt-mini-fill amber" style="width:71%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rpt-row">
+        <div class="rpt-dot amber">3</div>
+        <div class="rpt-body amber">
+          <div class="rpt-item-top">
+            <div class="rpt-item-left">
+              <div class="rpt-title-row">
+                <span class="rpt-title">3차 — 421,727 회</span>
+                <span class="rpt-pct amber">84%</span>
+              </div>
+              <div class="rpt-date">2026. 06. 05 기준 · 참여 영상 135개</div>
+              <div class="rpt-mini-prog"><div class="rpt-mini-fill amber" style="width:84%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rpt-row">
+        <div class="rpt-dot final">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"/><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"/><path d="M18 9h1.5a1 1 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/><path d="M6 9H4.5a1 1 0 0 1 0-5H6"/></svg>
+        </div>
+        <div class="rpt-body final">
+          <div class="rpt-item-top">
+            <div class="rpt-item-left">
+              <div class="rpt-title-row">
+                <span class="rpt-title">최종 — 574,260 회</span>
+                <span class="rpt-pct green">115%</span>
+              </div>
+              <div class="rpt-date">2026. 06. 08 10:00 기준 · 참여 영상 147개</div>
+              <div class="rpt-mini-prog"><div class="rpt-mini-fill green" style="width:100%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 참여 영상 -->
+  <div class="vid-card">
+    <div class="vid-card-head">
+      <button class="vid-toggle-btn">
+        <span>참여 영상 (147개)</span>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+    </div>
+    <div class="vid-summary-row">
+      <span>총 조회수 <strong>574,260</strong></span>
+      <span>총 좋아요 <strong>7,014</strong></span>
+      <span>총 댓글 <strong>310</strong></span>
+      <span>참여 채널 <strong>147</strong></span>
+    </div>
+    <div class="vid-table-wrap">
+      <table class="vid-table">
+        <colgroup>
+          <col style="width:74px"><col style="width:100px"><col style="width:60px">
+          <col style="width:auto"><col style="width:64px"><col style="width:64px">
+          <col style="width:54px"><col style="width:48px"><col style="width:58px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th><button class="vid-sort-btn">업로드일 ↓</button></th>
+            <th><button class="vid-sort-btn">채널명 ↕</button></th>
+            <th><button class="vid-sort-btn">구독자 ↕</button></th>
+            <th><button class="vid-sort-btn">영상 제목 ↕</button></th>
+            <th>영상 길이</th>
+            <th><button class="vid-sort-btn">조회수 ↕</button></th>
+            <th><button class="vid-sort-btn">좋아요 ↕</button></th>
+            <th><button class="vid-sort-btn">댓글 ↕</button></th>
+            <th style="text-align:center">유료광고</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>26/06/06</td>
+            <td title="NOT NORMAL">NOT NORMAL</td>
+            <td>367</td>
+            <td><a class="vid-table-link" href="#" target="_blank">망했다고요? 근데 이미 예매했어요. 나는 픽사에게 30년째 속는 중입니다. #토이스토리5</a></td>
+            <td>1분 13초</td>
+            <td>1,424</td><td>6</td><td>0</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
+          </tr>
+          <tr>
+            <td>26/06/05</td>
+            <td title="하봄">하봄</td>
+            <td>292K</td>
+            <td><a class="vid-table-link" href="#" target="_blank">[토이 스토리 5] 네일하기🤠💅🏻</a></td>
+            <td>1분 11초</td>
+            <td>97,376</td><td>1,740</td><td>37</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
+          </tr>
+          <tr>
+            <td>26/06/05</td>
+            <td title="하씨네 CINE">하씨네 CINE</td>
+            <td>210K</td>
+            <td><a class="vid-table-link" href="#" target="_blank">디테일 장인 픽사의 레전드 걸작 "토이 스토리 5" 6월 17일 극장 대개봉</a></td>
+            <td>47초</td>
+            <td>2,441</td><td>24</td><td>2</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
+          </tr>
+          <tr>
+            <td>26/06/04</td>
+            <td title="예고공식">예고공식</td>
+            <td>10.6K</td>
+            <td><a class="vid-table-link" href="#" target="_blank">첫시리즈 그땐 아이였는데, 이젠 부모가 되어 만나는 우디</a></td>
+            <td>27초</td>
+            <td>18,434</td><td>215</td><td>2</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
+          </tr>
+          <tr>
+            <td>26/06/03</td>
+            <td title="포브스튜디오">포브스튜디오</td>
+            <td>1.4M</td>
+            <td><a class="vid-table-link" href="#" target="_blank">인생 애니 귀환-토이 스토리 5</a></td>
+            <td>38초</td>
+            <td>5,950</td><td>21</td><td>3</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 유튜브 댓글 분석기 -->
+  <div class="yca-wrap">
+    <div class="yca-head-row">
+      <div class="yca-title">유튜브 댓글 분석기</div>
+    </div>
+    <div class="yca-subtitle">YouTube Data API v3로 댓글을 수집하고 AI로 요약합니다</div>
+
+
+    <div class="yca-input-row">
+      <input type="text" id="yca-urlInput" placeholder="유튜브 쇼츠 또는 영상 URL 붙여넣기">
+      <select id="yca-maxCount">
+        <option value="50">50개</option>
+        <option value="100" selected>100개</option>
+        <option value="200">200개</option>
+        <option value="500">500개</option>
+      </select>
+      <button class="yca-btn-fetch" id="yca-fetchBtn" data-fn="ycaFetchComments">수집</button>
+    </div>
+
+    <div class="yca-status" id="yca-status"></div>
+
+    <div id="yca-statsArea" style="display:none">
+      <div class="yca-stats-row">
+        <div class="yca-stat-card">
+          <div class="yca-stat-label">수집된 댓글</div>
+          <div class="yca-stat-val" id="yca-s-total">0</div>
+        </div>
+        <div class="yca-stat-card">
+          <div class="yca-stat-label">총 좋아요</div>
+          <div class="yca-stat-val" id="yca-s-likes">0</div>
+        </div>
+        <div class="yca-stat-card">
+          <div class="yca-stat-label">평균 좋아요</div>
+          <div class="yca-stat-val" id="yca-s-avg">0</div>
+        </div>
+      </div>
+
+      <div class="yca-tab-row">
+        <button class="yca-tab active" data-fn="ycaSwitchTab" data-args="yca-tab-comments">댓글 목록</button>
+        <button class="yca-tab" data-fn="ycaSwitchTab" data-args="yca-tab-analysis">AI 분석</button>
+      </div>
+
+      <div class="yca-panel active" id="yca-tab-comments">
+        <div class="yca-sort-row">
+          <span>정렬:</span>
+          <button class="yca-sort-btn on" data-fn="ycaSortComments" data-args="top">인기순</button>
+          <button class="yca-sort-btn" data-fn="ycaSortComments" data-args="new">최신순</button>
+          <button class="yca-sort-btn" data-fn="ycaSortComments" data-args="long">긴 댓글순</button>
+        </div>
+        <div class="yca-comment-list" id="yca-commentList"></div>
+      </div>
+
+      <div class="yca-panel" id="yca-tab-analysis">
+        <button class="yca-btn-analyze" id="yca-analyzeBtn" data-fn="ycaAnalyzeComments">AI로 댓글 분석하기</button>
+        <div id="yca-analysisResult" style="display:none">
+          <div class="yca-sentiment-row">
+            <div class="yca-sent-card yca-sent-pos">
+              <div class="yca-sent-label">긍정</div>
+              <div class="yca-sent-val" id="yca-a-pos">-</div>
+            </div>
+            <div class="yca-sent-card yca-sent-neu">
+              <div class="yca-sent-label">중립</div>
+              <div class="yca-sent-val" id="yca-a-neu">-</div>
+            </div>
+            <div class="yca-sent-card yca-sent-neg">
+              <div class="yca-sent-label">부정</div>
+              <div class="yca-sent-val" id="yca-a-neg">-</div>
+            </div>
+          </div>
+          <div class="yca-section-label">주요 키워드</div>
+          <div class="yca-keyword-grid" id="yca-a-keywords"></div>
+          <div class="yca-section-label">종합 요약</div>
+          <div class="yca-analysis-box"><p id="yca-a-summary"></p></div>
+          <div class="yca-section-label">인사이트 &amp; 시사점</div>
+          <div class="yca-analysis-box"><p id="yca-a-insight"></p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════ PAGE — 프리미엄 캠페인 상세 (탭형) ════ -->
+<div class="page-wrapper" id="p-detail-premium">
+
+  <!-- 헤더 -->
+  <div class="cd-header">
+    <button class="cd-back" data-fn="goBackToList">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+    </button>
+    <div class="cd-thumb">🎵</div>
+    <div class="cd-info">
+      <div class="cd-name-row">
+        <span class="cd-name">시리즈 〈다 이루어질지니〉</span>
+        <span class="cd-badge channel">채널 선정 중</span>
+        <span style="background:#7c3aed;color:#fff;border-radius:6px;font-size:11px;font-weight:700;padding:3px 10px;letter-spacing:0.5px;flex-shrink:0">프리미엄</span>
+        <span style="background:var(--orange);color:#fff;border-radius:6px;font-size:11px;font-weight:700;padding:3px 10px;letter-spacing:0.5px;flex-shrink:0">내부용</span>
+      </div>
+      <div class="cd-meta">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>
+        <span>유튜브</span><span>·</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#e1306c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+        <span>인스타그램</span><span>·</span><span>카카오엔터테인먼트</span>
+      </div>
+    </div>
+    <div class="cd-actions">
+      <button class="cd-btn cd-btn-excel">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
+        Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- 내부 정보 바 -->
+  <div class="cd-internal-bar">
+    <div class="cd-internal-item">
+      <div class="cd-internal-lbl">클라이언트</div>
+      <div class="cd-internal-val">카카오엔터테인먼트</div>
+    </div>
+    <div class="cd-internal-item">
+      <div class="cd-internal-lbl">담당자</div>
+      <div class="cd-internal-val">김현묵</div>
+    </div>
+    <div class="cd-internal-item">
+      <div class="cd-internal-lbl">집행 금액</div>
+      <div class="cd-internal-val">32,000,000원</div>
+    </div>
+  </div>
+
+  <!-- 탭 네비게이션 -->
+  <div class="pdp-tab-nav">
+    <button class="pdp-tab active" data-fn="switchPremiumTab" data-args="1">캠페인 개요</button>
+    <button class="pdp-tab" data-fn="switchPremiumTab" data-args="2">채널 선정</button>
+  </div>
+
+  <!-- ── 탭 1: 캠페인 개요 ── -->
+  <div class="pdp-pane active" id="pdp-pane-1">
+
+    <div class="pdp-status-card">
+      <div class="pdp-status-row">
+        <div class="pdp-status-dot"></div>
+        <span class="pdp-status-label">채널 선정 진행 중 — 최종 30개 선정 완료 후 라이브 예정</span>
+      </div>
+      <div class="pdp-goal-grid">
+        <div class="pdp-goal-item">
+          <div class="pdp-goal-lbl">캠페인 기간</div>
+          <div class="pdp-goal-val" style="font-size:14px">2026.05.01 ~ 06.30</div>
+        </div>
+        <div class="pdp-goal-item">
+          <div class="pdp-goal-lbl">조회수 목표</div>
+          <div class="pdp-goal-val orange">300,000 회</div>
+        </div>
+        <div class="pdp-goal-item">
+          <div class="pdp-goal-lbl">선정 채널 목표</div>
+          <div class="pdp-goal-val">30 개</div>
+        </div>
+        <div class="pdp-goal-item">
+          <div class="pdp-goal-lbl">참여 신청</div>
+          <div class="pdp-goal-val">142 개</div>
+        </div>
+        <div class="pdp-goal-item">
+          <div class="pdp-goal-lbl">라이브 희망일</div>
+          <div class="pdp-goal-val" style="font-size:14px">2026.06.14</div>
+        </div>
+        <div class="pdp-goal-item">
+          <div class="pdp-goal-lbl">모집 기간</div>
+          <div class="pdp-goal-val" style="font-size:14px">05.04 ~ 05.06</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rpt-card">
+      <div class="rpt-card-head"><span class="rpt-card-title">리포트 타임라인</span></div>
+      <div style="padding:40px;text-align:center;color:var(--gray-light);font-size:13px">
+        캠페인 라이브 이후 리포트가 업데이트됩니다.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 탭 2: 채널 선정 ── -->
+  <div class="pdp-pane" id="pdp-pane-2">
+    <div class="page4-header" style="padding:0 0 16px">
+      <div class="page4-header-left">
+        <p style="margin:0;font-size:13px;color:var(--gray-light)">최종 30개를 선정해 주세요</p>
+      </div>
+      <div class="counter-box">
+        <div class="counter-num" id="pdpCNum">0 / 30</div>
+        <div class="counter-label">선정된 채널</div>
+      </div>
+    </div>
+    <div class="info-bar">
+      <div class="info-bar-item">상품 <strong>커넥트 (프리미엄)</strong></div>
+      <div class="info-bar-item">모집 기간 <strong>25.05.04 ~ 05.06</strong></div>
+      <div class="info-bar-item">참여 신청 <strong class="orange">142개</strong></div>
+      <div class="info-bar-item">선정 목표 <strong>30개</strong></div>
+      <div class="info-bar-item">라이브 희망일 <strong>25.06.14</strong></div>
+    </div>
+    <div class="filter-row">
+      <input class="search-input" style="margin-left:0;width:200px" type="text" placeholder="채널명 검색">
+      <select class="filter-select"><option>전체 카테고리</option><option>엔터테인먼트</option><option>커뮤니티·썰</option><option>음악</option><option>패션·뷰티</option></select>
+      <select class="filter-select"><option>전체 플랫폼</option><option>유튜브 쇼츠</option><option>인스타그램 릴스</option><option>틱톡</option></select>
+      <select class="filter-select"><option>전체 규모</option><option>10만 이상</option><option>5만~10만</option><option>1만~5만</option><option>1만 미만</option></select>
+      <span class="result-count">142개 채널</span>
+      <select class="sort-select"><option>구독자 많은 순</option><option>조회수 많은 순</option><option>참여율 높은 순</option></select>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:28px">#</th>
+            <th>채널 정보</th>
+            <th class="c">카테고리</th>
+            <th class="c">플랫폼</th>
+            <th class="c">구독자</th>
+            <th class="c">평균 조회수</th>
+            <th class="c">참여율</th>
+            <th class="c">선정</th>
+          </tr>
+        </thead>
+        <tbody id="pdpChTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════ p5 캠페인 수정 모달 ════ -->
+<div class="p5-modal-overlay" id="p5EditModal">
+  <div class="p5-modal">
+    <div class="p5-modal-title">캠페인 수정</div>
+    <div class="p5-modal-grid">
+
+      <!-- 1. 캠페인명 -->
+      <div class="p5-modal-field full">
+        <label class="p5-modal-label">캠페인명</label>
+        <input class="p5-modal-input" type="text" id="p5e-title">
+      </div>
+
+      <!-- 2-1. 플랫폼 -->
+      <div class="p5-modal-field">
+        <label class="p5-modal-label">플랫폼</label>
+        <select class="p5-modal-select" id="p5e-platform">
+          <option value="yt">유튜브</option>
+          <option value="ig">인스타그램</option>
+          <option value="tt">틱톡</option>
+        </select>
+      </div>
+
+      <!-- 2-2. 캠페인 유형 -->
+      <div class="p5-modal-field">
+        <label class="p5-modal-label">캠페인 유형</label>
+        <select class="p5-modal-select" id="p5e-product">
+          <option value="조회수당">조회수당</option>
+          <option value="업로드당">업로드당</option>
+          <option value="프리미엄">프리미엄</option>
+        </select>
+      </div>
+
+      <!-- 3-1. 클라이언트 -->
+      <div class="p5-modal-field">
+        <label class="p5-modal-label">클라이언트</label>
+        <input class="p5-modal-input" type="text" id="p5e-client">
+      </div>
+
+      <!-- 3-2. 담당자 -->
+      <div class="p5-modal-field">
+        <label class="p5-modal-label">담당자</label>
+        <select class="p5-modal-select" id="p5e-assignee">
+          <option value="박건우">박건우</option>
+          <option value="김현묵">김현묵</option>
+        </select>
+      </div>
+
+      <!-- 4. 목표 -->
+      <div class="p5-modal-field full">
+        <label class="p5-modal-label">목표</label>
+        <div class="p5-goal-row">
+          <div class="p5-radio-group">
+            <label class="p5-modal-check"><input type="radio" name="p5e-goaltype" value="조회수" id="p5e-goal-views" data-change="updateP5GoalUnit"> 조회수</label>
+            <label class="p5-modal-check"><input type="radio" name="p5e-goaltype" value="영상수" id="p5e-goal-vids" data-change="updateP5GoalUnit"> 영상수</label>
+          </div>
+          <input class="p5-modal-input" type="text" id="p5e-goal-val" placeholder="500,000">
+          <span class="p5-goal-unit" id="p5e-goal-unit">회</span>
+        </div>
+      </div>
+
+      <!-- 5. 집행 금액 / 단가 -->
+      <div class="p5-modal-field">
+        <label class="p5-modal-label">집행 금액</label>
+        <div class="p5-input-suffix-wrap">
+          <input class="p5-modal-input" type="text" id="p5e-budget" placeholder="0">
+          <span class="p5-input-suffix">원</span>
+        </div>
+      </div>
+      <div class="p5-modal-field">
+        <label class="p5-modal-label" id="p5e-unitprice-label">단가 (조회당)</label>
+        <div class="p5-input-suffix-wrap">
+          <input class="p5-modal-input" type="text" id="p5e-unitprice" placeholder="0">
+          <span class="p5-input-suffix">원</span>
+        </div>
+      </div>
+
+      <!-- 6. 시작일 / 종료일 -->
+      <div class="p5-modal-field">
+        <label class="p5-modal-label">시작일</label>
+        <input class="p5-modal-input" type="date" id="p5e-start">
+      </div>
+      <div class="p5-modal-field">
+        <label class="p5-modal-label">종료일</label>
+        <input class="p5-modal-input" type="date" id="p5e-end">
+      </div>
+
+      <!-- 6. 상태 -->
+      <div class="p5-modal-field full">
+        <label class="p5-modal-label">상태</label>
+        <select class="p5-modal-select" id="p5e-status">
+          <option value="recruiting">모집 중</option>
+          <option value="channel">채널 선정 중</option>
+          <option value="ready">오픈 준비중</option>
+          <option value="active">진행 중</option>
+          <option value="done">완료</option>
+        </select>
+      </div>
+
+    </div>
+    <div class="p5-modal-footer">
+      <button class="p5-modal-btn-cancel" data-fn="closeP5Edit">취소</button>
+      <button class="p5-modal-btn-save" data-fn="saveP5Edit">저장</button>
+    </div>
+  </div>
+</div>
+
+
+<script src="channels.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

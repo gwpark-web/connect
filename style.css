@@ -1032,14 +1032,14 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
   backdrop-filter: blur(4px);
 }
 .p0-display-title {
-  font-family: 'Bebas Neue', sans-serif; font-size: 96px; font-weight: 400;
-  line-height: 0.93; margin-bottom: 20px; letter-spacing: 4px; color: var(--white);
-  white-space: nowrap;
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  font-size: 96px; font-weight: 900;
+  line-height: 1.05; margin-bottom: 20px; letter-spacing: -2px; color: var(--white);
 }
 .p0-display-title em { color: var(--orange); font-style: normal; }
 .p0-hero-en-sub {
   font-family: 'Bebas Neue', sans-serif; font-size: 21px; color: rgb(255, 255, 255);
-  letter-spacing: 10px; margin-bottom: 18px;
+  letter-spacing: 10px; margin-bottom: 18px;p0-process-subtitle
 }
 .p0-display-sub { font-size: 15px; color: rgb(255, 255, 255); line-height: 1.85; font-weight: 300; margin-bottom: 36px; }
 .p0-display-sub em { color: rgb(255, 255, 255); font-style: normal; font-weight: 600; }
@@ -1073,6 +1073,14 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
 .p0-btn-more:hover { border-color: var(--white); background: rgba(255,255,255,0.08); }
 
 
+.p0-platform-logos {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 20px 32px; padding: 20px 60px 20px; max-width: 1000px; margin: 0 auto;
+}
+.p0-logo-item { display: flex; align-items: center; justify-content: center; transition: opacity 0.2s; }
+.p0-logo-item:hover { opacity: 1; }
+.p0-logo-item svg { width: 100%; max-width: 200px; height: auto; }
+
 .p0-gallery-wrap { margin: 0 -40px; overflow: hidden; }
 @keyframes p0-marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 .p0-marquee-track {
@@ -1097,10 +1105,13 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
 .p0-marquee-lbl-stat { font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: rgba(255,255,255,0.55); margin-top: 3px; }
 
 /* ── P0 PROCESS MAP ── */
-.p0-process { min-height: 100vh; margin: 0; padding: 80px 0 0; text-align: center; display: flex; flex-direction: column; justify-content: space-between; align-items: stretch; width: 100%; }
-.p0-process-inner { display: flex; flex-direction: column; align-items: center; flex: 1; justify-content: center; padding-bottom: 60px; }
-.p0-process-label { font-size: 11px; color: rgba(255,150,70,0.75); font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 16px; }
-.p0-process-title { font-family: 'Noto Sans KR', sans-serif; font-size: 26px; font-weight: 900; color: var(--white); letter-spacing: -0.5px; margin-bottom: 52px; }
+.p0-process { min-height: 90vh; margin: 0; padding: 48px 0 32px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; align-items: stretch; width: 100%; }
+.p0-process-header { text-align: center; }
+.p0-process-label { font-size: 15px; color: rgba(255,150,70,0.75); font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 12px; }
+.p0-process-title { font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif; font-size: 75px; font-weight: 900; color: var(--white); letter-spacing: -2px; line-height: 1.1; }
+.p0-process-subtitle { font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif; font-size: 30px; font-weight: 400; color: rgba(255,255,255,0.55); letter-spacing: 0.5px; line-height: 1.35; }
+/* ── p0 MINDMAP SECTION (섹션3) ── */
+.p0-mindmap-section { min-height: 100vh; display: flex; align-items: center; padding: 80px 0; }
 /* ── p0 MINDMAP (SVG) ── */
 .p0-mindmap { width: 100%; }
 .p0-mindmap-svg { display: block; width: 100%; height: auto; }

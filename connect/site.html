@@ -1,0 +1,1995 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>커넥트 스튜디오 — 광고주 플랫폼</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
+<link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- ── P0 GRADIENT BACKGROUND ── -->
+<!-- ── P0 GRADIENT BACKGROUND ── -->
+<div class="p0-wave-bg"></div>
+<div class="p0-grain"></div>
+
+<!-- ── GNB ── -->
+<nav class="gnb">
+  <div class="gnb-left">
+    <button id="nav-p1" data-fn="goTo" data-args="p1">커넥트 스튜디오</button>
+    <div class="gnb-dropdown">
+      <button id="nav-p2" class="gnb-dropdown-trigger" data-fn="toggleServiceMenu" data-stop="1">서비스</button>
+      <div class="gnb-dropdown-menu" id="serviceDropdownMenu">
+        <button data-fn="goTo" data-args="p-prod-view">조회수당 캠페인</button>
+        <button data-fn="goTo" data-args="p-prod-upload">업로드당 캠페인</button>
+        <button data-fn="goTo" data-args="p-prod-premium">프리미엄 캠페인</button>
+      </div>
+    </div>
+    <button id="nav-p3" data-fn="goTo" data-args="p3">캠페인 문의하기</button>
+    <button id="nav-p7" data-fn="goTo" data-args="p7" style="display:none">서비스 v2</button>
+  </div>
+  <div class="gnb-logo" data-fn="goTo" data-args="p1">CRE<span>;</span>ABLE</div>
+  <div class="gnb-right">
+    <button class="gnb-btn-login" data-fn="goTo" data-args="p4">Login</button>
+    <button class="gnb-btn-join" data-fn="goToAuth" data-args="p-signup" style="display:none">Join</button>
+  </div>
+</nav>
+<!-- ════ PAGE 0 — 서비스 소개 ════ -->
+<div class="page-wrapper" id="p1">
+
+  <!-- 섹션1: 히어로 -->
+  <div class="p0-display-hero">
+
+    <!-- 배경 플랫폼 아이콘 (무드 요소 / PNG 교체 예정) -->
+    <div class="p0-hi-bg" aria-hidden="true">
+
+      <!-- YouTube: 좌측 상단 대형 -->
+      <div class="p0-hi p0-hi--yt">
+        <svg viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg" width="68%" height="68%">
+          <rect x="7" y="16" width="40" height="22" rx="7" fill="#FF0000"/>
+          <polygon points="22,21 22,33 35,27" fill="white"/>
+        </svg>
+      </div>
+
+      <!-- Instagram: 우측 상단 중형 -->
+      <div class="p0-hi p0-hi--ig">
+        <svg viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg" width="64%" height="64%">
+          <rect x="10" y="10" width="34" height="34" rx="10" stroke="white" stroke-width="3"/>
+          <circle cx="27" cy="27" r="9" stroke="white" stroke-width="3"/>
+          <circle cx="38" cy="16" r="2.5" fill="white"/>
+        </svg>
+      </div>
+
+      <!-- TikTok: 우측 하단 소형 -->
+      <div class="p0-hi p0-hi--tt">
+        <svg viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg" width="62%" height="62%">
+          <path d="M33 9c1 6 5 10 10 11v7c-3 0-7-2-10-4v16c0 7-6 12-12 12s-12-5-12-12 6-12 12-12v7a5 5 0 1 0 5 5V9h7z" fill="white"/>
+        </svg>
+      </div>
+
+    </div>
+
+    <div class="p0-hero-content">
+      <div class="p0-hero-eyebrow">● CONNECT STUDIO</div>
+      <div class="p0-display-title">숏폼으로 마케팅을 <br><em>완성해드립니다.</em></div>
+      <p class="p0-hero-en-sub">쉽고 빠르게, 효과적인 숏폼 광고를 시작하세요.</p>
+      <p class="p0-display-sub"></p>
+      <div class="p0-display-btns">
+        <button class="p0-btn-start" data-fn="goTo" data-args="p3">캠페인 문의하기 →</button>
+        <button class="p0-btn-case" data-fn="goToAuth" data-args="p-brochure">상품소개서 요청</button>
+      </div>
+    </div>
+    <div class="p0-why-stats-grid">
+      <div class="p0-why-stat"><div class="p0-why-stat-num"><em>200K</em>+</div><div class="p0-why-stat-lbl">크리에이터</div></div>
+      <div class="p0-why-stat"><div class="p0-why-stat-num"><em>60M</em>+</div><div class="p0-why-stat-lbl">누적 조회수</div></div>
+      <div class="p0-why-stat"><div class="p0-why-stat-num"><em>470</em>%</div><div class="p0-why-stat-lbl">재집행률</div></div>
+    </div>
+  </div>
+
+  <!-- 섹션2: 채널 네트워크 숏폼 모자이크 -->
+  <div class="p0-sfm-section">
+    <div class="p0-sfm-inner">
+      <div class="p0-sfm-left">
+        <div class="p0-sfm-headline">강력한 숏폼 채널 네트워크</div>
+        <h2 class="p0-sfm-headline">트렌드를 만드는 채널은,<br><em>따로 있습니다.</em></h2>
+        <p class="p0-sfm-sub">영화·드라마부터 지식·이슈까지 버티컬 카테고리별 채널 네트워크가<br>브랜드를 트렌드 속으로 이끕니다.</p>
+      </div>
+      <div class="p0-sfm-right">
+        <div class="p0-sfm-mosaic">
+          <!-- col A -->
+          <div class="p0-sfm-col p0-sfm-col-a">
+            <div class="p0-sfm-frame sfm-f1">
+              <div class="frame-bg"></div>
+              <div class="p0-sfm-gfx sfm-gfx-film"><div class="sfm-film-strip"></div></div>
+              <div class="p0-sfm-ui"><span class="sfm-live-dot"></span><span class="sfm-live-txt">LIVE</span></div>
+              <div class="p0-sfm-label">영화·드라마</div>
+            </div>
+            <div class="p0-sfm-frame sfm-f4">
+              <div class="frame-bg"></div>
+              <div class="p0-sfm-gfx sfm-gfx-wave"><div class="sfm-wave-bar b1"></div><div class="sfm-wave-bar b2"></div><div class="sfm-wave-bar b3"></div><div class="sfm-wave-bar b4"></div><div class="sfm-wave-bar b5"></div></div>
+              <div class="p0-sfm-label">음악·아이돌</div>
+            </div>
+          </div>
+          <!-- col B -->
+          <div class="p0-sfm-col p0-sfm-col-b">
+            <div class="p0-sfm-frame sfm-f2">
+              <div class="frame-bg"></div>
+              <div class="p0-sfm-gfx sfm-gfx-bolt"></div>
+              <div class="p0-sfm-ui sfm-views"><span>👁</span><span>1.2M</span></div>
+              <div class="p0-sfm-label">유머·이슈</div>
+            </div>
+            <div class="p0-sfm-frame sfm-f5">
+              <div class="frame-bg"></div>
+              <div class="p0-sfm-gfx sfm-gfx-arc"><div class="sfm-arc-ring r1"></div><div class="sfm-arc-ring r2"></div></div>
+              <div class="p0-sfm-ui sfm-views"><span>👁</span><span>8.7M</span></div>
+              <div class="p0-sfm-label">스포츠</div>
+            </div>
+          </div>
+          <!-- col C -->
+          <div class="p0-sfm-col p0-sfm-col-c">
+            <div class="p0-sfm-frame sfm-f3">
+              <div class="frame-bg"></div>
+              <div class="p0-sfm-gfx sfm-gfx-bar"><div class="sfm-data-bar db1"></div><div class="sfm-data-bar db2"></div><div class="sfm-data-bar db3"></div></div>
+              <div class="p0-sfm-ui"><span class="sfm-live-dot"></span><span class="sfm-live-txt">LIVE</span></div>
+              <div class="p0-sfm-label">지식·정보</div>
+            </div>
+            <div class="p0-sfm-frame sfm-f6">
+              <div class="frame-bg"></div>
+              <div class="p0-sfm-gfx sfm-gfx-dots"><div class="sfm-dot-grid"></div></div>
+              <div class="p0-sfm-ui sfm-views"><span>👁</span><span>3.4M</span></div>
+              <div class="p0-sfm-label">방송·예능</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 섹션3: 집행 사례 갤러리 -->
+  <div class="p0-gallery-wrap">
+      <div class="p0-marquee-track">
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#3d1010,#7a2020)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#0a1a2e,#1a3560)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#0d1f1a,#1a3d30)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#201520,#3d1a4a)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#0e1520,#1a2a40)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#2a1a08,#5a3510)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#100d1f,#221a40)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#1a1008,#3a2510)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#1a0a10,#3d1525)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#0a1a10,#183520)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#3d1010,#7a2020)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#0a1a2e,#1a3560)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#0d1f1a,#1a3d30)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#201520,#3d1a4a)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#0e1520,#1a2a40)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#2a1a08,#5a3510)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#100d1f,#221a40)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#1a1008,#3a2510)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#1a0a10,#3d1525)"></div>
+        <div class="p0-marquee-item" style="background:linear-gradient(160deg,#0a1a10,#183520)"></div>
+      </div>
+  </div><!-- /p0-gallery-wrap -->
+
+  <!-- 섹션4: 마인드맵 -->
+  <div class="p0-mindmap-section">
+    <div class="p0-mindmap-header">
+      <div class="p0-mindmap-label">구조화된 캠페인 시스템</div>
+      <div class="p0-mindmap-title">빠른 속도와 높은 참여율이<br>만드는 대규모 확산</div>
+    </div>
+    <div class="p0-mindmap">
+      <svg class="p0-mindmap-svg" viewBox="0 0 960 260" xmlns="http://www.w3.org/2000/svg">
+
+        <!-- ── STEP 01: 광고주 ── -->
+        <rect x="0" y="20" width="260" height="220" rx="24" fill="white" fill-opacity="0.07" stroke="white" stroke-opacity="0.18" stroke-width="1.5"/>
+        <text x="28" y="56" fill="#ff6200" font-family="'Noto Sans KR',sans-serif" font-size="11" font-weight="700" letter-spacing="2">STEP 01</text>
+        <!-- 사람 아이콘 -->
+        <circle cx="72" cy="128" r="24" fill="white" fill-opacity="0.1" stroke="white" stroke-opacity="0.25" stroke-width="1.5"/>
+        <circle cx="72" cy="120" r="9" fill="white" fill-opacity="0.75"/>
+        <path d="M 55 151 a 17 12 0 0 1 34 0" fill="white" fill-opacity="0.75"/>
+        <!-- 텍스트 -->
+        <text x="110" y="115" fill="white" font-family="'Noto Sans KR',sans-serif" font-size="24" font-weight="700">브랜드</text>
+        <text x="110" y="142" fill="rgba(255,255,255,0.45)" font-family="'Noto Sans KR',sans-serif" font-size="12">목표 · 예산 · 상품</text>
+
+        <!-- ── 화살표 1 ── -->
+        <line x1="268" y1="130" x2="318" y2="130" stroke="#ff6200" stroke-width="2.5" stroke-linecap="round"/>
+        <polygon points="311,123 324,130 311,137" fill="#ff6200"/>
+
+        <!-- ── STEP 02: Connect Studio ── -->
+        <rect x="328" y="0" width="300" height="260" rx="28" fill="#ff6200"/>
+        <text x="358" y="42" fill="rgba(255,255,255,0.6)" font-family="'Noto Sans KR',sans-serif" font-size="11" font-weight="700" letter-spacing="2">STEP 02</text>
+        <text x="478" y="108" text-anchor="middle" fill="white" font-family="'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif" font-size="36" font-weight="900" letter-spacing="-1">CONNECT</text>
+        <text x="478" y="148" text-anchor="middle" fill="white" font-family="'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif" font-size="36" font-weight="900" letter-spacing="-1">STUDIO</text>
+        <line x1="358" y1="162" x2="598" y2="162" stroke="white" stroke-opacity="0.2" stroke-width="1"/>
+        <text x="478" y="192" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="'Noto Sans KR',sans-serif" font-size="14">매칭 · 기획 · 집행</text>
+
+        <!-- ── 화살표 2 ── -->
+        <line x1="636" y1="130" x2="686" y2="130" stroke="#ff6200" stroke-width="2.5" stroke-linecap="round"/>
+        <polygon points="679,123 692,130 679,137" fill="#ff6200"/>
+
+        <!-- ── STEP 03: 확산 ── -->
+        <rect x="700" y="20" width="260" height="220" rx="24" fill="white" fill-opacity="0.07" stroke="white" stroke-opacity="0.18" stroke-width="1.5"/>
+        <text x="728" y="56" fill="#ff6200" font-family="'Noto Sans KR',sans-serif" font-size="11" font-weight="700" letter-spacing="2">STEP 03</text>
+        <text x="830" y="136" text-anchor="middle" fill="white" font-family="'Noto Sans KR',sans-serif" font-size="20" font-weight="700">확산</text>
+
+        <!-- YouTube Shorts (top, 0°) cx=830 cy=60 -->
+        <g>
+          <animateTransform attributeName="transform" type="translate" values="0,0;0,-7;0,0" dur="3.2s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" begin="0s"/>
+          <rect x="810" y="40" width="40" height="40" rx="12" fill="#FF0000" opacity="0.88"/>
+          <polygon points="820,51 820,69 838,60" fill="white"/>
+        </g>
+
+        <!-- Instagram Reels (top-right, 60°) cx=891 cy=95 -->
+        <g>
+          <animateTransform attributeName="transform" type="translate" values="0,0;0,-6;0,0" dur="3.5s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" begin="0.3s"/>
+          <rect x="871" y="75" width="40" height="40" rx="12" fill="#C13584" opacity="0.88"/>
+          <rect x="880" y="84" width="22" height="17" rx="3" fill="none" stroke="white" stroke-width="1.5"/>
+          <circle cx="891" cy="93" r="4.5" fill="none" stroke="white" stroke-width="1.5"/>
+          <circle cx="899" cy="85" r="1.5" fill="white"/>
+        </g>
+
+        <!-- 카카오 숏폼 (bottom-right, 120°) cx=891 cy=165 -->
+        <g>
+          <animateTransform attributeName="transform" type="translate" values="0,0;0,-7;0,0" dur="3.4s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" begin="1.5s"/>
+          <rect x="871" y="145" width="40" height="40" rx="12" fill="#FEE500" opacity="0.9"/>
+          <text x="891" y="171" text-anchor="middle" fill="#3C1E1E" font-family="'Noto Sans KR',sans-serif" font-size="18" font-weight="900">K</text>
+        </g>
+
+        <!-- 네이버 클립 (bottom, 180°) cx=830 cy=200 -->
+        <g>
+          <animateTransform attributeName="transform" type="translate" values="0,0;0,-6;0,0" dur="3.0s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" begin="0.9s"/>
+          <rect x="810" y="180" width="40" height="40" rx="12" fill="#03C75A" opacity="0.85"/>
+          <text x="830" y="206" text-anchor="middle" fill="white" font-family="sans-serif" font-size="16" font-weight="900">N</text>
+        </g>
+
+        <!-- TikTok (bottom-left, 240°) cx=769 cy=165 -->
+        <g>
+          <animateTransform attributeName="transform" type="translate" values="0,0;0,-8;0,0" dur="3.8s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" begin="1.2s"/>
+          <rect x="749" y="145" width="40" height="40" rx="12" fill="#010101" opacity="0.9" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+          <text x="769" y="171" text-anchor="middle" fill="white" font-family="sans-serif" font-size="18">♫</text>
+        </g>
+
+        <!-- 네이버 나우 (top-left, 300°) cx=769 cy=95 -->
+        <g>
+          <animateTransform attributeName="transform" type="translate" values="0,0;0,-5;0,0" dur="2.8s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" begin="0.6s"/>
+          <rect x="749" y="75" width="40" height="40" rx="12" fill="#03C75A" opacity="0.82"/>
+          <text x="769" y="101" text-anchor="middle" fill="white" font-family="sans-serif" font-size="16" font-weight="900">N</text>
+        </g>
+
+      </svg>
+    </div><!-- /p0-mindmap -->
+  <!-- 캠페인 플로우 카드 -->
+  <div class="p0-mindmap">
+    <div class="p0-cc-flow">
+
+      <!-- Card 1: 캠페인 오픈 -->
+      <div class="p0-cc-card p0-cc-sm">
+        <div class="p0-cc-nav">
+          <div>
+            <div class="p0-cc-step">STEP 01</div>
+            <div class="p0-cc-title">캠페인 오픈</div>
+          </div>
+          <span class="p0-cc-logo">CRE<span style="opacity:.55">;</span>ABLE</span>
+        </div>
+        <div class="p0-cc-body">
+          <div class="p0-cc-field">
+            <div class="p0-cc-label">캠페인명</div>
+            <div class="p0-cc-input">개봉 예정 드라마</div>
+          </div>
+          <div class="p0-cc-field">
+            <div class="p0-cc-label">카테고리</div>
+            <div class="p0-cc-tags">
+              <span class="p0-cc-tag on">영화·드라마</span>
+              <span class="p0-cc-tag">예능</span>
+              <span class="p0-cc-tag">스포츠</span>
+            </div>
+          </div>
+          <div class="p0-cc-field">
+            <div class="p0-cc-label">목표 조회수</div>
+            <div class="p0-cc-input">1,000,000 회</div>
+          </div>
+          <button class="p0-cc-open-btn">캠페인 오픈 →</button>
+        </div>
+      </div>
+
+      <div class="p0-cc-arrow">
+        <svg viewBox="0 0 62 14" width="100%" height="14" xmlns="http://www.w3.org/2000/svg" style="display:block">
+          <line x1="0" y1="7" x2="50" y2="7" stroke="#ff6200" stroke-width="2.5" stroke-linecap="round"/>
+          <polygon points="44,0 58,7 44,14" fill="#ff6200"/>
+        </svg>
+      </div>
+
+      <!-- Card 2: 채널 참여 -->
+      <div class="p0-cc-card p0-cc-lg" id="p0CcCard2">
+        <div class="p0-cc-nav">
+          <div>
+            <div class="p0-cc-step">STEP 02</div>
+            <div class="p0-cc-title">채널 참여</div>
+          </div>
+          <div class="p0-cc-nav-r">
+            <div class="p0-cc-dots">
+              <span class="p0-cc-dot active" data-fn="setCardSlide" data-args="p0CcCard2|0"></span>
+              <span class="p0-cc-dot" data-fn="setCardSlide" data-args="p0CcCard2|1"></span>
+            </div>
+            <span class="p0-cc-logo">CRE<span style="opacity:.55">;</span>ABLE</span>
+          </div>
+        </div>
+        <div class="p0-cc-slider-wrap">
+          <div class="p0-cc-slider-track">
+
+            <!-- Slide 1: 채널 참여 목록 -->
+            <div class="p0-cc-slide">
+              <div class="p0-cc-body">
+                <div class="p0-cc-ch-list">
+                  <div class="p0-cc-ch-row">
+                    <div>
+                      <div class="p0-cc-ch-name">영화리뷰 채널A</div>
+                      <div class="p0-cc-ch-sub">구독자 42만</div>
+                    </div>
+                    <span class="p0-cc-ch-val">참여 완료</span>
+                  </div>
+                  <div class="p0-cc-ch-row">
+                    <div>
+                      <div class="p0-cc-ch-name">드라마클립 채널B</div>
+                      <div class="p0-cc-ch-sub">구독자 28만</div>
+                    </div>
+                    <span class="p0-cc-ch-val">참여 완료</span>
+                  </div>
+                  <div class="p0-cc-ch-row">
+                    <div>
+                      <div class="p0-cc-ch-name">예능 채널C</div>
+                      <div class="p0-cc-ch-sub">구독자 65만</div>
+                    </div>
+                    <span class="p0-cc-ch-val">참여 완료</span>
+                  </div>
+                  <div class="p0-cc-ch-row">
+                    <div>
+                      <div class="p0-cc-ch-name">스포츠 채널D</div>
+                      <div class="p0-cc-ch-sub">구독자 33만</div>
+                    </div>
+                    <span class="p0-cc-ch-val">참여 완료</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 2: 채널 선정 방식 -->
+            <div class="p0-cc-slide">
+              <div class="p0-cc-body">
+                <div class="p0-cc-sel-bar">
+                  <span class="p0-cc-sel-label">채널 선정</span>
+                  <span class="p0-cc-sel-count"><b>12</b> / 30 선정됨</span>
+                </div>
+                <div class="p0-cc-sel-list">
+                  <div class="p0-cc-sel-row">
+                    <div class="p0-cc-sel-ch">
+                      <span class="p0-cc-sel-emoji">🎬</span>
+                      <div class="p0-cc-sel-name">궁금해소</div>
+                    </div>
+                    <div class="p0-cc-sel-meta"><span class="p-dot yt">YT</span><span class="p0-cc-sel-subs">99.7만</span></div>
+                    <button class="p0-cc-sel-btn on">✓</button>
+                  </div>
+                  <div class="p0-cc-sel-row">
+                    <div class="p0-cc-sel-ch">
+                      <span class="p0-cc-sel-emoji">🍜</span>
+                      <div class="p0-cc-sel-name">평양냉면</div>
+                    </div>
+                    <div class="p0-cc-sel-meta"><span class="p-dot yt">YT</span><span class="p0-cc-sel-subs">35만</span></div>
+                    <button class="p0-cc-sel-btn on">✓</button>
+                  </div>
+                  <div class="p0-cc-sel-row">
+                    <div class="p0-cc-sel-ch">
+                      <span class="p0-cc-sel-emoji">👗</span>
+                      <div class="p0-cc-sel-name">패피소희</div>
+                    </div>
+                    <div class="p0-cc-sel-meta"><span class="p-dot ig">IG</span><span class="p0-cc-sel-subs">18만</span></div>
+                    <button class="p0-cc-sel-btn">+</button>
+                  </div>
+                  <div class="p0-cc-sel-row">
+                    <div class="p0-cc-sel-ch">
+                      <span class="p0-cc-sel-emoji">🎮</span>
+                      <div class="p0-cc-sel-name">겜쟁이남자</div>
+                    </div>
+                    <div class="p0-cc-sel-meta"><span class="p-dot yt">YT</span><span class="p0-cc-sel-subs">44만</span></div>
+                    <button class="p0-cc-sel-btn">+</button>
+                  </div>
+                </div>
+                <div class="p0-cc-sel-hint">광고주가 직접 채널을 선정합니다</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="p0-cc-arrow">
+        <svg viewBox="0 0 62 14" width="100%" height="14" xmlns="http://www.w3.org/2000/svg" style="display:block">
+          <line x1="0" y1="7" x2="50" y2="7" stroke="#ff6200" stroke-width="2.5" stroke-linecap="round"/>
+          <polygon points="44,0 58,7 44,14" fill="#ff6200"/>
+        </svg>
+      </div>
+
+      <!-- Card 3: 성과 리포트 -->
+      <div class="p0-cc-card p0-cc-sm">
+        <div class="p0-cc-nav">
+          <div>
+            <div class="p0-cc-step">STEP 03</div>
+            <div class="p0-cc-title">성과 리포트</div>
+          </div>
+          <span class="p0-cc-logo">CRE<span style="opacity:.55">;</span>ABLE</span>
+        </div>
+        <div class="p0-cc-body">
+          <div class="p0-cc-big-num">
+            <div class="p0-cc-bn">214%</div>
+            <div class="p0-cc-bl">목표 달성률</div>
+          </div>
+          <div class="p0-cc-stat-rows">
+            <div class="p0-cc-stat-row">
+              <span>총 조회수</span><span>2,140,000</span>
+            </div>
+            <div class="p0-cc-stat-row">
+              <span>참여 채널</span><span>223개</span>
+            </div>
+            <div class="p0-cc-stat-row">
+              <span>총 좋아요</span><span>13,082개</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /p0-mindmap (card flow) -->
+
+  </div><!-- /p0-mindmap-section -->
+
+  <!-- CTA -->
+  <div class="p0-cta">
+    <h2>쉽고 빠르게,<br><em>효과적인 광고</em>를 시작하세요</h2>
+    <p>라이브 희망 일정을 공유해 주시면 일정에 맞춘 상세 안내드리겠습니다.</p>
+    <button class="p0-btn-start" data-fn="goTo" data-args="p4">캠페인 시작하기 →</button>
+    <div class="p0-cta-contact">또는 직접 문의 — contact@ai-company.co.kr</div>
+  </div>
+
+</div>
+
+<!-- ════ PAGE 6 — 서비스 안내 ════ -->
+<div class="page-wrapper" id="p2">
+  <div class="page-header">
+    <h1>서비스</h1>
+    <p>캠페인 목표에 맞는 상품을 확인하고, 전체 진행 흐름을 파악하세요</p>
+  </div>
+
+  <!-- 01 상품 소개 -->
+  <div class="p6-product-section">
+  <div class="p6-section-title">목표에 맞는 캠페인 상품</div>
+  <div class="products-grid">
+    <div class="product-card">
+      <div class="product-badge">VIEW BASED</div>
+      <div class="product-name">조회수당 캠페인</div>
+      <div class="product-kpi">KPI — 목표 조회수 도달</div>
+      <div class="product-divider"></div>
+      <div class="product-specs">
+        <div class="spec-row"><span class="spec-key">집행 금액</span><span class="spec-val orange">500만 원~</span></div>
+        <div class="spec-row"><span class="spec-key">목표 조회수</span><span class="spec-val">500,000 회~</span></div>
+        <div class="spec-row"><span class="spec-key">참여 방식</span><span class="spec-val">크리에이터 자율 참여</span></div>
+        <div class="spec-row"><span class="spec-key">캠페인 마감</span><span class="spec-val">목표 조회수 달성 시</span></div>
+      </div>
+      <ul class="product-feats">
+        <li>목표 조회수 설정, 도달 시 자동 종료</li>
+        <li>크리에이터 자율 편집·참여</li>
+        <li>영화·드라마·브랜드 확산에 최적</li>
+        <li>종료 후 조회수 지속 발생</li>
+      </ul>
+    </div>
+    <div class="product-card">
+      <div class="product-badge">UPLOAD BASED</div>
+      <div class="product-name">업로드당 캠페인</div>
+      <div class="product-kpi">KPI — 목표 영상 수 도달</div>
+      <div class="product-divider"></div>
+      <div class="product-specs">
+        <div class="spec-row"><span class="spec-key">집행 금액</span><span class="spec-val orange">500만 원~</span></div>
+        <div class="spec-row"><span class="spec-key">목표 영상 수</span><span class="spec-val">200개~</span></div>
+        <div class="spec-row"><span class="spec-key">참여 방식</span><span class="spec-val">크리에이터 자율 참여</span></div>
+        <div class="spec-row"><span class="spec-key">캠페인 마감</span><span class="spec-val">목표 영상 수 달성 시</span></div>
+      </div>
+      <ul class="product-feats">
+        <li>목표 영상 수 설정, 도달 시 자동 종료</li>
+        <li>음원·챌린지 유통량 확보에 효과적</li>
+        <li>단기간 콘텐츠 대량 배포</li>
+        <li>음원 차트 진입 부스트 효과</li>
+      </ul>
+    </div>
+    <div class="product-card featured">
+      <div class="product-badge">QUALITY BASED</div>
+      <div class="product-name">프리미엄 캠페인</div>
+      <div class="product-kpi">KPI — 채널 수 · 퀄리티</div>
+      <div class="product-divider"></div>
+      <div class="product-specs">
+        <div class="spec-row"><span class="spec-key">집행 금액</span><span class="spec-val orange">1,000만 원~</span></div>
+        <div class="spec-row"><span class="spec-key">제공 채널 수</span><span class="spec-val">30개</span></div>
+        <div class="spec-row"><span class="spec-key">평균 구독자</span><span class="spec-val">1만 명</span></div>
+        <div class="spec-row"><span class="spec-key">채널 선정</span><span class="spec-val orange">광고주 직접 선정</span></div>
+      </div>
+      <ul class="product-feats">
+        <li>모집된 채널 중 광고주가 직접 선정</li>
+        <li>브랜드 기획 방향 맞춤 제작 가이드</li>
+        <li>채널 규모·카테고리·타겟 필터링</li>
+        <li>커뮤니티·썰 등 고단가 채널 포함</li>
+      </ul>
+    </div>
+  </div>
+  <div class="notice-row">
+    <span>📌</span>
+    <p>콘텐츠 라이브 희망일 기준 최소 <strong>2주 전</strong> 캠페인 오픈이 필요합니다. 참여 채널 리스트 및 상세 정보는 진행 확정 이후 제공됩니다. 패키지 단위로 진행되며 개별 채널 단독 진행은 불가합니다.</p>
+  </div>
+  </div><!-- /p6-product-section -->
+
+  <!-- 03 Work Process -->
+  <div class="wp-section">
+    <input type="radio" id="wp-tab-ab" name="wp-tab" class="wp-radio" checked>
+    <input type="radio" id="wp-tab-c" name="wp-tab" class="wp-radio">
+
+    <div class="wp-header">
+      <div class="wp-main-title">WORK PROCESS</div>
+      <div class="wp-tabs">
+        <label for="wp-tab-ab" class="wp-tab-lbl">A · B 상품</label>
+        <label for="wp-tab-c" class="wp-tab-lbl">C 상품</label>
+      </div>
+    </div>
+
+    <!-- A·B 패널 -->
+    <div class="wp-panel wp-panel-ab">
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 1</div>
+        <div class="wp-card-icon">📋</div>
+        <div class="wp-card-title">상담 · 오픈 확정</div>
+        <div class="wp-card-duration">D-14 이전</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>목표 · 예산 · 일정 협의</li>
+          <li>캠페인 상품 선택 (A / B)</li>
+          <li>계약 및 비용 확정</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 2</div>
+        <div class="wp-card-icon">📢</div>
+        <div class="wp-card-title">캠페인 오픈 · 자율 참여</div>
+        <div class="wp-card-duration">D-14 ~ D-1</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>50K+ 크리에이터 알림 발송</li>
+          <li>크리에이터 자율 신청 · 제작</li>
+          <li>콘텐츠 가이드 전달</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 3</div>
+        <div class="wp-card-icon">🎬</div>
+        <div class="wp-card-title">영상 제작 · 업로드</div>
+        <div class="wp-card-duration">D-Day</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>크리에이터 자율 업로드</li>
+          <li>실시간 조회수 집계</li>
+          <li>실시간 모니터링</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 4</div>
+        <div class="wp-card-icon">🏆</div>
+        <div class="wp-card-title">KPI 달성 확인</div>
+        <div class="wp-card-duration">D+</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>목표 조회수 / 영상 수 도달</li>
+          <li>KPI 달성 시 자동 종료</li>
+          <li>종료 후 조회수 지속 발생</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 5</div>
+        <div class="wp-card-icon">📊</div>
+        <div class="wp-card-title">성과 리포트</div>
+        <div class="wp-card-duration">종료 후</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>최종 조회수 · 채널 수 집계</li>
+          <li>참여 영상 목록 제공</li>
+          <li>상세 결과 리포트 전달</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- C 패널 -->
+    <div class="wp-panel wp-panel-c">
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 1</div>
+        <div class="wp-card-icon">📋</div>
+        <div class="wp-card-title">상담 · 오픈 확정</div>
+        <div class="wp-card-duration">D-14 이전</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>목표 · 예산 · 일정 협의</li>
+          <li>채널 선정 기준 협의</li>
+          <li>계약 및 비용 확정</li>
+        </ul>
+      </div>
+      <div class="wp-card c-only">
+        <div class="wp-step-badge">STEP. 2</div>
+        <div class="wp-card-icon">📢</div>
+        <div class="wp-card-title">캠페인 오픈 · 크리에이터 선정</div>
+        <div class="wp-card-duration">D-14 ~ D-3 · C 상품 전용</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>크리에이터 신청 접수</li>
+          <li>광고주 직접 채널 선정</li>
+          <li>카테고리 · 규모 필터링</li>
+        </ul>
+      </div>
+      <div class="wp-card c-only">
+        <div class="wp-step-badge">STEP. 3</div>
+        <div class="wp-card-icon">🎬</div>
+        <div class="wp-card-title">영상 제작 · 검수</div>
+        <div class="wp-card-duration">D-7 ~ D-3 · C 상품 전용</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>콘텐츠 제작 가이드 전달</li>
+          <li>제작 후 광고주 검수</li>
+          <li>피드백 반영 후 확정</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 4</div>
+        <div class="wp-card-icon">🚀</div>
+        <div class="wp-card-title">일정 맞춰 배포</div>
+        <div class="wp-card-duration">D-Day</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>확정 일정에 순차 업로드</li>
+          <li>실시간 모니터링</li>
+          <li>업로드 현황 공유</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 5</div>
+        <div class="wp-card-icon">📊</div>
+        <div class="wp-card-title">성과 리포트</div>
+        <div class="wp-card-duration">종료 후</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>최종 채널 수 · 조회수 집계</li>
+          <li>참여 영상 목록 제공</li>
+          <li>상세 결과 리포트 전달</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 핵심 차이점 -->
+    <div class="wp-diff-wrap">
+      <div class="wp-diff-label">핵심 차이점</div>
+      <div class="wp-diff-grid">
+        <div class="wp-diff-card ab-type">
+          <div class="wp-diff-card-title">A · B 상품</div>
+          <ul class="wp-diff-feats">
+            <li>크리에이터가 자율적으로 참여</li>
+            <li>검수 없이 바로 업로드</li>
+            <li>빠른 집행, KPI로 성과 구분</li>
+          </ul>
+        </div>
+        <div class="wp-diff-card c-type">
+          <div class="wp-diff-card-title">C 상품</div>
+          <ul class="wp-diff-feats">
+            <li>담당자가 크리에이터 직접 선정</li>
+            <li>영상 검수 후 일정에 맞춰 업로드</li>
+            <li>높은 품질 관리, 일정 통제 가능</li>
+          </ul>
+        </div>
+      </div>
+      <div class="wp-legend">
+        <div class="wp-legend-item"><div class="wp-legend-dot common"></div>공통 단계</div>
+        <div class="wp-legend-item"><div class="wp-legend-dot c-excl"></div>C 상품 전용 단계</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CTA -->
+  <div class="p6-cta-row">
+    <button class="btn-primary" data-fn="goTo" data-args="p3">캠페인 문의하기 →</button>
+    <button class="btn-secondary" data-fn="goToAuth" data-args="p-brochure">상품소개서 요청</button>
+  </div>
+</div>
+
+<!-- ════ PAGE — 조회수당 캠페인 상세 ════ -->
+<div class="page-wrapper" id="p-prod-view">
+  <div class="breadcrumb"><button data-fn="goTo" data-args="p2">서비스</button> / <span>조회수당 캠페인</span></div>
+  <div class="page-header">
+    <h1>조회수당 캠페인</h1>
+    <p>목표 조회수 도달 시 자동 종료되는 KPI 기반 바이럴 캠페인</p>
+  </div>
+
+  <div class="p6-product-section">
+    <div class="product-card featured">
+      <div class="product-badge">VIEW BASED</div>
+      <div class="product-name">조회수당 캠페인</div>
+      <div class="product-kpi">KPI — 목표 조회수 도달</div>
+      <div class="product-divider"></div>
+      <div class="product-specs">
+        <div class="spec-row"><span class="spec-key">집행 금액</span><span class="spec-val orange">500만 원~</span></div>
+        <div class="spec-row"><span class="spec-key">목표 조회수</span><span class="spec-val">500,000 회~</span></div>
+        <div class="spec-row"><span class="spec-key">참여 방식</span><span class="spec-val">크리에이터 자율 참여</span></div>
+        <div class="spec-row"><span class="spec-key">캠페인 마감</span><span class="spec-val">목표 조회수 달성 시</span></div>
+      </div>
+      <ul class="product-feats">
+        <li>목표 조회수 설정, 도달 시 자동 종료</li>
+        <li>크리에이터 자율 편집·참여</li>
+        <li>영화·드라마·브랜드 확산에 최적</li>
+        <li>종료 후 조회수 지속 발생</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="p6-product-section" style="margin-top:32px">
+    <div class="p6-section-title">특징</div>
+  </div>
+
+  <div class="wp-section" style="margin-top:32px">
+    <div class="wp-main-title" style="font-size:32px;margin-bottom:32px">진행 프로세스</div>
+    <div class="wp-panel" style="display:grid">
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 1</div>
+        <div class="wp-card-icon">📋</div>
+        <div class="wp-card-title">상담 · 오픈 확정</div>
+        <div class="wp-card-duration">D-14 이전</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>목표 · 예산 · 일정 협의</li>
+          <li>캠페인 상품 선택</li>
+          <li>계약 및 비용 확정</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 2</div>
+        <div class="wp-card-icon">📢</div>
+        <div class="wp-card-title">캠페인 오픈 · 자율 참여</div>
+        <div class="wp-card-duration">D-14 ~ D-1</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>50K+ 크리에이터 알림 발송</li>
+          <li>크리에이터 자율 신청 · 제작</li>
+          <li>콘텐츠 가이드 전달</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 3</div>
+        <div class="wp-card-icon">🎬</div>
+        <div class="wp-card-title">영상 제작 · 업로드</div>
+        <div class="wp-card-duration">D-Day</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>크리에이터 자율 업로드</li>
+          <li>실시간 조회수 집계</li>
+          <li>실시간 모니터링</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 4</div>
+        <div class="wp-card-icon">🏆</div>
+        <div class="wp-card-title">KPI 달성 확인</div>
+        <div class="wp-card-duration">D+</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>목표 조회수 도달</li>
+          <li>KPI 달성 시 자동 종료</li>
+          <li>종료 후 조회수 지속 발생</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 5</div>
+        <div class="wp-card-icon">📊</div>
+        <div class="wp-card-title">성과 리포트</div>
+        <div class="wp-card-duration">종료 후</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>최종 조회수 집계</li>
+          <li>참여 영상 목록 제공</li>
+          <li>상세 결과 리포트 전달</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="p6-cta-row" style="margin-top:32px">
+    <button class="btn-primary" data-fn="goTo" data-args="p3">캠페인 문의하기 →</button>
+    <button class="btn-secondary" data-fn="goToAuth" data-args="p-brochure">상품소개서 요청</button>
+  </div>
+</div>
+
+<!-- ════ PAGE — 업로드당 캠페인 상세 ════ -->
+<div class="page-wrapper" id="p-prod-upload">
+  <div class="breadcrumb"><button data-fn="goTo" data-args="p2">서비스</button> / <span>업로드당 캠페인</span></div>
+  <div class="page-header">
+    <h1>업로드당 캠페인</h1>
+    <p>목표 영상 수 도달 시 자동 종료되는 KPI 기반 바이럴 캠페인</p>
+  </div>
+
+  <div class="p6-product-section">
+    <div class="product-card featured">
+      <div class="product-badge">UPLOAD BASED</div>
+      <div class="product-name">업로드당 캠페인</div>
+      <div class="product-kpi">KPI — 목표 영상 수 도달</div>
+      <div class="product-divider"></div>
+      <div class="product-specs">
+        <div class="spec-row"><span class="spec-key">집행 금액</span><span class="spec-val orange">500만 원~</span></div>
+        <div class="spec-row"><span class="spec-key">목표 영상 수</span><span class="spec-val">200개~</span></div>
+        <div class="spec-row"><span class="spec-key">참여 방식</span><span class="spec-val">크리에이터 자율 참여</span></div>
+        <div class="spec-row"><span class="spec-key">캠페인 마감</span><span class="spec-val">목표 영상 수 달성 시</span></div>
+      </div>
+      <ul class="product-feats">
+        <li>목표 영상 수 설정, 도달 시 자동 종료</li>
+        <li>음원·챌린지 유통량 확보에 효과적</li>
+        <li>단기간 콘텐츠 대량 배포</li>
+        <li>음원 차트 진입 부스트 효과</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="p6-product-section" style="margin-top:32px">
+    <div class="p6-section-title">특징</div>
+  </div>
+
+  <div class="wp-section" style="margin-top:32px">
+    <div class="wp-main-title" style="font-size:32px;margin-bottom:32px">진행 프로세스</div>
+    <div class="wp-panel" style="display:grid">
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 1</div>
+        <div class="wp-card-icon">📋</div>
+        <div class="wp-card-title">상담 · 오픈 확정</div>
+        <div class="wp-card-duration">D-14 이전</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>목표 · 예산 · 일정 협의</li>
+          <li>캠페인 상품 선택</li>
+          <li>계약 및 비용 확정</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 2</div>
+        <div class="wp-card-icon">📢</div>
+        <div class="wp-card-title">캠페인 오픈 · 자율 참여</div>
+        <div class="wp-card-duration">D-14 ~ D-1</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>50K+ 크리에이터 알림 발송</li>
+          <li>크리에이터 자율 신청 · 제작</li>
+          <li>콘텐츠 가이드 전달</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 3</div>
+        <div class="wp-card-icon">🎬</div>
+        <div class="wp-card-title">영상 제작 · 업로드</div>
+        <div class="wp-card-duration">D-Day</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>크리에이터 자율 업로드</li>
+          <li>실시간 업로드 영상 수 집계</li>
+          <li>실시간 모니터링</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 4</div>
+        <div class="wp-card-icon">🏆</div>
+        <div class="wp-card-title">KPI 달성 확인</div>
+        <div class="wp-card-duration">D+</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>목표 영상 수 도달</li>
+          <li>KPI 달성 시 자동 종료</li>
+          <li>음원 차트 진입 부스트</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 5</div>
+        <div class="wp-card-icon">📊</div>
+        <div class="wp-card-title">성과 리포트</div>
+        <div class="wp-card-duration">종료 후</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>최종 영상 수 집계</li>
+          <li>참여 영상 목록 제공</li>
+          <li>상세 결과 리포트 전달</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="p6-cta-row" style="margin-top:32px">
+    <button class="btn-primary" data-fn="goTo" data-args="p3">캠페인 문의하기 →</button>
+    <button class="btn-secondary" data-fn="goToAuth" data-args="p-brochure">상품소개서 요청</button>
+  </div>
+</div>
+
+<!-- ════ PAGE — 프리미엄 캠페인 상세 ════ -->
+<div class="page-wrapper" id="p-prod-premium">
+  <div class="breadcrumb"><button data-fn="goTo" data-args="p2">서비스</button> / <span>프리미엄 캠페인</span></div>
+  <div class="page-header">
+    <h1>프리미엄 캠페인</h1>
+    <p>광고주가 직접 채널을 선정하는 퀄리티 기반 캠페인</p>
+  </div>
+
+  <div class="p6-product-section">
+    <div class="product-card featured">
+      <div class="product-badge">QUALITY BASED</div>
+      <div class="product-name">프리미엄 캠페인</div>
+      <div class="product-kpi">KPI — 채널 수 · 퀄리티</div>
+      <div class="product-divider"></div>
+      <div class="product-specs">
+        <div class="spec-row"><span class="spec-key">집행 금액</span><span class="spec-val orange">1,000만 원~</span></div>
+        <div class="spec-row"><span class="spec-key">제공 채널 수</span><span class="spec-val">30개</span></div>
+        <div class="spec-row"><span class="spec-key">평균 구독자</span><span class="spec-val">1만 명</span></div>
+        <div class="spec-row"><span class="spec-key">채널 선정</span><span class="spec-val orange">광고주 직접 선정</span></div>
+      </div>
+      <ul class="product-feats">
+        <li>모집된 채널 중 광고주가 직접 선정</li>
+        <li>브랜드 기획 방향 맞춤 제작 가이드</li>
+        <li>채널 규모·카테고리·타겟 필터링</li>
+        <li>커뮤니티·썰 등 고단가 채널 포함</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="p6-product-section" style="margin-top:32px">
+    <div class="p6-section-title">특징</div>
+  </div>
+
+  <div class="wp-section" style="margin-top:32px">
+    <div class="wp-main-title" style="font-size:32px;margin-bottom:32px">진행 프로세스</div>
+    <div class="wp-panel" style="display:grid">
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 1</div>
+        <div class="wp-card-icon">📋</div>
+        <div class="wp-card-title">상담 · 오픈 확정</div>
+        <div class="wp-card-duration">D-14 이전</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>목표 · 예산 · 일정 협의</li>
+          <li>채널 선정 기준 협의</li>
+          <li>계약 및 비용 확정</li>
+        </ul>
+      </div>
+      <div class="wp-card c-only">
+        <div class="wp-step-badge">STEP. 2</div>
+        <div class="wp-card-icon">📢</div>
+        <div class="wp-card-title">캠페인 오픈 · 크리에이터 선정</div>
+        <div class="wp-card-duration">D-14 ~ D-3</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>크리에이터 신청 접수</li>
+          <li>광고주 직접 채널 선정</li>
+          <li>카테고리 · 규모 필터링</li>
+        </ul>
+      </div>
+      <div class="wp-card c-only">
+        <div class="wp-step-badge">STEP. 3</div>
+        <div class="wp-card-icon">🎬</div>
+        <div class="wp-card-title">영상 제작 · 검수</div>
+        <div class="wp-card-duration">D-7 ~ D-3</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>콘텐츠 제작 가이드 전달</li>
+          <li>제작 후 광고주 검수</li>
+          <li>피드백 반영 후 확정</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 4</div>
+        <div class="wp-card-icon">🚀</div>
+        <div class="wp-card-title">일정 맞춰 배포</div>
+        <div class="wp-card-duration">D-Day</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>확정 일정에 순차 업로드</li>
+          <li>실시간 모니터링</li>
+          <li>업로드 현황 공유</li>
+        </ul>
+      </div>
+      <div class="wp-card">
+        <div class="wp-step-badge">STEP. 5</div>
+        <div class="wp-card-icon">📊</div>
+        <div class="wp-card-title">성과 리포트</div>
+        <div class="wp-card-duration">종료 후</div>
+        <div class="wp-card-divider"></div>
+        <ul class="wp-checklist">
+          <li>최종 채널 수 · 조회수 집계</li>
+          <li>참여 영상 목록 제공</li>
+          <li>상세 결과 리포트 전달</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="p6-cta-row" style="margin-top:32px">
+    <button class="btn-primary" data-fn="goTo" data-args="p3">캠페인 문의하기 →</button>
+    <button class="btn-secondary" data-fn="goToAuth" data-args="p-brochure">상품소개서 요청</button>
+  </div>
+</div>
+
+<!-- ════ PAGE 7 — 서비스 안내 v2 (테스트) ════ -->
+<div class="page-wrapper wide" id="p7" style="display:none">
+
+  <!-- 다크 히어로 -->
+  <div class="p7-hero">
+    <div class="p7-hero-tag">숏폼 바이럴 마케팅</div>
+    <h2 class="p7-hero-title">브랜드의 성장 여정을<br>함께하는 캠페인 파트너</h2>
+    <p class="p7-hero-desc">크리에이터 자율 참여 방식으로 광고비를 95% 절감하고,<br>캠페인 종료 후에도 조회수가 지속 발생합니다.</p>
+    <div class="p7-hero-stats">
+      <div class="p7-hstat"><strong>1,200+</strong><span>누적 캠페인</span></div>
+      <div class="p7-hstat"><strong>4억+</strong><span>누적 조회수</span></div>
+      <div class="p7-hstat"><strong>50K+</strong><span>파트너 채널</span></div>
+    </div>
+  </div>
+
+  <!-- 01 상품 소개 -->
+  <div class="p7-block">
+    <div class="p7-block-title">목표에 맞는 캠페인을 선택하세요</div>
+    <div class="p7-service-grid">
+      <div class="p7-service-card">
+        <div class="p7-sc-icon">👁</div>
+        <div class="p7-sc-badge">VIEW BASED</div>
+        <div class="p7-sc-name">조회수당 캠페인</div>
+        <div class="p7-sc-kpi">KPI — 목표 조회수 달성</div>
+        <div class="p7-sc-divider"></div>
+        <ul class="p7-sc-feats">
+          <li>목표 조회수 설정, 도달 시 자동 종료</li>
+          <li>영화·드라마·브랜드 확산에 최적</li>
+          <li>종료 후 조회수 지속 발생</li>
+          <li class="price">500,000회~ · 500만 원~</li>
+        </ul>
+      </div>
+      <div class="p7-service-card">
+        <div class="p7-sc-icon">📤</div>
+        <div class="p7-sc-badge">UPLOAD BASED</div>
+        <div class="p7-sc-name">업로드당 캠페인</div>
+        <div class="p7-sc-kpi">KPI — 목표 영상 수 달성</div>
+        <div class="p7-sc-divider"></div>
+        <ul class="p7-sc-feats">
+          <li>목표 영상 수 설정, 도달 시 자동 종료</li>
+          <li>음원·챌린지 유통량 확보에 효과적</li>
+          <li>단기간 콘텐츠 대량 배포</li>
+          <li class="price">200개~ · 500만 원~</li>
+        </ul>
+      </div>
+      <div class="p7-service-card highlight">
+        <div class="p7-sc-icon">⭐</div>
+        <div class="p7-sc-badge">QUALITY BASED</div>
+        <div class="p7-sc-name">프리미엄 캠페인</div>
+        <div class="p7-sc-kpi">KPI — 채널 수 · 퀄리티</div>
+        <div class="p7-sc-divider"></div>
+        <ul class="p7-sc-feats">
+          <li>광고주가 직접 채널 선정</li>
+          <li>브랜드 맞춤 제작 가이드 제공</li>
+          <li>채널 규모·카테고리 필터링</li>
+          <li class="price">30개 채널 · 1,000만 원~</li>
+        </ul>
+      </div>
+    </div>
+    <div class="notice-row">
+      <span>📌</span>
+      <p>콘텐츠 라이브 희망일 기준 최소 <strong>2주 전</strong> 캠페인 오픈이 필요합니다. 패키지 단위로 진행되며 개별 채널 단독 진행은 불가합니다.</p>
+    </div>
+
+  </div>
+
+  <!-- CTA -->
+  <div class="p7-cta-block">
+    <div class="p7-cta-title">지금 바로 캠페인을 시작하세요</div>
+    <div class="p7-cta-sub">영업일 기준 1일 내 담당자가 연락드립니다</div>
+    <div class="p7-cta-btns">
+      <button class="btn-primary" data-fn="goTo" data-args="p3">캠페인 문의하기 →</button>
+      <button class="btn-secondary" data-fn="goToAuth" data-args="p-brochure">상품소개서 요청</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════ PAGE 1 — 상품 선택 ════ -->
+<div class="page-wrapper" id="p-shop">
+  <div class="breadcrumb">
+    <button data-fn="goTo" data-args="p-list">내 캠페인</button> / <span>캠페인 시작</span>
+  </div>
+  <div class="page-header">
+    <h1>상품 선택</h1>
+    <p>캠페인 목표에 맞는 상품을 선택해 주세요</p>
+  </div>
+  <div class="steps">
+    <div class="step-item"><div class="step-num active">1</div><div class="step-text active">상품 선택</div></div>
+    <div class="step-item"><div class="step-num pending">2</div><div class="step-text pending">캠페인 정보 입력</div></div>
+    <div class="step-item"><div class="step-num pending">3</div><div class="step-text pending">소스 업로드</div></div>
+    <div class="step-item"><div class="step-num pending">4</div><div class="step-text pending">최종 확인 및 결제</div></div>
+  </div>
+
+  <div class="products-grid">
+    <div class="product-card" id="prod-view" data-fn="selectProduct" data-args="view|조회수당 캠페인|500만 원">
+      <div class="product-badge">VIEW BASED</div>
+      <div class="product-name">조회수당 캠페인</div>
+      <div class="product-kpi">KPI — 목표 조회수 도달</div>
+      <div class="product-divider"></div>
+      <div class="product-specs">
+        <div class="spec-row"><span class="spec-key">집행 금액</span><span class="spec-val orange">500만 원~</span></div>
+        <div class="spec-row"><span class="spec-key">제공 채널 수</span><span class="spec-val">500,000 회</span></div>
+        <div class="spec-row"><span class="spec-key">평균 구독자</span><span class="spec-val">자율 참여</span></div>
+        <div class="spec-row"><span class="spec-key">캠페인 마감</span><span class="spec-val">목표 조회수 달성 시</span></div>
+      </div>
+      <ul class="product-feats">
+        <li>목표 조회수 설정, 도달 시 자동 종료</li>
+        <li>크리에이터 자율 편집·참여</li>
+        <li>영화·드라마·브랜드 확산에 최적</li>
+        <li>종료 후 조회수 지속 발생</li>
+      </ul>
+    </div>
+    <div class="product-card" id="prod-upload" data-fn="selectProduct" data-args="upload|업로드당 캠페인|500만 원">
+      <div class="product-badge">UPLOAD BASED</div>
+      <div class="product-name">업로드당 캠페인</div>
+      <div class="product-kpi">KPI — 목표 영상 수 도달</div>
+      <div class="product-divider"></div>
+      <div class="product-specs">
+        <div class="spec-row"><span class="spec-key">집행 금액</span><span class="spec-val orange">500만 원~</span></div>
+        <div class="spec-row"><span class="spec-key">목표 영상 수</span><span class="spec-val">200개~</span></div>
+        <div class="spec-row"><span class="spec-key">평균 구독자</span><span class="spec-val">자율 참여</span></div>
+        <div class="spec-row"><span class="spec-key">캠페인 마감</span><span class="spec-val">목표 영상 수 달성 시</span></div>
+      </div>
+      <ul class="product-feats">
+        <li>목표 영상 수 설정, 도달 시 자동 종료</li>
+        <li>음원·챌린지 유통량 확보에 효과적</li>
+        <li>단기간 콘텐츠 대량 배포</li>
+        <li>음원 차트 진입 부스트 효과</li>
+      </ul>
+    </div>
+    <div class="product-card featured" id="prod-connect" data-fn="selectProduct" data-args="connect|커넥트 캠페인|1,000만 원">
+      <div class="product-badge">QUALITY BASED</div>
+      <div class="product-name">프리미엄 캠페인</div>
+      <div class="product-kpi">KPI — 채널 수 · 퀄리티</div>
+      <div class="product-divider"></div>
+      <div class="product-specs">
+        <div class="spec-row"><span class="spec-key">집행 금액</span><span class="spec-val orange">1,000만 원~</span></div>
+        <div class="spec-row"><span class="spec-key">제공 채널 수</span><span class="spec-val">30개</span></div>
+        <div class="spec-row"><span class="spec-key">평균 구독자</span><span class="spec-val">1만 명</span></div>
+        <div class="spec-row"><span class="spec-key">채널 선정</span><span class="spec-val orange">광고주 직접 선정</span></div>
+      </div>
+      <ul class="product-feats">
+        <li>모집된 채널 중 광고주가 직접 선정</li>
+        <li>브랜드 기획 방향 맞춤 제작 가이드</li>
+        <li>채널 규모·카테고리·타겟 필터링</li>
+        <li>커뮤니티·썰 등 고단가 채널 포함</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="notice-row">
+    <span>📌</span>
+    <p>콘텐츠 라이브 희망일 기준 최소 <strong>2주 전</strong> 캠페인 오픈이 필요합니다. 참여 채널 리스트 및 상세 정보는 진행 확정 이후 제공됩니다. 패키지 단위로 진행되며 개별 채널 단독 진행은 불가합니다.</p>
+  </div>
+</div>
+
+<!-- ════ PAGE 2 — 내 캠페인 ════ -->
+<div class="page-wrapper" id="p-list">
+  <div class="page-header-row">
+    <div>
+      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;margin-bottom:4px">내 캠페인</h1>
+      <p style="font-size:13px;color:var(--gray-light);font-weight:300">진행 중인 캠페인의 현황을 확인하세요</p>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card active"><div class="summary-num">6</div><div class="summary-label">전체</div></div>
+    <div class="summary-card"><div class="summary-num">1</div><div class="summary-label">모집 중</div></div>
+    <div class="summary-card"><div class="summary-num">1</div><div class="summary-label">채널 선정 대기</div></div>
+    <div class="summary-card"><div class="summary-num">2</div><div class="summary-label">진행 중</div></div>
+    <div class="summary-card"><div class="summary-num">2</div><div class="summary-label">종료</div></div>
+  </div>
+
+  <div class="filter-bar">
+    <div class="filter-tab active">전체 캠페인</div>
+    <div class="filter-tab">조회수당</div>
+    <div class="filter-tab">업로드당</div>
+    <div class="filter-tab">커넥트</div>
+    <input class="search-input" type="text" placeholder="캠페인명 검색">
+  </div>
+
+  <div class="campaign-list">
+
+    <!-- 완료 -->
+    <div class="campaign-card" data-fn="goTo" data-args="p-detail">
+      <div class="card-thumb">
+        <img src="img/toy_story5.jpg" alt="토이 스토리 5">
+      </div>
+      <div class="card-left">
+        <div class="card-product-tag">조회수당</div>
+        <div class="status-badge done">완료</div>
+      </div>
+      <div class="card-center">
+        <div class="card-title">영화 〈토이 스토리 5〉</div>
+        <div class="card-meta">
+          <div class="card-platform-badges">
+            <span class="platform-badge yt">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+              유튜브 쇼츠
+            </span>
+          </div>
+          <div class="card-meta-goal">목표 <span>500,000회</span></div>
+        </div>
+      </div>
+      <div class="card-right">
+        <button class="card-btn primary" data-fn="goTo" data-args="p-detail" data-stop="1">상세 보기 →</button>
+      </div>
+    </div>
+
+    <!-- 채널 선정 -->
+    <div class="campaign-card" data-fn="goTo" data-args="p-channels">
+      <div class="card-thumb" style="background:linear-gradient(160deg,#1a0828,#3d1060)">
+      </div>
+      <div class="card-left">
+        <div class="card-product-tag">프리미엄</div>
+        <div class="status-badge recruiting">채널 선정 중</div>
+      </div>
+      <div class="card-center">
+        <div class="card-title">시리즈 〈다 이루어질지니〉</div>
+        <div class="card-meta">
+          <div class="card-platform-badges">
+            <span class="platform-badge yt">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+              유튜브 쇼츠
+            </span>
+            <span class="platform-badge ig">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+              인스타그램 릴스
+            </span>
+          </div>
+          <div class="card-meta-goal">목표 <span>300,000회</span></div>
+        </div>
+      </div>
+      <div class="card-right">
+        <button class="card-btn primary" data-fn="goTo" data-args="p-channels" data-stop="1">채널 선정하기 →</button>
+      </div>
+    </div>
+
+    <!-- 오픈 준비중 -->
+    <div class="campaign-card" data-fn="goTo" data-args="p-detail">
+      <div class="card-thumb" style="background:linear-gradient(160deg,#0a1628,#1a3060)">
+      </div>
+      <div class="card-left">
+        <div class="card-product-tag">업로드당</div>
+        <div class="status-badge ready">오픈 준비중</div>
+      </div>
+      <div class="card-center">
+        <div class="card-title">EPEX — UNIVERSE 음원 바이럴 캠페인</div>
+        <div class="card-meta">
+          <div class="card-platform-badges">
+            <span class="platform-badge yt">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+              유튜브 쇼츠
+            </span>
+            <span class="platform-badge tt">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>
+              틱톡
+            </span>
+          </div>
+          <div class="card-meta-goal">목표 <span>2,500개</span></div>
+        </div>
+      </div>
+      <div class="card-right">
+        <button class="card-btn primary" data-fn="goTo" data-args="p-detail" data-stop="1">상세 보기 →</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ════ PAGE 3 — 캠페인 정보 입력 ════ -->
+<div class="page-wrapper" id="p-form">
+  <div class="breadcrumb">
+    <button data-fn="goTo" data-args="p-list">내 캠페인</button> /
+    <button data-fn="goTo" data-args="p-shop">상품 선택</button> /
+    <span>캠페인 정보 입력</span>
+  </div>
+  <div class="page-header"><h1>캠페인 정보 입력</h1><p>캠페인 진행에 필요한 정보를 입력해 주세요</p></div>
+  <div class="steps">
+    <div class="step-item"><div class="step-num done">✓</div><div class="step-text done">상품 선택</div></div>
+    <div class="step-item"><div class="step-num active">2</div><div class="step-text active">캠페인 정보 입력</div></div>
+    <div class="step-item"><div class="step-num pending">3</div><div class="step-text pending">소스 업로드</div></div>
+    <div class="step-item"><div class="step-num pending">4</div><div class="step-text pending">최종 확인 및 결제</div></div>
+  </div>
+
+  <div class="form-layout">
+    <div>
+      <div class="form-card">
+        <div class="form-card-header"><div class="form-num">1</div><h3>기본 정보</h3></div>
+        <div class="form-card-body">
+          <div class="form-group">
+            <div class="form-label">캠페인명 <span class="required">필수</span></div>
+            <input class="form-input" type="text" placeholder="예: 영화 〈원더풀스〉 조회수당 캠페인">
+          </div>
+          <div class="form-group">
+            <div class="form-label">광고 카테고리 <span class="required">필수</span></div>
+            <select class="form-input">
+              <option value="" disabled selected>카테고리 선택</option>
+              <option>영화 · 드라마</option><option>음악 · 음원</option>
+              <option>커뮤니티 · 썰</option><option>패션 · 뷰티</option>
+              <option>음식 · 요리</option><option>운동 · 헬스</option>
+              <option>게임 · IT</option><option>기타 브랜드</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <div class="form-label">집행 플랫폼 <span class="required">필수</span></div>
+            <div class="platform-select">
+              <div class="platform-btn selected" data-toggle="selected">Youtube</div>
+              <div class="platform-btn" data-toggle="selected">Instagram</div>
+              <div class="platform-btn" data-toggle="selected">Tiktok</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-header"><div class="form-num">2</div><h3>캠페인 일정</h3></div>
+        <div class="form-card-body">
+          <div class="form-group">
+            <div class="form-label">콘텐츠 라이브 희망일 <span class="required">필수</span></div>
+            <input class="form-input" type="date" id="liveDate" data-change="calcDates">
+            <div class="form-hint warn">⚠ 라이브 희망일 기준 최소 2주 전 캠페인 오픈이 필요합니다.</div>
+          </div>
+          <div class="input-row">
+            <div class="form-group">
+              <div class="form-label">캠페인 오픈일 <span class="optional">자동 계산</span></div>
+              <input class="form-input readonly" type="date" id="openDate" readonly>
+            </div>
+            <div class="form-group">
+              <div class="form-label">모집 마감일 <span class="optional">자동 계산</span></div>
+              <input class="form-input readonly" type="date" id="closeDate" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-header"><div class="form-num">3</div><h3>목표 설정</h3></div>
+        <div class="form-card-body">
+          <div class="form-group">
+            <div class="form-label">목표 조회수 <span class="required">필수</span></div>
+            <input class="form-input" type="number" placeholder="예: 500000">
+            <div class="form-hint">목표 조회수 달성 시 캠페인이 자동 종료됩니다.</div>
+          </div>
+          <div class="form-group">
+            <div class="form-label">캠페인 소개 <span class="optional">선택</span></div>
+            <textarea class="form-input" placeholder="광고 배경, 주요 메시지, 참여 채널에 전달할 내용을 입력해 주세요."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-header"><div class="form-num">4</div><h3>소스 업로드</h3></div>
+        <div class="form-card-body">
+          <div class="form-group">
+            <div class="form-label">광고 소스 영상 <span class="required">필수</span></div>
+            <div class="upload-zone" data-fileinput="srcFile">
+              <div class="upload-icon">🎬</div>
+              <div class="upload-text">영상 파일을 업로드하세요</div>
+              <div class="upload-sub">드래그 앤 드롭 또는 <em>파일 선택</em> · MP4, MOV · 최대 2GB</div>
+            </div>
+            <input type="file" id="srcFile" style="display:none" accept="video/*">
+          </div>
+          <div class="form-group">
+            <div class="form-label">편집 가이드 <span class="optional">선택</span></div>
+            <textarea class="form-input" placeholder="편집 방향, 금지 내용, 필수 포함 요소 등을 입력해 주세요."></textarea>
+          </div>
+          <div class="form-group">
+            <div class="form-label">필수 해시태그 <span class="optional">선택</span></div>
+            <input class="form-input" type="text" placeholder="예: #원더풀스 #넷플릭스 #신작추천">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div>
+      <div class="sidebar-card">
+        <div class="sidebar-header"><h4>선택된 상품</h4></div>
+        <div class="sidebar-body">
+          <div class="s-product-badge">조회수당</div>
+          <div class="s-product-name">VIEW BASED</div>
+          <div class="s-rows">
+            <div class="s-row"><span class="s-key">제공 채널 수</span><span class="s-val">50개</span></div>
+            <div class="s-row"><span class="s-key">평균 구독자</span><span class="s-val">1만 명</span></div>
+            <div class="s-row"><span class="s-key">채널 선정</span><span class="s-val orange">자율 참여</span></div>
+            <div class="s-row"><span class="s-key">마감 기준</span><span class="s-val">목표 조회수 달성 시</span></div>
+          </div>
+          <div class="s-amount">
+            <div class="s-amount-label">집행 금액</div>
+            <div class="s-amount-val">500만 원</div>
+            <div class="s-amount-vat">VAT 별도</div>
+          </div>
+          <div class="s-notice"><p>📌 라이브 희망일 기준 최소 <strong>2주 전</strong> 오픈 필요<br>참여 채널 리스트는 진행 확정 이후 제공</p></div>
+          <button data-fn="goTo" data-args="p-shop" style="font-size:12px;color:var(--gray-light);background:none;border:none;cursor:pointer;display:block;width:100%;text-align:center;">← 상품 변경</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ PAGE 4 — 채널 선정 ════ -->
+<div class="page-wrapper wide" id="p-channels">
+  <div class="breadcrumb"><button data-fn="goTo" data-args="p-list">내 캠페인</button> / <span>시리즈 〈다 이루어질지니〉 — 채널 선정</span></div>
+  <div class="page4-header">
+    <div class="page4-header-left">
+      <h1>채널 선정</h1>
+      <p>시리즈 〈다 이루어질지니〉 프리미엄 캠페인 · 최종 30개를 선정해 주세요</p>
+    </div>
+    <div class="counter-box">
+      <div class="counter-num" id="cNum">0 / 30</div>
+      <div class="counter-label">선정된 채널</div>
+    </div>
+  </div>
+
+  <div class="info-bar">
+    <div class="info-bar-item">상품 <strong>커넥트 (프리미엄)</strong></div>
+    <div class="info-bar-item">모집 기간 <strong>25.05.04 ~ 05.06</strong></div>
+    <div class="info-bar-item">참여 신청 <strong class="orange">142개</strong></div>
+    <div class="info-bar-item">선정 목표 <strong>30개</strong></div>
+    <div class="info-bar-item">라이브 희망일 <strong>25.06.14</strong></div>
+  </div>
+
+  <div class="filter-row">
+    <input class="search-input" style="margin-left:0;width:200px" type="text" placeholder="채널명 검색">
+    <select class="filter-select"><option>전체 카테고리</option><option>엔터테인먼트</option><option>커뮤니티·썰</option><option>음악</option><option>패션·뷰티</option></select>
+    <select class="filter-select"><option>전체 플랫폼</option><option>유튜브 쇼츠</option><option>인스타그램 릴스</option><option>틱톡</option></select>
+    <select class="filter-select"><option>전체 규모</option><option>10만 이상</option><option>5만~10만</option><option>1만~5만</option><option>1만 미만</option></select>
+    <span class="result-count">142개 채널</span>
+    <select class="sort-select"><option>구독자 많은 순</option><option>조회수 많은 순</option><option>참여율 높은 순</option></select>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:28px">#</th>
+          <th>채널 정보</th>
+          <th class="c">카테고리</th>
+          <th class="c">플랫폼</th>
+          <th class="c">구독자</th>
+          <th class="c">평균 조회수</th>
+          <th class="c">참여율</th>
+          <th class="c">선정</th>
+        </tr>
+      </thead>
+      <tbody id="chTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════ PAGE 5 — 캠페인 상세 리포트 ════ -->
+<div class="page-wrapper" id="p-detail">
+
+  <!-- 헤더 -->
+  <div class="cd-header">
+    <button class="cd-back" data-fn="goBackToList">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+    </button>
+    <div class="cd-thumb">🎬</div>
+    <div class="cd-info">
+      <div class="cd-name-row">
+        <span class="cd-name">디즈니 &lt;토이 스토리 5&gt;</span>
+        <span class="cd-badge done">완료</span>
+      </div>
+      <div class="cd-meta">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>
+        <span>유튜브</span><span>·</span><span>프리엠컴퍼니</span>
+      </div>
+    </div>
+    <div class="cd-actions">
+      <button class="cd-btn cd-btn-excel">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
+        Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- 목표 달성 카드 -->
+  <div class="cd-achieve">
+    <div class="cd-achieve-inner">
+      <div class="cd-achieve-head">
+        <div class="cd-achieve-label">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"/><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"/><path d="M18 9h1.5a1 1 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/><path d="M6 9H4.5a1 1 0 0 1 0-5H6"/></svg>
+          조회수 목표 초과 달성!
+        </div>
+        <div class="cd-achieve-pct">🎉 115%</div>
+      </div>
+      <div class="cd-prog-wrap">
+        <div class="cd-prog-fill" style="width:100%"></div>
+        <div class="cd-prog-dot"></div>
+      </div>
+      <div class="cd-stats3">
+        <div class="cd-stat3">
+          <div class="cd-stat3-lbl">목표</div>
+          <div class="cd-stat3-val">500,000 회</div>
+        </div>
+        <div class="cd-stat3 accent">
+          <div class="cd-stat3-lbl">달성</div>
+          <div class="cd-stat3-val orange">574,260 회</div>
+        </div>
+        <div class="cd-stat3">
+          <div class="cd-stat3-lbl">초과</div>
+          <div class="cd-stat3-val">+74,260 회</div>
+        </div>
+      </div>
+      <div class="cd-achieve-period">캠페인 기간: 2026-05-26 ~ 2026-06-08</div>
+    </div>
+  </div>
+
+  <!-- 리포트 타임라인 -->
+  <div class="rpt-card">
+    <div class="rpt-card-head">
+      <span class="rpt-card-title">리포트 타임라인</span>
+    </div>
+    <div class="rpt-list">
+      <div class="rpt-vline"></div>
+
+      <!-- 1차 -->
+      <div class="rpt-row">
+        <div class="rpt-dot amber">1</div>
+        <div class="rpt-body amber">
+          <div class="rpt-item-top">
+            <div class="rpt-item-left">
+              <div class="rpt-title-row">
+                <span class="rpt-title">1차 — 121,554 회</span>
+                <span class="rpt-pct amber">24%</span>
+              </div>
+              <div class="rpt-date">2026. 05. 29 10:00 기준 · 참여 영상 116개</div>
+              <div class="rpt-mini-prog"><div class="rpt-mini-fill amber" style="width:24%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2차 -->
+      <div class="rpt-row">
+        <div class="rpt-dot amber">2</div>
+        <div class="rpt-body amber">
+          <div class="rpt-item-top">
+            <div class="rpt-item-left">
+              <div class="rpt-title-row">
+                <span class="rpt-title">2차 — 355,305 회</span>
+                <span class="rpt-pct amber">71%</span>
+              </div>
+              <div class="rpt-date">2026. 06. 01 10:00 기준 · 참여 영상 138개</div>
+              <div class="rpt-mini-prog"><div class="rpt-mini-fill amber" style="width:71%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3차 -->
+      <div class="rpt-row">
+        <div class="rpt-dot amber">3</div>
+        <div class="rpt-body amber">
+          <div class="rpt-item-top">
+            <div class="rpt-item-left">
+              <div class="rpt-title-row">
+                <span class="rpt-title">3차 — 421,727 회</span>
+                <span class="rpt-pct amber">84%</span>
+              </div>
+              <div class="rpt-date">2026. 06. 05 기준 · 참여 영상 135개</div>
+              <div class="rpt-mini-prog"><div class="rpt-mini-fill amber" style="width:84%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 최종 -->
+      <div class="rpt-row">
+        <div class="rpt-dot final">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"/><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"/><path d="M18 9h1.5a1 1 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/><path d="M6 9H4.5a1 1 0 0 1 0-5H6"/></svg>
+        </div>
+        <div class="rpt-body final">
+          <div class="rpt-item-top">
+            <div class="rpt-item-left">
+              <div class="rpt-title-row">
+                <span class="rpt-title">최종 — 574,260 회</span>
+                <span class="rpt-pct green">115%</span>
+              </div>
+              <div class="rpt-date">2026. 06. 08 10:00 기준 · 참여 영상 147개</div>
+              <div class="rpt-mini-prog"><div class="rpt-mini-fill green" style="width:100%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 참여 영상 -->
+  <div class="vid-card">
+    <div class="vid-card-head">
+      <button class="vid-toggle-btn">
+        <span>참여 영상 (147개)</span>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+    </div>
+    <div class="vid-summary-row">
+      <span>총 조회수 <strong>574,260</strong></span>
+      <span>총 좋아요 <strong>7,014</strong></span>
+      <span>총 댓글 <strong>310</strong></span>
+      <span>참여 채널 <strong>147</strong></span>
+    </div>
+    <div class="vid-table-wrap">
+      <table class="vid-table">
+        <colgroup>
+          <col style="width:74px"><col style="width:100px"><col style="width:60px">
+          <col style="width:auto"><col style="width:64px"><col style="width:64px">
+          <col style="width:54px"><col style="width:48px"><col style="width:58px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th><button class="vid-sort-btn">업로드일 ↓</button></th>
+            <th><button class="vid-sort-btn">채널명 ↕</button></th>
+            <th><button class="vid-sort-btn">구독자 ↕</button></th>
+            <th><button class="vid-sort-btn">영상 제목 ↕</button></th>
+            <th>영상 길이</th>
+            <th><button class="vid-sort-btn">조회수 ↕</button></th>
+            <th><button class="vid-sort-btn">좋아요 ↕</button></th>
+            <th><button class="vid-sort-btn">댓글 ↕</button></th>
+            <th style="text-align:center">유료광고</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>26/06/06</td>
+            <td title="NOT NORMAL">NOT NORMAL</td>
+            <td>367</td>
+            <td><a class="vid-table-link" href="#" target="_blank">망했다고요? 근데 이미 예매했어요. 나는 픽사에게 30년째 속는 중입니다. #토이스토리5</a></td>
+            <td>1분 13초</td>
+            <td>1,424</td><td>6</td><td>0</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
+          </tr>
+          <tr>
+            <td>26/06/05</td>
+            <td title="하봄">하봄</td>
+            <td>292K</td>
+            <td><a class="vid-table-link" href="#" target="_blank">[토이 스토리 5] 네일하기🤠💅🏻</a></td>
+            <td>1분 11초</td>
+            <td>97,376</td><td>1,740</td><td>37</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
+          </tr>
+          <tr>
+            <td>26/06/05</td>
+            <td title="하씨네 CINE">하씨네 CINE</td>
+            <td>210K</td>
+            <td><a class="vid-table-link" href="#" target="_blank">디테일 장인 픽사의 레전드 걸작 "토이 스토리 5" 6월 17일 극장 대개봉</a></td>
+            <td>47초</td>
+            <td>2,441</td><td>24</td><td>2</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
+          </tr>
+          <tr>
+            <td>26/06/04</td>
+            <td title="예고공식">예고공식</td>
+            <td>10.6K</td>
+            <td><a class="vid-table-link" href="#" target="_blank">첫시리즈 그땐 아이였는데, 이젠 부모가 되어 만나는 우디</a></td>
+            <td>27초</td>
+            <td>18,434</td><td>215</td><td>2</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
+          </tr>
+          <tr>
+            <td>26/06/03</td>
+            <td title="포브스튜디오">포브스튜디오</td>
+            <td>1.4M</td>
+            <td><a class="vid-table-link" href="#" target="_blank">인생 애니 귀환-토이 스토리 5</a></td>
+            <td>38초</td>
+            <td>5,950</td><td>21</td><td>3</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════ AUTH — 로그인 ════ -->
+<div class="auth-page fullpage" id="p4">
+  <div class="auth-top">
+    <div class="auth-top-logo" data-fn="goTo" data-args="p1">CRE<em>;</em>ABLE</div>
+    <h2>브랜드와 크리에이터가 연결되는<br><em>광고 플랫폼</em></h2>
+    <p>커넥트 스튜디오로 숏폼 바이럴 마케팅을 더 쉽고 빠르게 시작하세요.</p>
+  </div>
+  <div class="auth-form-box">
+    <div class="auth-form-header">
+      <h1>로그인</h1>
+      <p>계정에 로그인하여 캠페인을 관리하세요</p>
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">이메일</label>
+      <input class="auth-input" type="email" placeholder="example@company.com">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">비밀번호</label>
+      <input class="auth-input" type="password" placeholder="비밀번호를 입력하세요">
+    </div>
+    <div class="auth-options">
+      <label class="auth-remember"><input type="checkbox"> 로그인 상태 유지</label>
+      <button class="auth-forgot">비밀번호 찾기</button>
+    </div>
+    <button class="btn-auth" data-fn="doLogin">로그인</button>
+    <div class="auth-divider"><span>또는</span></div>
+    <div class="auth-footer">
+      계정이 없으신가요? <button data-fn="goToAuth" data-args="p-signup">회원가입</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ AUTH — 회원가입 ════ -->
+<div class="auth-page fullpage" id="p-signup">
+  <div class="auth-top">
+    <div class="auth-top-logo" data-fn="goTo" data-args="p1">CRE<em>;</em>ABLE</div>
+    <h2>지금 가입하고 첫 캠페인을<br><em>무료 상담</em>으로 시작하세요</h2>
+    <p>회원가입 후 전담 플래너의 1:1 상담을 통해 최적의 캠페인을 설계해 드립니다.</p>
+  </div>
+  <div class="auth-form-box">
+    <div class="auth-form-header">
+      <h1>회원가입</h1>
+      <p>광고주 계정을 생성하세요</p>
+    </div>
+    <div class="auth-row">
+      <div class="auth-field">
+        <label class="auth-label">회사명</label>
+        <input class="auth-input" type="text" placeholder="(주)회사명">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">담당자명</label>
+        <input class="auth-input" type="text" placeholder="홍길동">
+      </div>
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">이메일</label>
+      <input class="auth-input" type="email" placeholder="example@company.com">
+    </div>
+    <div class="auth-row">
+      <div class="auth-field">
+        <label class="auth-label">연락처</label>
+        <input class="auth-input" type="tel" placeholder="010-0000-0000">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">사업자등록번호</label>
+        <input class="auth-input" type="text" placeholder="000-00-00000">
+      </div>
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">사업자등록증 첨부 <span style="font-size:11px;font-weight:400;color:var(--gray-light)">(필수)</span></label>
+      <div class="auth-upload" data-fileinput="bizFile">
+        <div class="auth-upload-icon">📄</div>
+        <div class="auth-upload-text">사업자등록증을 업로드하세요</div>
+        <div class="auth-upload-sub">클릭하거나 파일을 드래그하세요 · JPG, PNG, PDF · 최대 10MB</div>
+      </div>
+      <input type="file" id="bizFile" style="display:none" accept="image/*,.pdf" data-change="showBizFile">
+      <div class="auth-upload-name" id="bizFileName"></div>
+    </div>
+    <div class="auth-row">
+      <div class="auth-field">
+        <label class="auth-label">비밀번호</label>
+        <input class="auth-input" type="password" placeholder="8자 이상">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">비밀번호 확인</label>
+        <input class="auth-input" type="password" placeholder="동일하게 입력">
+      </div>
+    </div>
+    <div class="auth-agree">
+      <label class="auth-agree-item" style="font-weight:700">
+        <input type="checkbox" id="agreeAll" data-change="toggleAllAgree"> 전체 동의
+      </label>
+      <label class="auth-agree-item">
+        <input type="checkbox" class="agree-check"> 이용약관 동의 (필수)
+        <button class="auth-agree-view">보기</button>
+      </label>
+      <label class="auth-agree-item">
+        <input type="checkbox" class="agree-check"> 개인정보 처리방침 동의 (필수)
+        <button class="auth-agree-view">보기</button>
+      </label>
+      <label class="auth-agree-item">
+        <input type="checkbox" class="agree-check"> 마케팅 수신 동의 (선택)
+        <button class="auth-agree-view">보기</button>
+      </label>
+    </div>
+    <button class="btn-auth" data-fn="doLogin">회원가입 완료</button>
+    <div class="auth-footer">
+      이미 계정이 있으신가요? <button data-fn="goTo" data-args="p4">로그인</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ INQUIRY — 캠페인 문의하기 ════ -->
+<div class="auth-page fullpage" id="p3">
+  <div class="inq-wrap">
+    <div class="inq-header">
+      <h1>캠페인 문의하기</h1>
+      <p>체크 항목을 선택해 주시면 영업일 기준 <strong style="color:rgba(255,185,100,0.9)">1일 내</strong> 담당자가 연락드립니다.</p>
+    </div>
+    <div class="inq-card">
+
+      <!-- 01 회사명/브랜드명 -->
+      <div class="inq-section">
+        <div class="inq-section-head">
+          <div class="inq-section-num">1</div>
+          <div class="inq-section-title">회사명 / 브랜드명</div>
+        </div>
+        <input class="inq-input" id="iq-company" type="text" placeholder="회사명 또는 브랜드명을 입력해 주세요" style="width:100%">
+      </div>
+      <div class="inq-divider"></div>
+
+      <!-- 02 담당자명 -->
+      <div class="inq-section">
+        <div class="inq-section-head">
+          <div class="inq-section-num">2</div>
+          <div class="inq-section-title">담당자명</div>
+        </div>
+        <input class="inq-input" id="iq-name" type="text" placeholder="담당자 성함을 입력해 주세요" style="width:100%">
+      </div>
+      <div class="inq-divider"></div>
+
+      <!-- 03 연락처 -->
+      <div class="inq-section">
+        <div class="inq-section-head">
+          <div class="inq-section-num">3</div>
+          <div class="inq-section-title">연락처</div>
+        </div>
+        <div class="inq-inputs">
+          <input class="inq-input" id="iq-phone" type="tel" placeholder="연락처">
+          <input class="inq-input" id="iq-email" type="email" placeholder="이메일">
+        </div>
+      </div>
+      <div class="inq-divider"></div>
+
+      <!-- 04 광고 카테고리 -->
+      <div class="inq-section">
+        <div class="inq-section-head">
+          <div class="inq-section-num">4</div>
+          <div class="inq-section-title">광고 카테고리</div>
+          <div class="inq-section-sub">중복 선택 가능</div>
+        </div>
+        <div class="inq-checks">
+          <input class="inq-chk" type="checkbox" id="iq-c1"><label class="inq-chk-label" for="iq-c1">영화·드라마</label>
+          <input class="inq-chk" type="checkbox" id="iq-c2"><label class="inq-chk-label" for="iq-c2">음악·음원</label>
+          <input class="inq-chk" type="checkbox" id="iq-c3"><label class="inq-chk-label" for="iq-c3">커뮤니티·썰</label>
+          <input class="inq-chk" type="checkbox" id="iq-c4"><label class="inq-chk-label" for="iq-c4">패션·뷰티</label>
+          <input class="inq-chk" type="checkbox" id="iq-c5"><label class="inq-chk-label" for="iq-c5">음식·요리</label>
+          <input class="inq-chk" type="checkbox" id="iq-c6"><label class="inq-chk-label" for="iq-c6">운동·헬스</label>
+          <input class="inq-chk" type="checkbox" id="iq-c7"><label class="inq-chk-label" for="iq-c7">게임·IT</label>
+          <input class="inq-chk" type="checkbox" id="iq-c8"><label class="inq-chk-label" for="iq-c8">기타 브랜드</label>
+        </div>
+      </div>
+      <div class="inq-divider"></div>
+
+      <!-- 05 집행 플랫폼 -->
+      <div class="inq-section">
+        <div class="inq-section-head">
+          <div class="inq-section-num">5</div>
+          <div class="inq-section-title">집행 플랫폼</div>
+        </div>
+        <div class="inq-checks">
+          <input class="inq-chk" type="checkbox" id="iq-yt"><label class="inq-chk-label" for="iq-yt">YouTube</label>
+          <input class="inq-chk" type="checkbox" id="iq-ig"><label class="inq-chk-label" for="iq-ig">Instagram</label>
+          <input class="inq-chk" type="checkbox" id="iq-tt"><label class="inq-chk-label" for="iq-tt">TikTok</label>
+        </div>
+      </div>
+      <div class="inq-divider"></div>
+
+      <!-- 06 예산 규모 -->
+      <div class="inq-section">
+        <div class="inq-section-head">
+          <div class="inq-section-num">6</div>
+          <div class="inq-section-title">예산 규모</div>
+        </div>
+        <div class="inq-checks">
+          <input class="inq-chk" type="radio" name="iq-budget" id="iq-b1"><label class="inq-chk-label" for="iq-b1">500만~1,000만 원</label>
+          <input class="inq-chk" type="radio" name="iq-budget" id="iq-b2"><label class="inq-chk-label" for="iq-b2">1,000만~3,000만 원</label>
+          <input class="inq-chk" type="radio" name="iq-budget" id="iq-b3"><label class="inq-chk-label" for="iq-b3">3,000만 원 이상</label>
+          <input class="inq-chk" type="radio" name="iq-budget" id="iq-b4"><label class="inq-chk-label" for="iq-b4">미정</label>
+        </div>
+      </div>
+      <div class="inq-divider"></div>
+
+      <!-- 07 희망 라이브 시기 -->
+      <div class="inq-section">
+        <div class="inq-section-head">
+          <div class="inq-section-num">7</div>
+          <div class="inq-section-title">희망 라이브 시기</div>
+        </div>
+        <div class="inq-checks">
+          <input class="inq-chk" type="radio" name="iq-timing" id="iq-t1"><label class="inq-chk-label" for="iq-t1">1개월 이내</label>
+          <input class="inq-chk" type="radio" name="iq-timing" id="iq-t2"><label class="inq-chk-label" for="iq-t2">1~3개월</label>
+          <input class="inq-chk" type="radio" name="iq-timing" id="iq-t3"><label class="inq-chk-label" for="iq-t3">3개월 이후</label>
+          <input class="inq-chk" type="radio" name="iq-timing" id="iq-t4"><label class="inq-chk-label" for="iq-t4">미정</label>
+        </div>
+      </div>
+
+      <button class="inq-submit" data-fn="submitInquiry">문의 접수하기 →</button>
+    </div>
+
+    <div style="margin-top:20px; text-align:center; font-size:12px; color:rgba(255,255,255,0.3)">
+      이미 계정이 있으신가요? <button data-fn="goTo" data-args="p4" style="background:none;border:none;color:rgba(255,180,100,0.8);font-size:12px;cursor:pointer;font-family:inherit;font-weight:600">로그인</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ BROCHURE — 상품소개서 요청 ════ -->
+<div class="auth-page fullpage" id="p-brochure">
+  <div class="auth-top-logo" data-fn="goTo" data-args="p1" style="margin-bottom:32px">CRE<em style="color:var(--orange);font-style:normal">;</em>ABLE</div>
+  <div class="inq-wrap" style="max-width:560px">
+    <div class="inq-header">
+      <h1>상품소개서 요청</h1>
+      <p>정보를 입력해 주시면 이메일로 소개서를 발송해드립니다.</p>
+    </div>
+    <div class="inq-card">
+
+      <!-- 01 회사명 / 브랜드명 -->
+      <div class="inq-section">
+        <div class="inq-section-head">
+          <div class="inq-section-num">1</div>
+          <div class="inq-section-title">회사명 / 브랜드명</div>
+        </div>
+        <input class="inq-text-input" type="text" id="br-company" placeholder="예: 주식회사 크리에이블">
+      </div>
+      <div class="inq-divider"></div>
+
+      <!-- 02 연락처 (이메일) -->
+      <div class="inq-section">
+        <div class="inq-section-head">
+          <div class="inq-section-num">2</div>
+          <div class="inq-section-title">이메일</div>
+        </div>
+        <input class="inq-text-input" type="email" id="br-email" placeholder="예: contact@brand.com">
+      </div>
+      <div class="inq-divider"></div>
+
+      <!-- 03 카테고리 -->
+      <div class="inq-section" style="margin-bottom:0">
+        <div class="inq-section-head">
+          <div class="inq-section-num">3</div>
+          <div class="inq-section-title">카테고리</div>
+          <div class="inq-section-sub">중복 선택 가능</div>
+        </div>
+        <div class="inq-checks">
+          <input class="inq-chk" type="checkbox" id="br-c1"><label class="inq-chk-label" for="br-c1">영화·드라마</label>
+          <input class="inq-chk" type="checkbox" id="br-c2"><label class="inq-chk-label" for="br-c2">음악·음원</label>
+          <input class="inq-chk" type="checkbox" id="br-c3"><label class="inq-chk-label" for="br-c3">커뮤니티·썰</label>
+          <input class="inq-chk" type="checkbox" id="br-c4"><label class="inq-chk-label" for="br-c4">패션·뷰티</label>
+          <input class="inq-chk" type="checkbox" id="br-c5"><label class="inq-chk-label" for="br-c5">음식·요리</label>
+          <input class="inq-chk" type="checkbox" id="br-c6"><label class="inq-chk-label" for="br-c6">운동·헬스</label>
+          <input class="inq-chk" type="checkbox" id="br-c7"><label class="inq-chk-label" for="br-c7">게임·IT</label>
+          <input class="inq-chk" type="checkbox" id="br-c8"><label class="inq-chk-label" for="br-c8">기타 브랜드</label>
+        </div>
+      </div>
+
+    </div><!-- /inq-card -->
+
+    <button class="inq-submit" data-fn="submitBrochure">소개서 받기 →</button>
+    <div style="margin-top:16px; text-align:center; font-size:12px; color:rgba(255,255,255,0.3)">
+      캠페인 문의는 <button data-fn="goTo" data-args="p3" style="background:none;border:none;color:rgba(255,180,100,0.8);font-size:12px;cursor:pointer;font-family:inherit;font-weight:600">여기</button>에서
+    </div>
+  </div>
+</div>
+
+<!-- CTA BAR -->
+<div class="cta-bar" id="ctaBar">
+  <div class="cta-info" id="ctaInfo">상품을 선택해 주세요</div>
+  <button class="btn-cta" id="ctaBtn" data-fn="handleCta">다음 단계로 →</button>
+</div>
+
+<script src="emailjs.min.js"></script>
+<script src="channels.js"></script>
+<script src="site.js"></script>
+</body>
+</html>

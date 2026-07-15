@@ -1,26 +1,63 @@
 try { emailjs.init('PR1yiM-fDVGYx5wCo'); } catch(e) { console.warn('EmailJS init failed', e); }
 
 // ── ROUTING ──
-const pages = ['p1','p2','p3','p4','p7','p-shop','p-list','p-form','p-channels','p-detail','p-prod-view','p-prod-upload','p-prod-premium'];
+const pages = ['p1','p3','p4','p7','p-shop','p-list','p-form','p-channels','p-detail'];
 const authPages = ['p-signup','p-brochure'];
-const navMap = { p1:'nav-p1', p2:'nav-p2', p3:'nav-p3', p7:'nav-p7' };
+const navMap = { p1:'nav-p1', p3:'nav-p3', p7:'nav-p7' };
 const ctaPages = ['p-shop','p-form','p-channels'];
-const p0ActivePages = ['p1','p2','p3','p4','p7','p-prod-view','p-prod-upload','p-prod-premium'];
+const p0ActivePages = ['p1','p3','p4','p7'];
 
 function goBackToList() { goTo('p-list'); }
 
-function toggleServiceMenu() {
-  document.getElementById('serviceDropdownMenu').classList.toggle('open');
+function filterCampaigns() {
+  const typeVal = document.getElementById('campaignTypeFilter')?.value || 'all';
+  const activeChip = document.querySelector('#p-list .status-chip.active');
+  const statusVal = activeChip ? activeChip.dataset.status : 'all';
+  document.querySelectorAll('#p-list .campaign-card').forEach(card => {
+    const typeMatch = typeVal === 'all' || card.dataset.campaignType === typeVal;
+    const statusMatch = statusVal === 'all' || card.dataset.campaignStatus === statusVal;
+    card.style.display = (typeMatch && statusMatch) ? '' : 'none';
+  });
 }
 
-document.addEventListener('click', function(e) {
-  const menu = document.getElementById('serviceDropdownMenu');
-  if (!menu || !menu.classList.contains('open')) return;
-  if (!e.target.closest('.gnb-dropdown')) menu.classList.remove('open');
-});
+function updateChipCounts() {
+  const cards = document.querySelectorAll('#p-list .campaign-card');
+  const counts = { all: cards.length };
+  cards.forEach(card => {
+    const s = card.dataset.campaignStatus;
+    if (s) counts[s] = (counts[s] || 0) + 1;
+  });
+
+  document.querySelectorAll('#p-list .status-chip').forEach(chip => {
+    const count = counts[chip.dataset.status] || 0;
+    chip.querySelector('.chip-count').textContent = count;
+    const empty = count === 0;
+    chip.disabled = empty;
+    chip.classList.toggle('disabled', empty);
+    if (empty && chip.classList.contains('active')) {
+      chip.classList.remove('active');
+      document.querySelector('#p-list .status-chip[data-status="all"]').classList.add('active');
+    }
+  });
+}
+
+function initCampaignFilter() {
+  const typeSel = document.getElementById('campaignTypeFilter');
+  if (typeSel) typeSel.addEventListener('change', filterCampaigns);
+
+  document.querySelectorAll('#p-list .status-chip').forEach(chip => {
+    chip.addEventListener('click', function(e) {
+      e.stopPropagation();
+      document.querySelectorAll('#p-list .status-chip').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      filterCampaigns();
+    });
+  });
+
+  updateChipCounts();
+}
 
 function goTo(id) {
-  document.getElementById('serviceDropdownMenu')?.classList.remove('open');
   authPages.forEach(p => document.getElementById(p).classList.remove('active'));
   pages.forEach(p => document.getElementById(p).classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -188,6 +225,84 @@ function setCardSlide(cardId, slideIdx) {
   dots.forEach((d, i) => d.classList.toggle('active', i === idx));
 }
 
+// ── 새 캠페인 요청 모달 ──
+function openNewCampaignModal() {
+  document.getElementById('newCampaignModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeNewCampaignModal() {
+  document.getElementById('newCampaignModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function selectCampaignProduct(val) {
+  document.querySelectorAll('#ncr-products .ncr-prod-btn').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.args === val);
+  });
+}
+
+function toggleCampaignPlatform(val) {
+  const btn = document.querySelector(`#ncr-platforms [data-args="${val}"]`);
+  if (btn) btn.classList.toggle('selected');
+}
+
+function submitNewCampaign() {
+  const name = document.getElementById('ncr-name').value.trim();
+  const product = document.querySelector('#ncr-products .ncr-prod-btn.selected')?.dataset.args;
+  const platforms = [...document.querySelectorAll('#ncr-platforms .ncr-plat-btn.selected')].map(b => b.dataset.args);
+
+  document.getElementById('ncr-name').classList.toggle('error', !name);
+  document.getElementById('ncr-products').classList.toggle('error', !product);
+  document.getElementById('ncr-platforms').classList.toggle('error', platforms.length === 0);
+  if (!name || !product || platforms.length === 0) return;
+
+  const flexible = document.getElementById('ncr-flexible').checked;
+  const formData = {
+    name,
+    product,
+    platforms,
+    goal: document.getElementById('ncr-goal').value.trim(),
+    date: flexible ? '협의 가능' : document.getElementById('ncr-date').value,
+    memo: document.getElementById('ncr-memo').value.trim(),
+  };
+
+  // TODO: 전송 로직 연결 (EmailJS 또는 백엔드 API)
+  console.log('[새 캠페인 요청]', formData);
+
+  closeNewCampaignModal();
+  const toast = document.getElementById('ncrToast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+// 모달 오버레이 클릭 시 닫기
+document.getElementById('newCampaignModal')?.addEventListener('click', function(e) {
+  if (e.target === this) closeNewCampaignModal();
+});
+
+// 협의 가능 체크 시 날짜 비활성
+document.getElementById('ncr-flexible')?.addEventListener('change', function() {
+  document.getElementById('ncr-date').disabled = this.checked;
+  if (this.checked) document.getElementById('ncr-date').value = '';
+});
+
+function toggleVidList() {
+  const wrap = document.getElementById('vidTableWrap');
+  const btn = document.getElementById('vidExpandBtn');
+  if (!wrap || !btn) return;
+  const expanded = wrap.dataset.expanded === '1';
+  if (expanded) {
+    wrap.style.maxHeight = '';
+    wrap.dataset.expanded = '0';
+    btn.textContent = '전체 147개 보기 ↓';
+  } else {
+    wrap.style.maxHeight = 'none';
+    wrap.dataset.expanded = '1';
+    btn.textContent = '접기 ↑';
+  }
+}
+
 function handleCta() {
   const active = pages.find(p => document.getElementById(p).classList.contains('active'));
   if (active === 'p-shop') goTo('p-form');
@@ -208,8 +323,11 @@ document.body.classList.add('p0-active');
 (function() {
   const fnMap = {
     goTo, goToAuth, goBackToList, doLogin, handleCta,
-    selectProduct, toggleCh, toggleServiceMenu,
-    submitInquiry, submitBrochure, setCardSlide
+    selectProduct, toggleCh,
+    submitInquiry, submitBrochure, setCardSlide,
+    openNewCampaignModal, closeNewCampaignModal,
+    selectCampaignProduct, toggleCampaignPlatform, submitNewCampaign,
+    toggleVidList
   };
 
   document.addEventListener('click', function(e) {
@@ -239,4 +357,6 @@ document.body.classList.add('p0-active');
     if (el.dataset.change === 'showBizFile') { showBizFile(el); return; }
     if (el.dataset.change === 'toggleAllAgree') { toggleAllAgree(el); return; }
   });
+
+  initCampaignFilter();
 })();

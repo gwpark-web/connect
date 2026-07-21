@@ -1998,7 +1998,6 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
 .p0-cc-stat-row span:last-child { font-weight: 600; color: var(--black); }
 
 /* ── P0 FEATURE SECTION ── */
-.p0-combined-section { min-height: 100vh; margin: 0; padding: 80px 0; display: flex; flex-direction: column; justify-content: center; gap: 90px; }
 .p0-feature-section { margin: 0; }
 .p0-feature-label { font-size: 11px; color: rgba(255,150,70,0.75); font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 18px; }
 .p0-feature-headline { font-family: 'Noto Sans KR', sans-serif; font-size: 30px; font-weight: 900; color: var(--white); line-height: 1.35; letter-spacing: -1px; margin-bottom: 4px; }
@@ -2554,13 +2553,24 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
 .ch-tab-card--active .ch-tab-card-label { color:var(--orange); }
 .ch-tab-card-sub { font-size:12px; color:var(--gray-light); }
 .ch-tab-card--active .ch-tab-card-sub { color:var(--orange); opacity:.8; }
-/* "0/30 선정" + 분포 가로 한 줄 */
-.ch-tab-sub-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
-/* 탭 카드 ① 내 플랫폼 분포 */
-.ch-tab-card-dist { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
-.ch-tab-dist-item { display:inline-flex; align-items:center; gap:3px; font-size:12px; font-weight:700; color:var(--gray-mid); }
+
+/* ── 탭 카드 ①② 좌우 분할 레이아웃 ── */
+.ch-tab-card[data-args="0"],
+.ch-tab-card[data-args="1"] { flex-direction:row; align-items:center; justify-content:space-between; gap:12px; }
+.ch-tab-card-left { display:flex; flex-direction:column; gap:4px; }
+.ch-tab-card-left .ch-tab-num { margin-bottom:0; }
+.ch-tab-card-right { display:flex; flex-direction:column; align-items:flex-end; gap:5px; flex-shrink:0; }
+/* 히어로 숫자 */
+.ch-tab-hero-count { display:flex; align-items:baseline; gap:3px; line-height:1; }
+.ch-tab-hero-sel { font-size:36px; font-weight:900; color:var(--orange); font-style:normal; }
+.ch-tab-card:not(.ch-tab-card--active) .ch-tab-hero-sel { color:var(--gray-mid); }
+.ch-tab-hero-div { font-size:17px; font-weight:700; color:var(--gray-mid); }
+.ch-tab-hero-lbl { font-size:12px; font-weight:600; color:var(--gray-light); margin-left:2px; }
+/* 플랫폼 분포 */
+.ch-tab-card-dist { display:flex; align-items:center; gap:7px; }
+.ch-tab-dist-item { display:inline-flex; align-items:center; gap:4px; font-size:14px; font-weight:700; color:var(--gray-mid); }
 .ch-tab-card--active .ch-tab-dist-item { color:var(--orange); }
-.ch-tab-dist-sep { font-size:11px; color:var(--border); }
+.ch-tab-dist-sep { font-size:12px; color:var(--border); }
 
 /* ── 탭 패널 ── */
 .ch-panel { }
@@ -2660,3 +2670,126 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
 @media (max-width:768px) {
   .ch-summary-cards { grid-template-columns:1fr 1fr; }
 }
+
+/* ── 검토 현황 패널 (chPanel1) ── */
+.ch-rv-item {
+  display:flex; align-items:center; gap:12px;
+  padding:14px 16px; border:1px solid var(--border); border-radius:10px;
+  margin-bottom:8px; background:var(--white);
+}
+.ch-rv-left { display:flex; align-items:center; gap:10px; flex:1; min-width:0; }
+.ch-rv-info { min-width:0; }
+.ch-rv-name { font-size:14px; font-weight:700; color:var(--black); }
+.ch-rv-meta { font-size:12px; color:var(--gray-light); margin-top:2px; }
+
+/* 상태 뱃지 */
+.ch-rv-badge { flex-shrink:0; display:inline-block; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap; }
+.ch-rv-badge--confirming { background:rgba(255,100,35,0.08); color:var(--orange); border:1px solid rgba(255,100,35,0.22); }
+.ch-rv-badge--producing  { background:#e8f5e9; color:#2e7d32; border:1px solid #a5d6a7; }
+.ch-rv-badge--needcheck  { background:var(--orange-pale); color:var(--orange); border:1px solid rgba(255,100,35,0.18); }
+.ch-rv-badge--revision   { background:#fff3e0; color:#e65100; border:1px solid #ffcc80; }
+.ch-rv-badge--waiting    { background:#e8f5e9; color:#558b2f; border:1px solid #aed581; }
+.ch-rv-badge--done       { background:var(--status-done-bg); color:var(--status-done); border:1px solid var(--status-done); }
+.ch-rv-post-link { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; color:var(--orange); text-decoration:none; padding:4px 10px; border:1.5px solid var(--orange); border-radius:5px; white-space:nowrap; transition:all .15s; }
+.ch-rv-post-link:hover { background:var(--orange); color:#fff; }
+.ch-rv-sim-inactive { font-size:11px; color:var(--gray-light); font-style:italic; }
+
+/* ── 결과 패널 ── */
+.ch-result-layout { display:flex; gap:20px; margin-bottom:20px; align-items:flex-start; flex-wrap:wrap; }
+.ch-result-card { flex:0 0 220px; background:var(--white); border:1px solid var(--border); border-radius:14px; padding:20px 18px; }
+.ch-result-trophy { font-size:12px; font-weight:700; color:var(--gray-mid); margin-bottom:10px; }
+.ch-result-hero { text-align:center; margin-bottom:16px; line-height:1; }
+.ch-result-hero-pct { font-size:48px; font-weight:900; color:var(--orange); font-style:normal; }
+.ch-result-rows { display:flex; flex-direction:column; gap:6px; }
+.ch-result-row { display:flex; justify-content:space-between; align-items:center; font-size:13px; }
+.ch-result-row--hi { padding:6px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin:2px 0; }
+.ch-result-label { color:var(--gray-mid); }
+.ch-result-val { font-weight:700; color:var(--gray-dark); }
+.ch-result-val--hi { color:var(--orange); }
+.ch-result-val--na { color:var(--gray-light); font-weight:400; font-size:11px; }
+.ch-result-tl-box { flex:1; min-width:180px; background:var(--white); border:1px solid var(--border); border-radius:14px; padding:20px 18px; }
+.ch-result-tl-title { font-size:13px; font-weight:700; color:var(--gray-dark); margin-bottom:12px; }
+.ch-result-tl-list { display:flex; flex-direction:column; }
+.ch-result-tl-item { display:flex; align-items:flex-start; gap:10px; padding:7px 0; position:relative; }
+.ch-result-tl-item:not(:last-child)::after { content:''; position:absolute; left:5px; top:20px; bottom:-7px; width:2px; background:var(--border); }
+.ch-result-tl-dot { width:12px; height:12px; border-radius:50%; background:var(--orange); flex-shrink:0; margin-top:3px; }
+.ch-result-tl-body { display:flex; gap:8px; align-items:center; }
+.ch-result-tl-num { font-size:11px; font-weight:700; color:var(--gray-light); min-width:24px; }
+.ch-result-tl-name { font-size:13px; font-weight:600; color:var(--gray-dark); }
+.ch-result-table-box { background:var(--white); border:1px solid var(--border); border-radius:14px; padding:20px 18px; }
+.ch-result-na { color:var(--gray-light) !important; text-align:center !important; font-size:12px !important; }
+.ch-result-post-na { display:inline-flex; flex-direction:column; align-items:center; gap:3px; }
+.ch-result-post-btn { font-size:11px; padding:4px 10px; border-radius:5px; border:1.5px solid var(--border); background:var(--gray-bg); color:var(--gray-light); cursor:not-allowed; font-family:inherit; font-weight:600; }
+.ch-result-post-wait { font-size:10px; color:var(--gray-light); white-space:nowrap; }
+
+/* ── 수정 요청 히스토리 ── */
+.ch-rv-hist-box { margin:8px 0 4px; }
+.ch-rv-hist-title { font-size:10px; font-weight:700; color:var(--gray-light); letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px; }
+.ch-rv-hist-item { background:var(--gray-bg); border-radius:8px; padding:10px 12px; margin-bottom:5px; }
+.ch-rv-hist-item:last-child { margin-bottom:0; }
+.ch-rv-hist-meta { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
+.ch-rv-hist-round { font-size:11px; font-weight:700; color:var(--orange); }
+.ch-rv-hist-ts { font-size:11px; color:var(--gray-light); }
+.ch-rv-hist-text { font-size:13px; color:var(--gray-dark); line-height:1.55; }
+
+/* 시뮬레이션 영역 */
+.ch-rv-sim { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.ch-rv-sim-label { font-size:9px; font-weight:700; color:var(--border); letter-spacing:.5px; white-space:nowrap; padding:2px 5px; border:1px solid var(--border); border-radius:3px; }
+.ch-rv-sim-btn { font-size:11px; padding:4px 10px; border:1px solid var(--border); border-radius:5px; background:var(--white); color:var(--gray-dark); cursor:pointer; white-space:nowrap; font-family:inherit; }
+.ch-rv-sim-btn:hover { background:var(--gray-bg); }
+.ch-rv-sim-btn--reject { color:#c0392b; border-color:#e0b0ad; }
+.ch-rv-sim-btn--reject:hover { background:#fdf2f2; }
+.ch-rv-sim-inactive { font-size:11px; color:var(--border); }
+
+/* 영상 검토 버튼 (검토 필요 행) */
+.ch-rv-review-btn { font-size:11px; padding:5px 12px; border-radius:5px; border:1.5px solid var(--orange); background:var(--orange-pale); color:var(--orange); font-weight:700; cursor:pointer; white-space:nowrap; font-family:inherit; }
+.ch-rv-review-btn:hover { background:var(--orange); color:#fff; }
+
+/* ── 영상 검토 모달 내부 ── */
+.ch-rv-video-box { background:var(--gray-bg); border-radius:10px; padding:16px; margin-bottom:4px; }
+.ch-rv-video-info { margin-bottom:12px; }
+.ch-rv-video-title { font-size:13px; font-weight:700; color:var(--black); margin-bottom:4px; }
+.ch-rv-video-dur   { font-size:12px; color:var(--gray-light); }
+.ch-rv-video-link  {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:13px; font-weight:700; color:var(--orange); text-decoration:none;
+  padding:7px 16px; border:1.5px solid var(--orange); border-radius:6px;
+  transition:all .15s;
+}
+.ch-rv-video-link:hover  { background:var(--orange); color:#fff; }
+.ch-rv-video-link--disabled { color:var(--gray-light); border-color:var(--border); pointer-events:none; opacity:.55; }
+.ch-rv-video-none  { display:flex; align-items:center; gap:12px; }
+.ch-rv-video-pending { font-size:12px; color:var(--gray-light); }
+
+/* 수정 요청 영역 */
+.ch-rv-revision-box { margin-top:12px; }
+.ch-rv-textarea {
+  width:100%; box-sizing:border-box; padding:10px 12px;
+  border:1.5px solid var(--border); border-radius:8px;
+  font-size:13px; font-family:inherit; color:var(--black);
+  resize:vertical; min-height:80px; display:block;
+  background:var(--white); transition:border-color .15s; margin-bottom:8px;
+}
+.ch-rv-textarea:focus { outline:none; border-color:var(--orange); }
+.ch-rv-revision-submit { width:100%; }
+.ch-rv-revision-submit:disabled { opacity:.4; cursor:not-allowed; }
+
+/* 토스트 */
+.ch-toast {
+  position:fixed; bottom:28px; left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:#1a1a1a; color:#fff;
+  padding:10px 22px; border-radius:24px;
+  font-size:13px; font-weight:600; letter-spacing:-.2px;
+  opacity:0; transition:opacity .22s, transform .22s;
+  z-index:10000; pointer-events:none; white-space:nowrap;
+}
+.ch-toast--show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ── 탭 카드 ② 상태 분포 텍스트 ── */
+.ch-tab2-dist { display:flex; align-items:center; gap:5px; }
+.ch-t2d-item { font-size:11px; font-weight:600; white-space:nowrap; }
+.ch-t2d-sep  { font-size:10px; color:var(--border); }
+.ch-t2d-confirming { color:var(--orange); opacity:.75; }
+.ch-t2d-producing  { color:#2a7d32; }
+.ch-t2d-done       { color:var(--gray-mid); }

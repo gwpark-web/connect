@@ -1,7 +1,7 @@
 try { emailjs.init('PR1yiM-fDVGYx5wCo'); } catch(e) { console.warn('EmailJS init failed', e); }
 
 // ── ROUTING ──
-const pages = ['p1','p3','p4','p7','p-shop','p-list','p-form','p-channels','p-detail'];
+const pages = ['p1','p3','p4','p7','p-shop','p-list','p-form','p-channels','p-detail','p-detail-upload'];
 const authPages = ['p-signup','p-brochure'];
 const navMap = { p1:'nav-p1', p3:'nav-p3', p7:'nav-p7' };
 const ctaPages = ['p-shop','p-form','p-channels'];
@@ -74,7 +74,8 @@ function goTo(id) {
     bar.classList.remove('visible');
   }
 
-  if (id === 'p-channels') renderChannels('chTable');
+  if (id === 'p-channels') { updateSortArrows(); renderChannels(); updateChSummary(); }
+  if (id === 'p-list') { if (typeof updateListCardPremium === 'function') updateListCardPremium(); }
 }
 
 function goToAuth(id) {
@@ -138,7 +139,7 @@ function updateCta(page) {
     info.innerHTML = '정보를 입력하고 다음 단계로 진행하세요';
     btn.classList.add('on'); btn.textContent = '다음 단계로 →';
   } else if (page === 'p-channels') {
-    const n = selected4.size;
+    const n = Object.values(chState || {}).filter(s => s === 'selected').length;
     if (n >= 30) {
       info.innerHTML = `<strong style="color:var(--orange)">30개 선정 완료</strong> · 확정 후 제작 가이드가 전달됩니다`;
       btn.classList.add('on'); btn.textContent = '선정 확정 →';
@@ -280,6 +281,9 @@ function submitNewCampaign() {
 document.getElementById('newCampaignModal')?.addEventListener('click', function(e) {
   if (e.target === this) closeNewCampaignModal();
 });
+document.getElementById('taxModal')?.addEventListener('click', function(e) {
+  if (e.target === this) closeTaxModal();
+});
 
 // 협의 가능 체크 시 날짜 비활성
 document.getElementById('ncr-flexible')?.addEventListener('change', function() {
@@ -303,6 +307,43 @@ function toggleVidList() {
   }
 }
 
+// ── 세금계산서 요청 ──
+let _taxBtnId = null;
+
+function openTaxModal(amount, btnId) {
+  const display = document.getElementById('taxAmountDisplay');
+  if (display) display.textContent = amount || '–';
+  _taxBtnId = btnId || null;
+  document.getElementById('taxModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeTaxModal() {
+  document.getElementById('taxModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function submitTaxRequest() {
+  // TODO: 전송 로직 연결 (EmailJS 또는 백엔드 API)
+  const display = document.getElementById('taxAmountDisplay');
+  console.log('[세금계산서 요청]', { amount: display?.textContent, btnId: _taxBtnId });
+
+  closeTaxModal();
+
+  if (_taxBtnId) {
+    const btn = document.getElementById(_taxBtnId);
+    if (btn) {
+      btn.textContent = '✓ 요청됨';
+      btn.disabled = true;
+      btn.classList.add('cd-btn-tax--done');
+    }
+  }
+
+  const toast = document.getElementById('taxToast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
 function handleCta() {
   const active = pages.find(p => document.getElementById(p).classList.contains('active'));
   if (active === 'p-shop') goTo('p-form');
@@ -323,11 +364,19 @@ document.body.classList.add('p0-active');
 (function() {
   const fnMap = {
     goTo, goToAuth, goBackToList, doLogin, handleCta,
-    selectProduct, toggleCh,
+    selectProduct,
     submitInquiry, submitBrochure, setCardSlide,
     openNewCampaignModal, closeNewCampaignModal,
     selectCampaignProduct, toggleCampaignPlatform, submitNewCampaign,
-    toggleVidList
+    toggleVidList,
+    openTaxModal, closeTaxModal, submitTaxRequest,
+    openChSelectModal, closeSingleModal, confirmChSelect,
+    closeChSelectModal, confirmChSelectMulti,
+    toggleChCheck, selectChecked, clearChecked,
+    rejectCh, undoCh,
+    chSortBy, chSetStatus, chSwitchTab,
+    advanceReviewState, creatorRejectCh,
+    openReviewModal, closeReviewModal, approveReview, requestRevision, submitRevision
   };
 
   document.addEventListener('click', function(e) {

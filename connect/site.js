@@ -76,6 +76,7 @@ function goTo(id) {
 
   if (id === 'p-channels') { updateSortArrows(); renderChannels(); updateChSummary(); }
   if (id === 'p-list') { if (typeof updateListCardPremium === 'function') updateListCardPremium(); }
+  if (id === 'p1') { setTimeout(runStatCountUp, 200); }
 }
 
 function goToAuth(id) {
@@ -408,4 +409,25 @@ document.body.classList.add('p0-active');
   });
 
   initCampaignFilter();
+  setTimeout(runStatCountUp, 300);
 })();
+
+/* ── 통계 카운트업 애니메이션 ── */
+function runStatCountUp() {
+  document.querySelectorAll('.p0-why-stat-num').forEach(el => {
+    const em = el.querySelector('em');
+    if (!em) return;
+    if (!em.dataset.orig) em.dataset.orig = em.textContent.trim();
+    const orig = em.dataset.orig;
+    const m = orig.match(/^(\d+)([KM]?)$/);
+    if (!m) return;
+    const target = +m[1], unit = m[2];
+    const dur = 1400, t0 = performance.now();
+    (function tick(now) {
+      const p = Math.min((now - t0) / dur, 1);
+      const ease = 1 - Math.pow(1 - p, 3); // ease-out cubic
+      em.textContent = Math.round(ease * target) + unit;
+      if (p < 1) requestAnimationFrame(tick);
+    })(performance.now());
+  });
+}

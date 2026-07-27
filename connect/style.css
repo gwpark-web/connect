@@ -10,43 +10,14 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Noto Sans KR', sans-serif; background: var(--gray-bg); color: var(--black); overflow-x: hidden; }
 body.p0-active {
-  background: #1a0c06;
+  background: #0d0704;
 }
 
-/* ── P0 GRADIENT BG ── */
-.p0-wave-bg {
-  position: fixed;
-  inset: -20%;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0;
-  transition: opacity 1.2s ease;
-  filter: blur(72px);
-  transform: scale(1.1);
-  background:
-    radial-gradient(ellipse 90% 60% at 0% 95%,   rgba(255, 110, 0, 0.95) 0%, rgba(255, 70, 0, 0.40) 40%, transparent 70%),
-    radial-gradient(ellipse 60% 50% at 18% 65%,  rgba(255, 150, 30, 0.65) 0%, transparent 60%),
-    radial-gradient(ellipse 80% 55% at 95% 5%,   rgba(230, 60, 0, 0.65) 0%, rgba(180, 30, 0, 0.25) 45%, transparent 70%),
-    radial-gradient(ellipse 55% 45% at 72% 30%,  rgba(255, 100, 10, 0.40) 0%, transparent 58%),
-    radial-gradient(ellipse 70% 40% at 88% 80%,  rgba(255, 80, 0, 0.45) 0%, transparent 62%),
-    radial-gradient(ellipse 50% 55% at 48% 52%,  rgba(255, 170, 50, 0.28) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 30% at 30% 10%,  rgba(220, 60, 0, 0.32) 0%, transparent 50%),
-    #1a0c06;
-}
-body.p0-active .p0-wave-bg { opacity: 1; }
-.p0-grain {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 1.2s ease;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='256' height='256' filter='url(%23n)'/></svg>");
-  background-repeat: repeat;
-  background-size: 180px 180px;
-}
-body.p0-active .p0-grain { opacity: 0.22; }
+/* ── P0 GRADIENT BG (비활성 — 섹션별 독립 배경으로 대체) ── */
+.p0-wave-bg { display: none; pointer-events: none; }
+body.p0-active .p0-wave-bg { display: none; }
+.p0-grain { display: none; pointer-events: none; }
+body.p0-active .p0-grain { display: none; }
 
 /* ── GNB ── */
 .gnb {
@@ -1121,7 +1092,7 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
   will-change: transform;
 }
 
-/* YouTube — 좌측, 대형 */
+/* YouTube — 좌측 */
 .p0-hi--yt {
   width: 128px; height: 128px;
   background: linear-gradient(145deg, #ffffff 0%, #dcdcdc 100%);
@@ -1131,11 +1102,11 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
     inset 0 2px 0 rgba(255,255,255,0.95),
     inset 0 -3px 8px rgba(0,0,0,0.1);
   opacity: 0.62;
-  top: 20%; left: 1.5%;
+  top: 20%; left: 21%;
   animation: p0-float-a 7.2s ease-in-out infinite;
 }
 
-/* Instagram — 우측 상단, 중형 */
+/* Instagram — 우측 중하단 */
 .p0-hi--ig {
   width: 96px; height: 96px;
   background: radial-gradient(circle at 28% 115%, #f09433 0%, #e6683c 22%, #dc2743 46%, #cc2366 72%, #bc1888 100%);
@@ -1145,11 +1116,11 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
     inset 0 2px 0 rgba(255,255,255,0.45),
     inset 0 -2px 6px rgba(0,0,0,0.2);
   opacity: 0.65;
-  top: 58%; right: 0.5%;
+  top: 58%; right: 22%;
   animation: p0-float-b 8.8s ease-in-out infinite;
 }
 
-/* TikTok — 우측 상단 (인스타와 위치 교체), 중형 */
+/* TikTok — 우측 상단 */
 .p0-hi--tt {
   width: 90px; height: 90px;
   background: linear-gradient(145deg, #1c1c1c 0%, #030303 100%);
@@ -1159,7 +1130,7 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
     inset 0 1.5px 0 rgba(255,255,255,0.13),
     inset 0 -2px 4px rgba(0,0,0,0.6);
   opacity: 0.50;
-  top: 8%; right: 8%;
+  top: 9%; right: 27%;
   animation: p0-float-c 6.1s ease-in-out infinite;
 }
 
@@ -1196,7 +1167,7 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
 .p0-display-title em { color: var(--orange); font-style: normal; }
 .p0-hero-en-sub {
   font-family: 'Bebas Neue', sans-serif; font-size: 21px; color: rgb(255, 255, 255);
-  letter-spacing: 10px; margin-bottom: 18px;
+  letter-spacing: 10px; margin-bottom: 18px; font-weight: 700;
 }
 .p0-display-sub { font-size: 15px; color: rgb(255, 255, 255); line-height: 1.85; font-weight: 300; margin-bottom: 36px; }
 .p0-display-sub em { color: rgb(255, 255, 255); font-style: normal; font-weight: 600; }
@@ -1208,10 +1179,23 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
 .p0-main-card { padding: 0; }
 .p0-why-row { display: flex; justify-content: center; margin-bottom: 0; }
 .p0-why-stats-grid { display: grid; grid-template-columns: repeat(3,1fr); max-width: 780px; margin: 0 auto; width: 100%; }
-.p0-why-stat { padding: 36px 24px; text-align: center; }
-.p0-why-stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 75px; color: var(--white); letter-spacing: 1px; line-height: 1; margin-bottom: 10px; }
-.p0-why-stat-num em { color: var(--white); font-style: normal; }
-.p0-why-stat-lbl { font-size: 13px; color: rgba(255,255,255,0.65); margin-bottom: 4px; font-weight: 600; }
+.p0-why-stat { padding: 36px 24px; text-align: center; position: relative; }
+/* 항목 사이 오렌지 그라데이션 세로 구분선 */
+.p0-why-stat:not(:last-child)::after {
+  content: ''; position: absolute;
+  right: 0; top: 10%; height: 80%; width: 2px;
+  background: linear-gradient(to bottom, transparent, #FF4500, transparent);
+}
+/* 숫자: 흰색 채움 + 은은한 오렌지 외곽선 (paint-order로 fill이 위) */
+.p0-why-stat-num {
+  font-family: 'Bebas Neue', sans-serif; font-size: 75px; letter-spacing: 1px; line-height: 1; margin-bottom: 10px;
+  color: #fff;
+  -webkit-text-stroke: 0.8px rgba(255, 69, 0, 0.8);
+  paint-order: stroke fill;
+}
+.p0-why-stat-num em { color: #fff; font-style: normal; }
+/* 라벨: 회백색, 숫자보다 작게 */
+.p0-why-stat-lbl { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 10px; margin-bottom: 0; font-weight: 400; letter-spacing: 0.5px; }
 .p0-why-stat-sub { font-size: 11px; color: rgba(255,255,255,0.38); }
 
 .p0-card-divider { height: 1px; background: rgba(255,255,255,0.12); margin: 36px 0; }
@@ -2793,3 +2777,176 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
 .ch-t2d-confirming { color:var(--orange); opacity:.75; }
 .ch-t2d-producing  { color:#2a7d32; }
 .ch-t2d-done       { color:var(--gray-mid); }
+
+/* ══ P0 풀폭 레이아웃 — 배경 풀폭, 콘텐츠 가운데 정렬 ══════════════════
+   #p1의 max-width/가로패딩을 제거해 각 섹션이 뷰포트 전체 폭을 채우도록.
+   콘텐츠 가로 여백(40px)과 max-width는 섹션·내부 래퍼 단위로 이전.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* 1. #p1 가로 제한 해제 (배경은 각 섹션이 자기 안에서 완결) */
+#p1 { max-width: 100%; padding-left: 0; padding-right: 0; }
+
+/* 2. 각 섹션에 가로 패딩 이전 → 배경은 뷰포트 전체, 콘텐츠는 40px 안쪽 */
+.p0-display-hero,
+.p0-sfm-section,
+.p0-mindmap-section,
+.p0-products-section,
+.p0-role-section,
+.p0-cta { padding-left: 40px; padding-right: 40px; }
+
+/* 3. 초대형 화면 대비 콘텐츠 최대폭 지정 */
+.p0-sfm-inner       { max-width: 1360px; margin-left: auto; margin-right: auto; }
+.p0-mindmap-header,
+.p0-mindmap         { max-width: 1360px; margin-left: auto; margin-right: auto; }
+.p0-products-header { max-width: 1360px; margin-left: auto; margin-right: auto; }
+.p0-role-header,
+.p0-role-grid,
+.p0-role-footnote   { max-width: 1360px; margin-left: auto; margin-right: auto; }
+
+/* 4. 갤러리 마퀴: 기존 네거티브 마진(-40px) 제거 → 이미 풀폭 섹션이 됨 */
+.p0-gallery-wrap { margin-left: 0; margin-right: 0; }
+.p0-gallery-caption,
+.p0-gallery-footer  { padding-left: 40px; padding-right: 40px; }
+
+/* ══ P0 섹션 배경 — 섹션 내부 자기완결 그라데이션 ══════════════════════
+   홀수 섹션: 검정(#0d0704)으로 시작·끝, 내부에서 오렌지 차오름
+   짝수 섹션: 검정 유지 → 경계에서 검정끼리 만나 칼선 원천 제거
+   ══════════════════════════════════════════════════════════════════ */
+
+/* S1 히어로 — 검정→강한 오렌지→검정착지
+   radial 중심을 섹션 내부(y=55%)에 두고 y반경=48% → transparent가 y≈87%에서 완료,
+   하단 13%는 linear-gradient 베이스의 순수 검정이 드러남 → 칼선 원천 제거 */
+.p0-display-hero {
+  background:
+    /* 좌측 메인 글로우: 중심 (0%, 55%), 투명화 완료 지점 y≈87% */
+    radial-gradient(ellipse 105% 48% at 0% 55%, rgba(255,80,0,0.88) 0%, rgba(200,48,0,0.38) 40%, transparent 66%),
+    /* 우상단 보조 글로우: 상단에서 y≈40%까지만 영향, 하단 미도달 */
+    radial-gradient(ellipse 80% 58% at 100% 0%,  rgba(220,58,0,0.68) 0%, rgba(155,32,0,0.24) 42%, transparent 66%),
+    /* 중앙 미세 웜톤: y≈75%까지만 영향 */
+    radial-gradient(ellipse 52% 34% at 50% 48%,  rgba(255,110,0,0.13) 0%, transparent 62%),
+    /* 세로 베이스: 상·하단 검정 착지 보장 */
+    linear-gradient(to bottom,
+      #0d0704  0%,
+      #0d0704  7%,
+      #1a0c06 24%,
+      #3a1508 50%,
+      #1a0c06 74%,
+      #0d0704 88%,
+      #0d0704 100%);
+  overflow: hidden;
+}
+
+/* ══ 경계 연결 원칙 ════════════════════════════════════════════════════
+   홀수 하단 = #0d0704 (검정착지)   ↔   짝수 상단 = #0d0704  ✅ 검정끼리
+   짝수 하단 = #251105 (오렌지상승) ↔   홀수 상단 = #251105  ✅ 오렌지끼리
+   경계색 #251105 로 통일 → 모든 섹션 경계에서 칼선 원천 불가
+   ════════════════════════════════════════════════════════════════════ */
+
+/* S2 채널 네트워크 — 좌상단 영역에 은은 글로우
+   center(18%,34%), y반경28% → transparent: 위 y≈0% ✅ / 아래 y≈63% ✅ */
+.p0-sfm-section {
+  background:
+    radial-gradient(ellipse 72% 28% at 18% 34%, rgba(255,80,0,0.09) 0%, transparent 66%),
+    linear-gradient(to bottom,
+      #0d0704  0%,
+      #0d0704 62%,
+      #160804 78%,
+      #251105 93%,
+      #251105 100%);
+}
+
+/* S3 갤러리 — 우중앙~우하단 글로우 (좌측은 어두움)
+   ① solid band 경계 보호 유지 / ②③④ 우측 집중 재배치 */
+.p0-gallery-section {
+  background:
+    linear-gradient(to bottom, #251105 0%, #251105 6%, transparent 14%),
+    radial-gradient(ellipse 95% 38% at 82% 58%, rgba(255,80,0,0.86) 0%, rgba(200,48,0,0.36) 40%, transparent 66%),
+    radial-gradient(ellipse 65% 40% at 90% 28%, rgba(220,58,0,0.58) 0%, rgba(155,32,0,0.20) 42%, transparent 66%),
+    radial-gradient(ellipse 45% 28% at 70% 48%, rgba(255,110,0,0.12) 0%, transparent 62%),
+    linear-gradient(to bottom,
+      #251105  0%,
+      #3a1508 44%,
+      #1a0c06 73%,
+      #0d0704 87%,
+      #0d0704 100%);
+}
+
+/* S4 확산 마인드맵 — 좌중앙 은은 글로우
+   center(22%,38%), y반경28% → transparent: 위 y≈0% ✅ / 아래 y≈57% ✅ */
+.p0-mindmap-section {
+  background:
+    radial-gradient(ellipse 65% 28% at 22% 38%, rgba(255,80,0,0.09) 0%, transparent 66%),
+    linear-gradient(to bottom,
+      #0d0704  0%,
+      #0d0704 62%,
+      #160804 78%,
+      #251105 93%,
+      #251105 100%);
+}
+
+/* S5 상품/보장 — 우상단~우중앙 글로우 + 좌상단 보조 (S3 대칭 구도)
+   ① solid band 경계 보호 유지 / ②③④ 우상단 집중 재배치 */
+.p0-products-section {
+  background:
+    linear-gradient(to bottom, #251105 0%, #251105 6%, transparent 14%),
+    radial-gradient(ellipse 88% 40% at 80% 42%, rgba(255,80,0,0.86) 0%, rgba(200,48,0,0.36) 40%, transparent 66%),
+    radial-gradient(ellipse 55% 36% at 12% 28%, rgba(220,58,0,0.50) 0%, rgba(155,32,0,0.16) 42%, transparent 66%),
+    radial-gradient(ellipse 42% 26% at 60% 52%, rgba(255,110,0,0.11) 0%, transparent 62%),
+    linear-gradient(to bottom,
+      #251105  0%,
+      #3a1508 44%,
+      #1a0c06 73%,
+      #0d0704 87%,
+      #0d0704 100%);
+}
+
+/* S6 역할분담 — 좌하단 방향 은은 글로우
+   center(14%,44%), y반경24% → transparent: 위 y≈0% ✅ / 아래 y≈60% ✅ */
+.p0-role-section {
+  background:
+    radial-gradient(ellipse 58% 24% at 14% 44%, rgba(255,80,0,0.08) 0%, transparent 66%),
+    linear-gradient(to bottom,
+      #0d0704  0%,
+      #0d0704 62%,
+      #160804 78%,
+      #251105 93%,
+      #251105 100%);
+}
+
+/* CTA — 상단 오렌지 시작(S6 하단과 연결), 하단 오렌지 마무리 */
+.p0-cta {
+  background:
+    linear-gradient(to bottom, #251105 0%, #251105 6%, transparent 14%),
+    radial-gradient(ellipse 105% 48% at 0% 55%, rgba(255,80,0,0.88) 0%, rgba(200,48,0,0.38) 40%, transparent 66%),
+    radial-gradient(ellipse 80% 58% at 100% 0%,  rgba(220,58,0,0.68) 0%, rgba(155,32,0,0.24) 42%, transparent 66%),
+    radial-gradient(ellipse 52% 34% at 50% 48%,  rgba(255,110,0,0.13) 0%, transparent 62%),
+    linear-gradient(to bottom,
+      #251105  0%,
+      #3a1508 55%,
+      #2a1005 100%);
+}
+
+/* ══ P0 섹션 높이 통일 — 섹션당 1화면(100vh), 콘텐츠 세로 중앙 ════════
+   히어로(S1)가 min-height:100vh 기준 → 나머지 섹션도 동일하게 맞춤.
+   과도한 padding은 justify-content:center가 대신하므로 60px로 정리.
+   수평 padding은 레이아웃 fix 블록에서 이미 설정됨 (건드리지 않음).
+   ══════════════════════════════════════════════════════════════════ */
+
+/* S2·S3·S4·S5·S6 공통 */
+.p0-sfm-section,
+.p0-gallery-section,
+.p0-mindmap-section,
+.p0-products-section,
+.p0-role-section {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* 수직 패딩 정리 */
+.p0-sfm-section      { padding-top: 60px; padding-bottom: 60px; }
+.p0-gallery-section  { padding-top: 60px; padding-bottom: 60px; }
+.p0-mindmap-section  { padding-top: 60px; padding-bottom: 60px; }
+.p0-products-section { padding-top: 60px; padding-bottom: 60px; }
+.p0-role-section     { padding-top: 60px; padding-bottom: 60px; }

@@ -25,12 +25,26 @@ const CH_VIDEO = {
   9: { url: null }, // 영상 준비 중
 };
 
-// ── 채널별 배포 링크 더미 데이터 (실제 게시물) ───────────────────────
+// ── 채널별 배포 링크 더미 데이터 (게시물 URL + 업로드 시각) ─────────────
+// TODO: 어드민 구축 시 API 응답으로 대체
 const CH_POST = {
-  0: { url: 'https://youtu.be/dummy_yt_0' },
-  6: { url: 'https://youtu.be/dummy_yt_6' },
-  // 나머지: 배포 전 (undefined → url 없음)
+  0:  { url: 'https://www.youtube.com/shorts/dR7kGv2x3Hs', uploadedAt: '2025-07-18 10:30' },
+  1:  { url: 'https://www.youtube.com/shorts/pLm4nQ8rWZo', uploadedAt: '2025-07-18 14:20' },
+  2:  { url: 'https://www.youtube.com/shorts/tKc9bJ6vNxY', uploadedAt: '2025-07-19 09:15' },
+  3:  { url: 'https://www.youtube.com/shorts/aHs5mR2pQeL', uploadedAt: '2025-07-19 11:00' },
+  4:  { url: 'https://www.instagram.com/reel/Cxk7mNpWqR8/', uploadedAt: '2025-07-19 15:30' },
+  5:  { url: 'https://www.instagram.com/reel/Dyk9pLqVwS3/', uploadedAt: '2025-07-20 08:30' },
+  6:  { url: 'https://www.youtube.com/shorts/gVr3hM7nBwP', uploadedAt: '2025-07-20 11:45' },
+  7:  { url: 'https://www.youtube.com/shorts/jFq8sN4mCkE', uploadedAt: '2025-07-20 14:20' },
+  8:  { url: 'https://www.tiktok.com/@healthking/video/7259384710234', uploadedAt: '2025-07-21 10:00' },
+  9:  { url: 'https://www.youtube.com/shorts/nWx2vB6kHrT', uploadedAt: '2025-07-21 13:15' },
+  10: { url: 'https://www.instagram.com/reel/Ezp4qMsRtU7/', uploadedAt: '2025-07-22 09:00' },
+  11: { url: 'https://www.youtube.com/shorts/oBn5tC9jLqM', uploadedAt: '2025-07-22 12:30' },
 };
+
+// 시뮬레이션: 초기 게시물 등록 완료 채널 인덱스 (관리자 미구축으로 클라이언트 토글)
+// TODO: 어드민 구축 시 서버 상태로 대체
+let _simPosted = new Set([0, 6]);
 
 // ── 채널별 수정 요청 히스토리 (더미: 시간순 누적) ────────────────────
 const chRevisions = {
@@ -49,10 +63,15 @@ channels.forEach((_, i) => { chState[i] = 'pending'; });
 
 const chReviewState = {}; // '최종 확정 중'→'제작 중'→'검토 필요'→[수정시]'수정 중'→'검토 필요'→[승인]'업로드 대기'→'업로드 완료'
 
+// ── 데모 초기 상태 (탭2·탭3 바로 확인 가능하도록 일부 시딩) ─────────────
+[0, 2, 5, 6, 9, 11].forEach(i => { chState[i] = 'selected'; chReviewState[i] = '승인 완료'; });
+[1, 3, 4, 7].forEach(i => { chState[i] = 'selected'; chReviewState[i] = '제작 중'; });
+
 let _chChecked      = new Set();
 let _chPendingIdx   = null;
 let _chReviewIdx    = null; // 영상 검토 모달 대상 채널 인덱스
 let _chFilterStatus = '';
+let _chReviewFilter = '';
 let _chSort         = 'subs';
 let _chSortDir      = 'desc';
 
@@ -240,7 +259,27 @@ function renderReviewPanel() {
   const container = document.getElementById('chReviewList');
   if (!container) return;
 
-  const items = channels
+  // 상태별 카운트 집계
+  const counts = { '': 0, '최종 확정 중': 0, '제작 중': 0, '검토 필요': 0, '수정 중': 0 };
+  channels.forEach((_, i) => {
+    if (chState[i] === 'selected' && (chReviewState[i] || '최종 확정 중') !== '승인 완료') {
+      const rs = chReviewState[i] || '최종 확정 중';
+      counts['']++;
+      if (counts[rs] !== undefined) counts[rs]++;
+    }
+  });
+
+  // 칩 카운트 텍스트 + 비활성 처리
+  const CHIP_LABELS = { '': '전체', '최종 확정 중': '최종 확정 중', '제작 중': '제작 중', '검토 필요': '검토 필요', '수정 중': '수정 중' };
+  document.querySelectorAll('#chReviewChipsRow .ch-chip').forEach(btn => {
+    const key = btn.dataset.args || '';
+    const cnt = counts[key] ?? 0;
+    btn.textContent = cnt > 0 ? `${CHIP_LABELS[key]} ${cnt}` : CHIP_LABELS[key];
+    btn.classList.toggle('ch-chip--active', key === _chReviewFilter);
+    btn.classList.toggle('ch-chip--zero', cnt === 0 && key !== '');
+  });
+
+  const allItems = channels
     .map((ch, i) => ({ ch, i }))
     .filter(({ i }) => chState[i] === 'selected' && (chReviewState[i] || '최종 확정 중') !== '승인 완료')
     .sort((a, b) => {
@@ -248,6 +287,14 @@ function renderReviewPanel() {
       const ob = REVIEW_ORDER.indexOf(chReviewState[b.i] || '최종 확정 중');
       return oa - ob;
     });
+
+  const items = _chReviewFilter
+    ? allItems.filter(({ i }) => (chReviewState[i] || '최종 확정 중') === _chReviewFilter)
+    : allItems;
+
+  // 총계 카운트
+  const cntEl = document.getElementById('chReviewResultCount');
+  if (cntEl) cntEl.textContent = `${items.length}개 채널`;
 
   if (!items.length) {
     container.innerHTML = `<div class="ch-placeholder">
@@ -292,10 +339,18 @@ function renderResultPanel() {
     .filter(({ i }) => chState[i] === 'selected' && chReviewState[i] === '승인 완료');
 
   const doneCount = doneItems.length;
-  const pct = GOAL > 0 ? Math.round(doneCount / GOAL * 100) : 0;
+  const postedCount = doneItems.filter(({ i }) => _simPosted.has(i)).length;
+  const pct = GOAL > 0 ? Math.round(postedCount / GOAL * 100) : 0;
 
-  const sub2 = document.getElementById('chTabSub2');
-  if (sub2) sub2.textContent = `승인 ${doneCount}`;
+  // 탭3 카드 카운트 + 뱃지 갱신
+  const hero3 = document.getElementById('chTabHero3Sel');
+  if (hero3) hero3.textContent = postedCount;
+  const badge3 = document.getElementById('chTab3Badge');
+  if (badge3) {
+    const isDone = postedCount >= GOAL;
+    badge3.textContent = isDone ? '완료' : '진행 중';
+    badge3.className = isDone ? 'ch-tab3-badge ch-tab3-badge--done' : 'ch-tab3-badge ch-tab3-badge--progress';
+  }
 
   // 헤더 액션 버튼 + 뱃지 갱신
   const headerActions = document.getElementById('chHeaderActions');
@@ -317,9 +372,16 @@ function renderResultPanel() {
 
   const tableRows = doneItems.map(({ ch, i }) => {
     const post = CH_POST[i];
-    const postCell = post?.url
-      ? `<a class="vid-table-link" href="${post.url}" target="_blank" rel="noopener">게시물 보기 →</a>`
-      : `<span class="ch-result-post-wait">배포 링크 대기</span>`;
+    const isPosted = _simPosted.has(i);
+    const postCell = isPosted
+      ? `<div class="ch-result-post-cell">
+           <a class="ch-result-link" href="${post?.url || '#'}" target="_blank" rel="noopener">게시물 보기 →</a>
+           <button class="ch-sim-btn ch-sim-btn--on" data-fn="toggleSimPost" data-args="${i}" title="등록 취소 (시뮬레이션)">✓ 등록됨</button>
+         </div>`
+      : `<div class="ch-result-post-cell">
+           <span class="ch-result-wait">${post?.uploadedAt ? post.uploadedAt.slice(5, 10).replace('-', '/') + ' 업로드' : '배포 링크 대기'}</span>
+           <button class="ch-sim-btn ch-sim-btn--off" data-fn="toggleSimPost" data-args="${i}" title="게시물 등록 시뮬레이션">+ 등록</button>
+         </div>`;
     return `<tr>
       <td>
         <div style="display:flex;align-items:center;gap:8px">
@@ -342,7 +404,7 @@ function renderResultPanel() {
     <div class="cd-report-row">
 
       <div class="cd-result-card">
-        <div class="cd-result-badge">🏆 영상 목표 달성!</div>
+        ${pct >= 100 ? '<div class="cd-result-badge">🏆 영상 목표 달성!</div>' : ''}
         <div class="cd-result-hero">${pct}%</div>
         <div class="cd-result-list">
           <div class="cd-result-item">
@@ -350,8 +412,8 @@ function renderResultPanel() {
             <span class="cd-result-val">${GOAL}개</span>
           </div>
           <div class="cd-result-item">
-            <span class="cd-result-lbl">달성 영상 수</span>
-            <span class="cd-result-val cd-result-val--accent">${doneCount}개</span>
+            <span class="cd-result-lbl">게시물 등록 완료</span>
+            <span class="cd-result-val cd-result-val--accent">${postedCount}개</span>
           </div>
           <div class="cd-result-item">
             <span class="cd-result-lbl">달성 조회수</span>
@@ -447,13 +509,17 @@ function renderResultPanel() {
           <div class="vid-stat-lbl">총 댓글</div>
         </div>
       </div>
+      <div class="ch-sim-notice">
+        <span class="ch-sim-notice-icon">🔧</span>
+        게시물 등록은 관리자가 설정합니다 · 아래 [+ 등록] 버튼은 표시 시뮬레이션용입니다
+      </div>
       <div class="vid-table-wrap">
         <table class="vid-table">
           <thead>
             <tr>
               <th style="min-width:140px">채널</th>
               <th style="text-align:center;width:50px">플랫폼</th>
-              <th style="text-align:center;min-width:110px">게시물</th>
+              <th style="text-align:center;min-width:160px">게시물 (관리자 등록)</th>
               <th style="text-align:right;width:72px">조회수</th>
               <th style="text-align:right;width:64px">좋아요</th>
               <th style="text-align:right;width:52px">댓글</th>
@@ -554,18 +620,24 @@ function openReviewModal(idx) {
   // 수정 요청 입력 영역 초기화
   const revBox  = document.getElementById('chRvRevisionBox');
   const ta      = document.getElementById('chRvRevisionText');
-  const subBtn  = document.getElementById('chRvRevisionSubmit');
   if (revBox) revBox.style.display = 'none';
   if (ta)    { ta.value = ''; ta.addEventListener('input', _onRevisionInput); }
-  if (subBtn) subBtn.disabled = true;
+  _setRevisionFooter(false);
 
   const modal = document.getElementById('chReviewModal');
   if (modal) { modal.classList.add('open'); document.body.style.overflow = 'hidden'; }
 }
 
 function _onRevisionInput() {
-  const btn = document.getElementById('chRvRevisionSubmit');
+  const btn = document.getElementById('chRvFooterSubmit');
   if (btn) btn.disabled = !this.value.trim();
+}
+
+function _setRevisionFooter(revMode) {
+  const normal   = document.getElementById('chRvFooterNormal');
+  const revision = document.getElementById('chRvFooterRevision');
+  if (normal)   normal.style.display   = revMode ? 'none' : '';
+  if (revision) revision.style.display = revMode ? ''     : 'none';
 }
 
 function closeReviewModal() {
@@ -587,12 +659,20 @@ function approveReview() {
 function requestRevision() {
   const box = document.getElementById('chRvRevisionBox');
   if (!box) return;
-  const isOpen = box.style.display !== 'none';
-  box.style.display = isOpen ? 'none' : '';
-  if (!isOpen) {
-    const ta = document.getElementById('chRvRevisionText');
-    if (ta) ta.focus();
-  }
+  box.style.display = '';
+  _setRevisionFooter(true);
+  const ta = document.getElementById('chRvRevisionText');
+  if (ta) ta.focus();
+}
+
+function cancelRevision() {
+  const box = document.getElementById('chRvRevisionBox');
+  if (box) box.style.display = 'none';
+  const ta = document.getElementById('chRvRevisionText');
+  if (ta) ta.value = '';
+  const btn = document.getElementById('chRvFooterSubmit');
+  if (btn) btn.disabled = true;
+  _setRevisionFooter(false);
 }
 
 function submitRevision() {
@@ -609,6 +689,15 @@ function submitRevision() {
   closeReviewModal();
   updateChSummary();
   showToast('수정 요청이 전달되었습니다');
+}
+
+// ── 게시물 등록 시뮬레이션 토글 ─────────────────────────────────────────
+// TODO: 어드민 구축 시 POST /api/result/:channelId/register 로 대체
+function toggleSimPost(idx) {
+  const i = Number(idx);
+  if (_simPosted.has(i)) _simPosted.delete(i);
+  else _simPosted.add(i);
+  renderResultPanel();
 }
 
 // ── 컬럼 정렬 토글 ───────────────────────────────────────────────────
@@ -771,10 +860,15 @@ function undoCh(idx) {
 // ── 상태 필터 칩 ─────────────────────────────────────────────────────
 function chSetStatus(val) {
   _chFilterStatus = val || '';
-  document.querySelectorAll('.ch-chip').forEach(btn => {
+  document.querySelectorAll('#chPanel0 .ch-chip').forEach(btn => {
     btn.classList.toggle('ch-chip--active', (btn.dataset.args || '') === _chFilterStatus);
   });
   renderChannels();
+}
+
+function chSetReviewStatus(val) {
+  _chReviewFilter = val || '';
+  renderReviewPanel();
 }
 
 // ── p-list 프리미엄 카드 진행률 갱신 ─────────────────────────────────

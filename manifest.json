@@ -14,6 +14,9 @@
   "host_permissions": [
     "https://api.emailjs.com/*",
     "https://www.googleapis.com/*",
-    "https://api.anthropic.com/*"
+    "https://api.anthropic.com/*",
+    "https://www.kobis.or.kr/*",
+    "https://api.themoviedb.org/*",
+    "https://streaming-availability.p.rapidapi.com/*"
   ]
 }

@@ -1,0 +1,7 @@
+creds.json
+creds_2.json
+chrome_profile/
+__pycache__/
+*.pyc
+*.pyo
+.env

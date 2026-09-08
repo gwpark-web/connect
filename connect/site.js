@@ -1,13 +1,16 @@
 try { emailjs.init('PR1yiM-fDVGYx5wCo'); } catch(e) { console.warn('EmailJS init failed', e); }
 
 // ── ROUTING ──
-const pages = ['p1','p3','p4','p7','p-shop','p-list','p-form','p-channels','p-detail','p-detail-upload'];
+const pages = ['p1','p3','p4','p7','p-shop','p-list','p-form','p-channels','p-detail','p-detail-upload','p-prod-view','p-prod-upload','p-prod-premium','p2','p-admin'];
 const authPages = ['p-signup','p-brochure'];
 const navMap = { p1:'nav-p1', p3:'nav-p3', p7:'nav-p7' };
 const ctaPages = ['p-shop','p-form','p-channels'];
 const p0ActivePages = ['p1','p3','p4','p7'];
+const DETAIL_PAGES = ['p-detail', 'p-detail-upload', 'p-channels'];
 
-function goBackToList() { goTo('p-list'); }
+let campaignReturnPage = 'p-list';
+
+function goBackToList() { goTo(campaignReturnPage); }
 
 function filterCampaigns() {
   const typeVal = document.getElementById('campaignTypeFilter')?.value || 'all';
@@ -58,12 +61,21 @@ function initCampaignFilter() {
 }
 
 function goTo(id) {
+  if (DETAIL_PAGES.includes(id)) {
+    const cur = pages.find(p => document.getElementById(p)?.classList.contains('active'));
+    if (cur && !DETAIL_PAGES.includes(cur)) {
+      campaignReturnPage = cur;
+      document.body.dataset.viewerRole = cur === 'p-admin' ? 'admin' : 'advertiser';
+    }
+  }
   authPages.forEach(p => document.getElementById(p).classList.remove('active'));
   pages.forEach(p => document.getElementById(p).classList.remove('active'));
   document.getElementById(id).classList.add('active');
   Object.values(navMap).forEach(n => document.getElementById(n)?.classList.remove('active'));
   document.getElementById(navMap[id])?.classList.add('active');
   document.body.classList.toggle('p0-active', p0ActivePages.includes(id));
+  var gni = document.getElementById('gnb-user-info');
+  if (gni) gni.hidden = (id !== 'p-admin');
   window.scrollTo(0,0);
   document.getElementById('p1').scrollTop = 0;
 
@@ -126,33 +138,8 @@ function calcDates() {
 }
 
 // ── CTA ──
-function updateCta(page) {
-  const info = document.getElementById('ctaInfo');
-  const btn = document.getElementById('ctaBtn');
-  if (page === 'p-shop') {
-    if (selectedProduct) {
-      info.innerHTML = `선택: <strong>${selectedProduct.name}</strong> &nbsp;·&nbsp; <span class="orange">${selectedProduct.price}</span> (VAT 별도)`;
-      btn.classList.add('on'); btn.textContent = '다음 단계로 →';
-    } else {
-      info.innerHTML = '상품을 선택해 주세요';
-      btn.classList.remove('on');
-    }
-  } else if (page === 'p-form') {
-    info.innerHTML = '정보를 입력하고 다음 단계로 진행하세요';
-    btn.classList.add('on'); btn.textContent = '다음 단계로 →';
-  } else if (page === 'p-channels') {
-    const n = Object.values(chState || {}).filter(s => s === 'selected').length;
-    if (n >= 30) {
-      info.innerHTML = `<strong style="color:var(--orange)">30개 선정 완료</strong> · 확정 후 제작 가이드가 전달됩니다`;
-      btn.classList.add('on'); btn.textContent = '선정 확정 →';
-    } else if (n > 0) {
-      info.innerHTML = `<strong>${n}개</strong> 선정됨 · 목표 30개까지 추가 선정 가능`;
-      btn.classList.remove('on');
-    } else {
-      info.innerHTML = '채널을 선택해 주세요 (최대 30개)';
-      btn.classList.remove('on');
-    }
-  }
+function updateCta() {
+  // 모든 페이지에서 동일한 소개서 요청 CTA
 }
 
 const EJS_SVC  = 'service_zl4kqql';
@@ -218,6 +205,7 @@ function submitInquiry() {
   });
 }
 
+/* [SEC-STRUCTURE] 구조 섹션 카드 슬라이드 토글 */
 function setCardSlide(cardId, slideIdx) {
   const card = document.getElementById(cardId);
   if (!card) return;
@@ -508,10 +496,26 @@ document.getElementById('statModal')?.addEventListener('click', function(e) {
 });
 
 function handleCta() {
-  const active = pages.find(p => document.getElementById(p).classList.contains('active'));
-  if (active === 'p-shop') goTo('p-form');
-  else if (active === 'p-form') goTo('p-channels');
-  else if (active === 'p-channels') { alert('선정 완료! 캠페인이 시작됩니다.'); goTo('p-list'); }
+  goToAuth('p-brochure');
+}
+
+// ── 조회수 갱신 제한 모달 ──
+function closeRefreshLimitModal() {
+  document.getElementById('refreshLimitModal').classList.remove('open');
+}
+
+// ── 리포트 업로드 모달 ──
+function openReportUploadModal() {
+  document.getElementById('reportUploadModal').classList.add('open');
+}
+function closeReportUploadModal() {
+  document.getElementById('reportUploadModal').classList.remove('open');
+}
+function ruSwitchTab(idx) {
+  const i = Number(idx);
+  document.querySelectorAll('#reportUploadModal .ru-tab').forEach((btn, j) => {
+    btn.classList.toggle('ru-tab--active', j === i);
+  });
 }
 
 // ── SCROLL — #p1이 스크롤 컨테이너이므로 window 대신 #p1 이벤트 감지 ──
@@ -524,6 +528,7 @@ _p1El.addEventListener('scroll', () => {
 goTo('p1');
 document.body.classList.add('p0-active');
 
+/* [SEC-PROCESS] 프로세스 데이터 및 렌더링 */
 // ── 섹션6 진행 프로세스 데이터 ──
 const processSteps = {
   standard: [
@@ -654,6 +659,7 @@ function p0RoleToggle(mode) {
 
 renderProcessCards('std');
 
+/* [SEC-STRUCTURE] 구조 섹션 CC 토글 */
 function p0CcToggle(mode) {
   document.querySelectorAll('#p0CcToggle .p0rt-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.args === mode)
@@ -681,6 +687,9 @@ function p0CcToggle(mode) {
     advanceReviewState, creatorRejectCh,
     openReviewModal, closeReviewModal, approveReview, requestRevision, cancelRevision, submitRevision,
     toggleSimPost,
+    refreshViewCounts,
+    closeRefreshLimitModal,
+    openReportUploadModal, closeReportUploadModal, ruSwitchTab,
     p0RoleToggle,
     p0CcToggle
   };
@@ -748,3 +757,624 @@ function runStatCountUp() {
     })(performance.now());
   });
 }
+
+// ── ADMIN PAGE: 탭 / 서브탭 / 모달 ──
+document.addEventListener('click', function(e) {
+  // 메인 탭
+  const tabbtn = e.target.closest('[data-adm-tab]');
+  if (tabbtn) {
+    const tab = tabbtn.dataset.admTab;
+    document.querySelectorAll('#p-admin [data-adm-tab]').forEach(b => b.classList.toggle('active', b.dataset.admTab === tab));
+    document.querySelectorAll('.adm-panel').forEach(p => p.classList.toggle('active', p.id === 'adm-panel-' + tab));
+    if (tab === 'sales' && window.scRender) window.scRender();
+    return;
+  }
+  // 서브탭
+  const subtabbtn = e.target.closest('[data-adm-sub]');
+  if (subtabbtn) {
+    const sub = subtabbtn.dataset.admSub;
+    document.querySelectorAll('#p-admin [data-adm-sub]').forEach(b => b.classList.toggle('active', b.dataset.admSub === sub));
+    document.querySelectorAll('.adm-subpanel').forEach(p => p.classList.toggle('active', p.id === 'adm-sub-' + sub));
+    return;
+  }
+  // 모달 열기
+  const modalTrigger = e.target.closest('[data-adm-modal]');
+  if (modalTrigger) {
+    const overlay = document.getElementById(modalTrigger.dataset.admModal);
+    if (overlay) overlay.classList.add('open');
+    return;
+  }
+  // 모달 닫기
+  const closeBtn = e.target.closest('[data-adm-close]');
+  if (closeBtn) {
+    closeBtn.closest('.adm-overlay')?.classList.remove('open');
+    return;
+  }
+  // 오버레이 배경 클릭으로 닫기
+  if (e.target.classList.contains('adm-overlay')) {
+    e.target.classList.remove('open');
+    return;
+  }
+  // 필터 칩
+  const chip = e.target.closest('#p-admin .adm-chip');
+  if (chip) {
+    chip.closest('.adm-filters').querySelectorAll('.adm-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+  }
+});
+
+// ════════════════════════════════════════════
+// 영업 캘린더 (Sales Calendar)
+// ════════════════════════════════════════════
+(function () {
+  var STORE_KEY = 'cs_sales_cal_v1';
+  var STATUSES = ['미접촉', '접이중', '접촉완료', '진행', '무산'];
+  var CLOSED = ['진행', '무산'];
+  var scView = 'list';
+  var scMonth = startOfMonth(new Date());
+  var scEditId = null;
+  var scItems = scLoad();
+  var scSortKey = 'date';
+  var scSortDir = 1; // 1 = 오름차순, -1 = 내림차순
+
+  function uid() { return Math.random().toString(36).slice(2, 10); }
+  function startOfMonth(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
+  function today0() { var t = new Date(); t.setHours(0, 0, 0, 0); return t; }
+  function dday(dateStr) {
+    if (!dateStr) return 9999;
+    var d = new Date(dateStr + 'T00:00:00');
+    if (isNaN(d.getTime())) return 9999;
+    return Math.round((d - today0()) / 86400000);
+  }
+  function fmtDate(s) {
+    if (!s) return '—';
+    var p = s.split('-');
+    if (p.length < 3 || !p[1] || !p[2]) return s;
+    return p[0].slice(2) + '.' + p[1] + '.' + p[2];
+  }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  function scLoad() {
+    try { var r = localStorage.getItem(STORE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return [];
+  }
+  function scSave() { try { localStorage.setItem(STORE_KEY, JSON.stringify(scItems)); } catch (e) {} }
+
+  function scSortVal(it, key) {
+    if (key === 'date') return it.date || 'zzzzz';
+    if (key === 'lastContact') return it.lastContact || 'zzzzz';
+    if (key === 'title') return (it.title || '').toLowerCase();
+    if (key === 'type') return (it.type || '').toLowerCase();
+    if (key === 'filmCat') return (it.filmCat || '').toLowerCase();
+    if (key === 'genre') return (it.genre || '').toLowerCase();
+    if (key === 'company') return (it.company || '').toLowerCase();
+    if (key === 'country') return (it.country || '').toLowerCase();
+    if (key === 'source') return (it.source || '').toLowerCase();
+    if (key === 'owner') return (it.owner || '').toLowerCase();
+    if (key === 'status') return STATUSES.indexOf(it.status);
+    return '';
+  }
+
+
+  function scFiltered() {
+    var type = (g('sc-fType') || {}).value || '';
+    var filmCat = (g('sc-fFilmCat') || {}).value || '';
+    var status = (g('sc-fStatus') || {}).value || 'open';
+    var q = ((g('sc-fQuery') || {}).value || '').trim().toLowerCase();
+    var list = scItems.filter(function (it) {
+      if (it.date && dday(it.date) < -7) return false;
+      if (type && it.type !== type) return false;
+      if (filmCat && it.filmCat !== filmCat) return false;
+      if (status === 'open') { if (CLOSED.indexOf(it.status) !== -1) return false; }
+      else if (status && it.status !== status) return false;
+      if (q && (it.title + ' ' + (it.company || '')).toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+    list.sort(function (a, b) {
+      var av = scSortVal(a, scSortKey), bv = scSortVal(b, scSortKey);
+      if (av < bv) return -scSortDir;
+      if (av > bv) return scSortDir;
+      return 0;
+    });
+    return list;
+  }
+
+  function g(id) { return document.getElementById(id); }
+
+  function scRenderTop() {
+    var t = today0();
+    var wd = ['일','월','화','수','목','금','토'][t.getDay()];
+    var el = g('sc-today-date');
+    if (el) el.textContent = t.getFullYear() + '. ' + pad(t.getMonth() + 1) + '. ' + pad(t.getDate()) + ' (' + wd + ')';
+    var due = scItems.filter(function (it) {
+      if (CLOSED.indexOf(it.status) !== -1) return false;
+      var n = dday(it.date); return n >= 0 && n <= 60;
+    }).length;
+    var ce = g('sc-today-count');
+    if (ce) ce.innerHTML = due ? '연락할 작품 <b style="color:var(--orange)">' + due + '</b>건' : '연락할 작품 없음';
+    var tc = g('sc-tab-count');
+    if (tc) tc.textContent = scItems.filter(function (it) { return CLOSED.indexOf(it.status) === -1; }).length;
+    var sn = g('sc-source-note');
+    if (sn) sn.textContent = '전체 ' + scItems.length + '건';
+  }
+
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+
+  function scUpdateSortHead() {
+    var head = g('sc-row-head');
+    if (!head) return;
+    head.querySelectorAll('[data-sort-key]').forEach(function (el) {
+      var k = el.dataset.sortKey;
+      el.classList.remove('sc-sort-asc', 'sc-sort-desc');
+      if (k === scSortKey) el.classList.add(scSortDir === 1 ? 'sc-sort-asc' : 'sc-sort-desc');
+    });
+  }
+
+  function scRenderList() {
+    var tbody = g('sc-buckets'), empty = g('sc-empty');
+    if (!tbody) return;
+    var list = scFiltered();
+    scUpdateSortHead();
+    if (!list.length) { tbody.innerHTML = ''; if (empty) empty.hidden = false; return; }
+    if (empty) empty.hidden = true;
+    tbody.innerHTML = list.map(rowHTML).join('');
+  }
+
+  function naverSearch(title, type) {
+    var kw = type === '드라마' ? '드라마' : '영화';
+    return 'https://search.naver.com/search.naver?where=nexearch&query=' + encodeURIComponent(title + ' ' + kw);
+  }
+
+  var KOBIS_POPUP_BASE = 'https://www.kobis.or.kr/kobis/business/mast/mvie/searchMovieList.do?dtTp=movie&dtCd=';
+
+  function rowHTML(it) {
+    var n = dday(it.date);
+    var urgent = n >= 0 && n <= 14 && CLOSED.indexOf(it.status) === -1;
+    var ddayStr = n === 9999
+      ? '<span class="sc-dday is-past">—</span>'
+      : n < 0
+        ? '<span class="sc-dday is-past">공개됨</span>'
+        : '<span class="sc-dday' + (urgent ? ' is-urgent' : '') + '">D-' + n + '</span>';
+    var priorityDot = it.priority === '높음' ? '🔴' : it.priority === '낮음' ? '⚪' : '';
+    var sourceCell = it.movieCd
+      ? '<a class="sc-link-kobis" href="' + KOBIS_POPUP_BASE + esc(it.movieCd) + '" target="_blank" rel="noopener">KOBIS</a>'
+      : (it.source ? '<span class="sc-source-tag">' + esc(it.source) + '</span>' : '<span style="color:var(--gray-light)">—</span>');
+    return '<tr class="sc-tr' + (urgent ? ' is-urgent' : '') + (CLOSED.indexOf(it.status) !== -1 ? ' is-closed' : '') + '" data-sc-id="' + it.id + '">' +
+      '<td class="sc-dday-col">' + ddayStr + '<span class="sc-date">' + fmtDate(it.date) + '</span></td>' +
+      '<td class="sc-title">' + (priorityDot ? '<span class="sc-pri-dot">' + priorityDot + '</span>' : '') + esc(it.title) +
+        (it.filmCat ? '<span class="sc-filmcat">' + esc(it.filmCat) + '</span>' : '') + '</td>' +
+      '<td><span class="sc-type-badge">' + esc(it.type || '—') + '</span></td>' +
+      '<td class="sc-genre">' + esc(it.genre || '—') + '</td>' +
+      '<td class="sc-country">' + esc(it.country || '—') + '</td>' +
+      '<td class="sc-company">' + esc(it.company || '—') + '</td>' +
+      '<td>' + sourceCell + '</td>' +
+      '<td><button class="sc-status sc-st-' + it.status + '" data-sc-cycle="' + it.id + '">' +
+        '<i class="sc-dot"></i>' + it.status +
+      '</button></td>' +
+      '<td class="sc-owner">' + esc(it.owner || '—') + '</td>' +
+    '</tr>';
+  }
+
+  function scRenderMonth() {
+    var y = scMonth.getFullYear(), m = scMonth.getMonth();
+    var lbl = g('sc-month-label');
+    if (lbl) lbl.textContent = y + '년 ' + (m + 1) + '월';
+    var startDow = new Date(y, m, 1).getDay();
+    var start = new Date(y, m, 1 - startDow);
+    var list = scFiltered();
+    var byDate = {};
+    list.forEach(function (it) { if (!byDate[it.date]) byDate[it.date] = []; byDate[it.date].push(it); });
+    var dows = ['일','월','화','수','목','금','토'];
+    var html = dows.map(function (d, i) { return '<div class="sc-dow' + (i === 0 ? ' sun' : '') + '">' + d + '</div>'; }).join('');
+    var tISO = today0().toISOString().slice(0, 10);
+    for (var i = 0; i < 42; i++) {
+      var cur = new Date(start); cur.setDate(start.getDate() + i);
+      var iso = cur.getFullYear() + '-' + pad(cur.getMonth() + 1) + '-' + pad(cur.getDate());
+      var out = cur.getMonth() !== m;
+      var hits = byDate[iso] || [];
+      var chips = hits.slice(0, 3).map(function (it) {
+        var n = dday(it.date);
+        var urg = n >= 0 && n <= 14 && CLOSED.indexOf(it.status) === -1;
+        return '<button class="sc-cal-chip sc-st-' + it.status + (urg ? ' is-urgent' : '') + '" data-sc-id="' + it.id + '">' + esc(it.title) + '</button>';
+      }).join('');
+      var more = hits.length > 3 ? '<div class="sc-cell-more">외 ' + (hits.length - 3) + '건</div>' : '';
+      html += '<div class="sc-cell' + (out ? ' is-out' : '') + (iso === tISO ? ' is-today' : '') + '">' +
+        '<span class="sc-cell-n">' + cur.getDate() + '</span>' + chips + more + '</div>';
+    }
+    var grid = g('sc-cal-grid');
+    if (grid) grid.innerHTML = html;
+  }
+
+  function scRender() { scRenderTop(); if (scView === 'list') scRenderList(); else scRenderMonth(); }
+
+  // 시트 열기/닫기
+  function scToggleCancelReason(status) {
+    var wrap = g('sc-cancel-reason-wrap');
+    if (wrap) wrap.hidden = (status !== '무산');
+  }
+  function scOpenSheet(id) {
+    scEditId = id || null;
+    var it = id ? scItems.find(function (x) { return x.id === id; }) : null;
+    g('sc-sheet-title').textContent = it ? '일정 편집' : '일정 추가';
+    g('sc-iTitle').value = it ? it.title : '';
+    g('sc-iType').value = it ? it.type : '영화';
+    g('sc-iCountry').value = it ? (it.country || '') : '';
+    g('sc-iDate').value = it ? it.date : '';
+    g('sc-iCompany').value = it ? (it.company || '') : '';
+    g('sc-iContact').value = it ? (it.contact || '') : '';
+    g('sc-iStatus').value = it ? it.status : '미접촉';
+    g('sc-iPriority').value = it ? (it.priority || '보통') : '보통';
+    g('sc-iOwner').value = it ? (it.owner || '') : '';
+    g('sc-iLastContact').value = it ? (it.lastContact || '') : '';
+    g('sc-iNextAction').value = it ? (it.nextAction || '') : '';
+    g('sc-iNextActionDate').value = it ? (it.nextActionDate || '') : '';
+    g('sc-iCancelReason').value = it ? (it.cancelReason || '') : '';
+    g('sc-iUrl').value = it ? (it.url || '') : '';
+    g('sc-iMemo').value = it ? (it.memo || '') : '';
+    var mcInput = g('sc-iMovieCd'); if (mcInput) mcInput.value = it ? (it.movieCd || '') : '';
+    scToggleCancelReason(it ? it.status : '미접촉');
+    g('sc-btn-delete').hidden = !it;
+    g('sc-sheet').hidden = false;
+    setTimeout(function () { g('sc-iTitle').focus(); }, 40);
+  }
+  function scCloseSheet() { g('sc-sheet').hidden = true; scEditId = null; }
+  function scSaveSheet() {
+    var title = g('sc-iTitle').value.trim();
+    var date = g('sc-iDate').value;
+    if (!title) { scToast('작품명을 입력하세요'); g('sc-iTitle').focus(); return; }
+    if (!date) { scToast('개봉일을 선택하세요'); g('sc-iDate').focus(); return; }
+    var data = {
+      title: title, type: g('sc-iType').value, date: date,
+      country: g('sc-iCountry').value.trim(),
+      company: g('sc-iCompany').value.trim(),
+      contact: g('sc-iContact').value.trim(),
+      status: g('sc-iStatus').value,
+      priority: g('sc-iPriority').value,
+      owner: g('sc-iOwner').value.trim(),
+      lastContact: g('sc-iLastContact').value,
+      nextAction: g('sc-iNextAction').value.trim(),
+      nextActionDate: g('sc-iNextActionDate').value,
+      cancelReason: g('sc-iCancelReason').value.trim(),
+      url: g('sc-iUrl').value.trim(),
+      memo: g('sc-iMemo').value.trim()
+    };
+    if (scEditId) {
+      var it = scItems.find(function (x) { return x.id === scEditId; });
+      Object.assign(it, data);
+      // movieCd·source는 편집 시 보존 (덮어쓰지 않음)
+    } else {
+      var mcInput = g('sc-iMovieCd');
+      var movieCd = mcInput ? mcInput.value.trim() : '';
+      scItems.push(Object.assign({ id: uid(), source: movieCd ? 'KOBIS' : 'manual', movieCd: movieCd }, data));
+    }
+    scSave(); scCloseSheet(); scRender();
+    scToast(scEditId ? '저장했습니다' : '추가했습니다');
+  }
+  function scDeleteItem() {
+    if (!scEditId) return;
+    scItems = scItems.filter(function (x) { return x.id !== scEditId; });
+    scSave(); scCloseSheet(); scRender(); scToast('삭제했습니다');
+  }
+
+  var toastTimer;
+  function scToast(msg) {
+    var el = g('sc-toast'); if (!el) return;
+    el.textContent = msg; el.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.hidden = true; }, 1800);
+  }
+
+  // 이벤트
+  document.addEventListener('click', function (e) {
+    var sortSpan = e.target.closest('[data-sort-key]');
+    if (sortSpan) {
+      var k = sortSpan.dataset.sortKey;
+      if (scSortKey === k) { scSortDir = -scSortDir; } else { scSortKey = k; scSortDir = 1; }
+      if (scView === 'list') scRenderList();
+      return;
+    }
+    if (e.target.id === 'sc-btn-sync') { scSync(); return; }
+    if (e.target.id === 'sc-btn-add') { scOpenSheet(null); return; }
+    if (e.target.id === 'sc-btn-save') { scSaveSheet(); return; }
+    if (e.target.id === 'sc-btn-cancel' || e.target.id === 'sc-sheet-close') { scCloseSheet(); return; }
+    if (e.target.id === 'sc-btn-delete') { scDeleteItem(); return; }
+    if (e.target.id === 'sc-sheet-scrim') { scCloseSheet(); return; }
+    if (e.target.id === 'sc-reset-filters') {
+      var ft = g('sc-fType'), fs = g('sc-fStatus'), fq = g('sc-fQuery');
+      if (ft) ft.value = ''; if (fs) fs.value = 'open'; if (fq) fq.value = '';
+      scRender(); return;
+    }
+    var segBtn = e.target.closest('[data-sc-view]');
+    if (segBtn) {
+      scView = segBtn.dataset.scView;
+      document.querySelectorAll('[data-sc-view]').forEach(function (b) { b.classList.toggle('is-on', b === segBtn); });
+      var vl = g('sc-view-list'), vm = g('sc-view-month');
+      if (vl) vl.hidden = scView !== 'list'; if (vm) vm.hidden = scView !== 'month';
+      scRender(); return;
+    }
+    if (e.target.id === 'sc-prev-month') { scMonth = new Date(scMonth.getFullYear(), scMonth.getMonth() - 1, 1); scRenderMonth(); return; }
+    if (e.target.id === 'sc-next-month') { scMonth = new Date(scMonth.getFullYear(), scMonth.getMonth() + 1, 1); scRenderMonth(); return; }
+    if (e.target.id === 'sc-this-month') { scMonth = startOfMonth(new Date()); scRenderMonth(); return; }
+    var cycleBtn = e.target.closest('[data-sc-cycle]');
+    if (cycleBtn) {
+      e.stopPropagation();
+      var itC = scItems.find(function (x) { return x.id === cycleBtn.dataset.scCycle; });
+      if (itC) {
+        itC.status = STATUSES[(STATUSES.indexOf(itC.status) + 1) % STATUSES.length];
+        scSave(); scRender();
+        var row = document.querySelector('tr[data-sc-id="' + itC.id + '"]');
+        if (row) { row.classList.add('is-flash'); setTimeout(function () { row.classList.remove('is-flash'); }, 900); }
+      }
+      return;
+    }
+    var row = e.target.closest('tr[data-sc-id]');
+    if (row && row.dataset.scId && !e.target.closest('.sc-link-col')) { scOpenSheet(row.dataset.scId); return; }
+    var chip = e.target.closest('.sc-cal-chip');
+    if (chip && chip.dataset.scId) { scOpenSheet(chip.dataset.scId); return; }
+  });
+
+  document.addEventListener('input', function (e) {
+    if (['sc-fType','sc-fFilmCat','sc-fStatus','sc-fQuery'].indexOf(e.target.id) !== -1) scRender();
+    if (e.target.id === 'sc-iTitle') scAcDebounce(e.target.value);
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && g('sc-sheet') && !g('sc-sheet').hidden) scCloseSheet();
+  });
+
+  // 상태 변경 시 무산 사유 필드 표시/숨김
+  var scStatusSel = g('sc-iStatus');
+  if (scStatusSel) scStatusSel.addEventListener('change', function() { scToggleCancelReason(this.value); });
+
+  // ── KOBIS API 연동 ────────────────────────────────────────────────
+  var KOBIS_KEY = 'fc1410907e1bad0b8c48a0ebf75e7bcf';
+  var KOBIS_BASE = 'https://www.kobis.or.kr/kobisopenapi/webservice/rest/';
+
+  function kobisDateFmt(dt) {
+    if (!dt) return '';
+    if (dt.length === 8) return dt.slice(0,4) + '-' + dt.slice(4,6) + '-' + dt.slice(6,8);
+    if (dt.length === 10 && dt.indexOf('-') !== -1) return dt;
+    return '';
+  }
+  function kobisCompany(companys) {
+    if (!companys || !companys.length) return '';
+    // 배급사 우선, 없으면 수입사, 없으면 첫 번째 회사
+    var dist = companys.find(function(c) { return c.companyPart === '배급사'; });
+    if (dist) return dist.companyNm;
+    var imp = companys.find(function(c) { return c.companyPart === '수입사'; });
+    if (imp) return imp.companyNm;
+    return companys[0].companyNm;
+  }
+
+  // 자동완성용 제목 검색 (OpenAPI)
+  async function kobisFetch(params) {
+    var url = KOBIS_BASE + 'movie/searchMovieList.json?key=' + KOBIS_KEY + '&itemPerPage=10&' + params;
+    try {
+      var res = await fetch(url);
+      var json = await res.json();
+      return (json.movieListResult && json.movieListResult.movieList) || [];
+    } catch(e) { return []; }
+  }
+
+  // 개봉 예정작 조회 (searchMovieList.json — openDt·repNationNm·movieCd 반환)
+  var KOBIS_PROXY = 'https://corsproxy.io/?url=';
+  async function kobisScheduleFetch() {
+    var y = new Date().getFullYear();
+    var url = KOBIS_BASE + 'movie/searchMovieList.json?key=' + KOBIS_KEY +
+      '&openStartDt=' + y + '&openEndDt=' + (y + 1) + '&itemPerPage=100&curPage=1';
+    // 7일 전 기준 cutoff (이미 지난 개봉작 제외)
+    var cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 7);
+    var cutoffStr = cutoff.getFullYear() + pad(cutoff.getMonth()+1) + pad(cutoff.getDate());
+    async function tryFetch(u) {
+      var r = await fetch(u); if (!r.ok) throw new Error('fail'); return r.json();
+    }
+    var json;
+    try { json = await tryFetch(url); } catch(e) {
+      try { json = await tryFetch(KOBIS_PROXY + encodeURIComponent(url)); } catch(e2) {
+        try { json = await tryFetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url)); } catch(e3) { return []; }
+      }
+    }
+    var ADULT_GENRES = ['성인물', '에로', '성인', 'adult', 'erotic'];
+    var list = (json.movieListResult && json.movieListResult.movieList) || [];
+    return list.filter(function(m) {
+      // 성인물·에로 장르 제외
+      var genre = (m.repGenreNm || '').toLowerCase();
+      if (ADULT_GENRES.some(function(g) { return genre.indexOf(g) !== -1; })) return false;
+      // 7일 이상 지난 개봉작 제외 (날짜 미등록은 유지)
+      if (!m.openDt || m.openDt.length < 8) return true;
+      return m.openDt >= cutoffStr;
+    });
+  }
+
+  // ── 자동완성 ──
+  var _acTimer;
+  function scAcDebounce(val) {
+    clearTimeout(_acTimer);
+    if (!val || val.length < 2) { scAcClear(); return; }
+    _acTimer = setTimeout(function() { scAcSearch(val); }, 380);
+  }
+  async function scAcSearch(q) {
+    var movies = await kobisFetch('movieNm=' + encodeURIComponent(q));
+    var drop = g('sc-ac-drop');
+    if (!drop) return;
+    if (!movies.length) { drop.hidden = true; return; }
+    drop.innerHTML = movies.slice(0, 6).map(function(m) {
+      var dt = kobisDateFmt(m.openDt);
+      var co = kobisCompany(m.companys);
+      return '<div class="sc-ac-item" data-mc="' + esc(m.movieCd) + '" data-mn="' + esc(m.movieNm) + '" data-dt="' + esc(dt) + '" data-co="' + esc(co) + '">' +
+        '<span class="sc-ac-name">' + esc(m.movieNm) + '</span>' +
+        '<span class="sc-ac-meta">' + (dt || '개봉일 미정') + (co ? ' · ' + co : '') + '</span>' +
+      '</div>';
+    }).join('');
+    drop.hidden = false;
+  }
+  function scAcClear() { var d = g('sc-ac-drop'); if (d) d.hidden = true; }
+
+  // 자동완성 클릭 → 폼 채우기
+  document.addEventListener('click', function(e) {
+    var item = e.target.closest('.sc-ac-item');
+    if (item) {
+      g('sc-iTitle').value  = item.dataset.mn;
+      if (item.dataset.dt) g('sc-iDate').value = item.dataset.dt;
+      if (item.dataset.co) g('sc-iCompany').value = item.dataset.co;
+      g('sc-iType').value = '영화';
+      g('sc-iUrl').value = '';
+      // movieCd를 hidden input에 임시 저장 (저장 시 item에 반영)
+      var mcInput = g('sc-iMovieCd');
+      if (mcInput) mcInput.value = item.dataset.mc || '';
+      scAcClear();
+      return;
+    }
+    if (!e.target.closest('#sc-ac-drop') && !e.target.closest('#sc-iTitle')) scAcClear();
+  });
+
+
+  // ── 외부 API 동기화 (확장 가능 구조) ──────────────────────────────
+  // 새 API 추가 시 _syncSources 배열에 { name, fn } 형태로 push
+  var _syncSources = [];
+
+  // KOBIS 소스 등록 (searchMovieList.json — movieCd·openDt·repNationNm 반환)
+  _syncSources.push({
+    name: 'KOBIS',
+    fn: async function() {
+      var movies = await kobisScheduleFetch();
+      var added = 0;
+      movies.forEach(function(m) {
+        var title = m.movieNm || '';
+        if (!title) return;
+        var exists = scItems.some(function(it) { return it.title === title && it.source === 'KOBIS'; });
+        if (exists) return;
+        scItems.push({
+          id: uid(), title: title, type: '영화',
+          filmCat: m.typeNm || '',
+          genre: m.repGenreNm || '',
+          country: m.repNationNm || '한국',
+          date: kobisDateFmt(m.openDt || '') || '',
+          company: kobisCompany(m.companys),
+          movieCd: m.movieCd || '',
+          status: '미접촉', owner: '',
+          url: '', memo: '', source: 'KOBIS'
+        });
+        added++;
+      });
+      return added;
+    }
+  });
+
+  async function scSync() {
+    var btn = g('sc-btn-sync');
+    if (!btn || btn.disabled) return;
+    btn.disabled = true;
+    var orig = btn.innerHTML;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin .6s linear infinite"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>갱신 중…';
+    // 기존 리스트 전체 초기화 후 KOBIS 재수신
+    scItems = [];
+    var totalAdded = 0;
+    for (var i = 0; i < _syncSources.length; i++) {
+      try { totalAdded += await _syncSources[i].fn(); } catch(e) {}
+    }
+    scSave(); scRender();
+    scToast(totalAdded ? 'KOBIS ' + totalAdded + '건 불러왔습니다' : 'KOBIS 데이터가 없습니다');
+    btn.disabled = false;
+    btn.innerHTML = orig;
+  }
+
+  // 전역 노출 (탭 전환 시 호출용)
+  window.scRender = scRender;
+
+  // 초기 렌더
+  scRender();
+})();
+
+// ── 관리자 페이지 정렬 기능 ────────────────────────────────────────────────
+
+// 캠페인 보고서 정렬
+(function() {
+  var sel = document.getElementById('adm-report-sort');
+  if (!sel) return;
+  function admSortReport() {
+    var val = sel.value;
+    var grid = document.querySelector('.adm-report-grid');
+    if (!grid) return;
+    var cards = Array.from(grid.querySelectorAll('.campaign-card'));
+    cards.sort(function(a, b) {
+      var pctA = parseFloat(a.dataset.pct) || 0;
+      var pctB = parseFloat(b.dataset.pct) || 0;
+      var stA = (a.dataset.campaignStatus || '').toLowerCase();
+      var stB = (b.dataset.campaignStatus || '').toLowerCase();
+      if (val === 'pct-desc') return pctB - pctA;
+      if (val === 'pct-asc')  return pctA - pctB;
+      if (val === 'status')   return stA < stB ? -1 : stA > stB ? 1 : 0;
+      return 0;
+    });
+    cards.forEach(function(c) { grid.appendChild(c); });
+  }
+  sel.addEventListener('change', admSortReport);
+})();
+
+// 정적 테이블(캠페인 생성, 계정 관리) 열 정렬
+(function() {
+  var admSortState = {};
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.adm-th-sort[data-adm-col]');
+    if (!btn) return;
+    var thead = btn.closest('thead');
+    if (!thead) return;
+    var table = thead.closest('table');
+    if (!table) return;
+    var colIdx = parseInt(btn.dataset.admCol, 10);
+    var key = table.id || table.className;
+    var cur = admSortState[key] || { col: -1, dir: 'asc' };
+    var dir = (cur.col === colIdx && cur.dir === 'asc') ? 'desc' : 'asc';
+    admSortState[key] = { col: colIdx, dir: dir };
+
+    // 헤더 아이콘 업데이트
+    thead.querySelectorAll('.adm-th-sort').forEach(function(b) {
+      b.classList.remove('adm-sort-asc', 'adm-sort-desc');
+    });
+    btn.classList.add(dir === 'asc' ? 'adm-sort-asc' : 'adm-sort-desc');
+
+    // tbody 행 정렬
+    var tbody = table.querySelector('tbody');
+    if (!tbody) return;
+    var rows = Array.from(tbody.querySelectorAll('tr'));
+    rows.sort(function(a, b) {
+      var cellA = (a.cells[colIdx] ? a.cells[colIdx].textContent : '').trim();
+      var cellB = (b.cells[colIdx] ? b.cells[colIdx].textContent : '').trim();
+      var numA = parseFloat(cellA.replace(/[^0-9.-]/g, ''));
+      var numB = parseFloat(cellB.replace(/[^0-9.-]/g, ''));
+      var cmp = (!isNaN(numA) && !isNaN(numB))
+        ? numA - numB
+        : cellA.localeCompare(cellB, 'ko');
+      return dir === 'asc' ? cmp : -cmp;
+    });
+    rows.forEach(function(r) { tbody.appendChild(r); });
+  });
+})();
+
+// ── 경계 글로우 animation 동기화 — 항상 상위 섹션 기준으로 하위를 맞춤 ──
+(function syncGlowAnimations() {
+  // refClass: 상위 섹션 클래스, targetClass: 하위 섹션 클래스
+  var pairs = [
+    { name: 'br3-breathe', ref: 'p0-products-section', target: 'p0-role-section' },
+    { name: 'br4-breathe', ref: 'p0-role-section',     target: 'p0-cta' }
+  ];
+
+  function sync() {
+    var all = document.getAnimations();
+    pairs.forEach(function(p) {
+      var anims = all.filter(function(a) { return a.animationName === p.name; });
+      if (anims.length < 2) return;
+      var refAnim = null;
+      anims.forEach(function(a) {
+        var el = a.effect && a.effect.target;
+        if (el && el.classList && el.classList.contains(p.ref)) refAnim = a;
+      });
+      if (!refAnim) refAnim = anims[0];
+      var t = refAnim.currentTime;
+      anims.forEach(function(a) { if (a !== refAnim) a.currentTime = t; });
+    });
+  }
+  requestAnimationFrame(function() { requestAnimationFrame(sync); });
+})();
+

@@ -259,6 +259,8 @@ function renderReviewPanel() {
   const container = document.getElementById('chReviewList');
   if (!container) return;
 
+  const isAdmin = document.body.dataset.viewerRole === 'admin';
+
   // 상태별 카운트 집계
   const counts = { '': 0, '최종 확정 중': 0, '제작 중': 0, '검토 필요': 0, '수정 중': 0 };
   channels.forEach((_, i) => {
@@ -324,7 +326,7 @@ function renderReviewPanel() {
         </div>
       </div>
       <span class="ch-rv-badge ${badgeCls}">${rs}</span>
-      <div class="ch-rv-sim"><span class="ch-rv-sim-label">시뮬</span>${simBtns}</div>
+      ${isAdmin ? `<div class="ch-rv-sim"><span class="ch-rv-sim-label">시뮬</span>${simBtns}</div>` : ''}
     </div>`;
   }).join('');
 }
@@ -333,6 +335,8 @@ function renderReviewPanel() {
 function renderResultPanel() {
   const container = document.getElementById('chResultContent');
   if (!container) return;
+
+  const isAdmin = document.body.dataset.viewerRole === 'admin';
 
   const doneItems = channels
     .map((ch, i) => ({ ch, i }))
@@ -376,11 +380,11 @@ function renderResultPanel() {
     const postCell = isPosted
       ? `<div class="ch-result-post-cell">
            <a class="ch-result-link" href="${post?.url || '#'}" target="_blank" rel="noopener">게시물 보기 →</a>
-           <button class="ch-sim-btn ch-sim-btn--on" data-fn="toggleSimPost" data-args="${i}" title="등록 취소 (시뮬레이션)">✓ 등록됨</button>
+           ${isAdmin ? `<button class="ch-sim-btn ch-sim-btn--on" data-fn="toggleSimPost" data-args="${i}">✓ 등록됨</button>` : ''}
          </div>`
       : `<div class="ch-result-post-cell">
-           <span class="ch-result-wait">${post?.uploadedAt ? post.uploadedAt.slice(5, 10).replace('-', '/') + ' 업로드' : '배포 링크 대기'}</span>
-           <button class="ch-sim-btn ch-sim-btn--off" data-fn="toggleSimPost" data-args="${i}" title="게시물 등록 시뮬레이션">+ 등록</button>
+           <span class="ch-result-wait">업로드전</span>
+           ${isAdmin ? `<button class="ch-sim-btn ch-sim-btn--off" data-fn="toggleSimPost" data-args="${i}">+ 등록</button>` : ''}
          </div>`;
     return `<tr>
       <td>
@@ -477,7 +481,11 @@ function renderResultPanel() {
 
     <div class="vid-card">
       <div class="vid-card-head">
-        참여 영상 <span class="vid-total-badge">${doneCount}개</span>
+        참여 영상
+        ${isAdmin ? `<div class="vid-head-actions">
+          <button class="cd-btn cd-btn-excel vid-refresh-btn" data-fn="refreshViewCounts"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>조회수 갱신</button>
+          <button class="cd-btn cd-btn-edit" data-fn="openReportUploadModal"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>리포트 업로드</button>
+        </div>` : ''}
       </div>
       <div class="vid-stat-strip">
         <div class="vid-stat-col">
@@ -509,10 +517,10 @@ function renderResultPanel() {
           <div class="vid-stat-lbl">총 댓글</div>
         </div>
       </div>
-      <div class="ch-sim-notice">
+      ${isAdmin ? `<div class="ch-sim-notice">
         <span class="ch-sim-notice-icon">🔧</span>
         게시물 등록은 관리자가 설정합니다 · 아래 [+ 등록] 버튼은 표시 시뮬레이션용입니다
-      </div>
+      </div>` : ''}
       <div class="vid-table-wrap">
         <table class="vid-table">
           <thead>
@@ -893,4 +901,38 @@ function updateListCardPremium() {
     const pctSpan = `<span class="${pctCls}">(${pct}%)</span>`;
     textEl.innerHTML = `${doneCount} / ${GOAL}개 ${pctSpan}`;
   }
+}
+
+// ── 조회수 갱신 (API / 크롤링 연동 예정) ──────────────────────────────
+// TODO: GET /api/result/:campaignId/views 응답으로 테이블 행 업데이트
+function refreshViewCounts() {
+  const TODAY = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
+  const LAST_KEY = 'cs_refresh_last';
+
+  if (localStorage.getItem(LAST_KEY) === TODAY) {
+    // 오늘 이미 갱신 완료 → 제한 모달 표시
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    const nextEl = document.getElementById('refreshNextTime');
+    if (nextEl) {
+      nextEl.textContent = '다음 갱신 가능 시간: ' + tomorrow.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' }) + ' 오전 12:00';
+    }
+    const modal = document.getElementById('refreshLimitModal');
+    if (modal) modal.classList.add('open');
+    return;
+  }
+
+  const btn = document.querySelector('.vid-refresh-btn');
+  if (!btn || btn.disabled) return;
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '갱신 중…';
+  // 연동 전 1.2s 로딩 시뮬레이션
+  setTimeout(() => {
+    localStorage.setItem(LAST_KEY, TODAY);
+    btn.disabled = false;
+    btn.innerHTML = orig;
+    // 연동 완료 후: renderResultPanel() 또는 개별 행 업데이트
+  }, 1200);
 }

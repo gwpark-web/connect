@@ -225,14 +225,16 @@
       <span>참여 채널 <strong>147</strong></span>
     </div>
     <div class="vid-table-wrap">
-      <table class="vid-table">
+      <table class="vid-table" data-vid-mode="internal">
         <colgroup>
+          <col style="width:36px">
           <col style="width:74px"><col style="width:100px"><col style="width:60px">
           <col style="width:auto"><col style="width:64px"><col style="width:64px">
-          <col style="width:54px"><col style="width:48px"><col style="width:58px">
+          <col style="width:54px"><col style="width:48px"><col style="width:58px"><col style="width:46px">
         </colgroup>
         <thead>
           <tr>
+            <th class="vid-cb-th"><input type="checkbox" class="vid-select-all" aria-label="전체선택"></th>
             <th><button class="vid-sort-btn">업로드일 ↓</button></th>
             <th><button class="vid-sort-btn">채널명 ↕</button></th>
             <th><button class="vid-sort-btn">구독자 ↕</button></th>
@@ -242,10 +244,12 @@
             <th><button class="vid-sort-btn">좋아요 ↕</button></th>
             <th><button class="vid-sort-btn">댓글 ↕</button></th>
             <th style="text-align:center">유료광고</th>
+            <th style="text-align:center">짤</th>
           </tr>
         </thead>
         <tbody>
           <tr>
+            <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="NOT NORMAL"></td>
             <td>26/06/06</td>
             <td title="NOT NORMAL">NOT NORMAL</td>
             <td>367</td>
@@ -253,8 +257,10 @@
             <td>1분 13초</td>
             <td>1,424</td><td>6</td><td>0</td>
             <td style="text-align:center;color:var(--gray-light)">-</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
           </tr>
           <tr>
+            <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="하봄"></td>
             <td>26/06/05</td>
             <td title="하봄">하봄</td>
             <td>292K</td>
@@ -262,8 +268,10 @@
             <td>1분 11초</td>
             <td>97,376</td><td>1,740</td><td>37</td>
             <td style="text-align:center;color:var(--gray-light)">-</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
           </tr>
           <tr>
+            <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="하씨네 CINE"></td>
             <td>26/06/05</td>
             <td title="하씨네 CINE">하씨네 CINE</td>
             <td>210K</td>
@@ -271,8 +279,10 @@
             <td>47초</td>
             <td>2,441</td><td>24</td><td>2</td>
             <td style="text-align:center;color:var(--gray-light)">-</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
           </tr>
           <tr>
+            <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="예고공식"></td>
             <td>26/06/04</td>
             <td title="예고공식">예고공식</td>
             <td>10.6K</td>
@@ -280,14 +290,17 @@
             <td>27초</td>
             <td>18,434</td><td>215</td><td>2</td>
             <td style="text-align:center;color:var(--gray-light)">-</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
           </tr>
           <tr>
+            <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="포브스튜디오"></td>
             <td>26/06/03</td>
             <td title="포브스튜디오">포브스튜디오</td>
             <td>1.4M</td>
             <td><a class="vid-table-link" href="#" target="_blank">인생 애니 귀환-토이 스토리 5</a></td>
             <td>38초</td>
             <td>5,950</td><td>21</td><td>3</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
             <td style="text-align:center;color:var(--gray-light)">-</td>
           </tr>
         </tbody>
@@ -428,6 +441,7 @@
   <div class="pdp-tab-nav">
     <button class="pdp-tab active" data-fn="switchPremiumTab" data-args="1">캠페인 개요</button>
     <button class="pdp-tab" data-fn="switchPremiumTab" data-args="2">채널 선정</button>
+    <button class="pdp-tab" data-fn="switchPremiumTab" data-args="3">검토 현황</button>
   </div>
 
   <!-- ── 탭 1: 캠페인 개요 ── -->
@@ -517,6 +531,15 @@
         <tbody id="pdpChTable"></tbody>
       </table>
     </div>
+  </div>
+
+  <!-- ── 탭 3: 검토 현황 ── -->
+  <div class="pdp-pane" id="pdp-pane-3">
+    <div class="pdp-rv-header">
+      <span class="pdp-rv-title">검토 현황</span>
+      <span class="result-count" id="pdpReviewCount">불러오는 중…</span>
+    </div>
+    <div id="pdpReviewList"></div>
   </div>
 
 </div>
@@ -627,6 +650,44 @@
   </div>
 </div>
 
+
+<!-- ── 짤 회원 사이드패널 ── -->
+<div class="sc-sheet" id="zealSheet" hidden>
+  <div class="sc-sheet-scrim" data-fn="closeZealPanel"></div>
+  <div class="sc-sheet-panel">
+    <div class="sc-sheet-head">
+      <h2>짤 회원 정보</h2>
+      <button class="adm-modal-x" data-fn="closeZealPanel">&#x2715;</button>
+    </div>
+    <div class="sc-sheet-body">
+      <input type="hidden" id="zealPanelHandle">
+      <div class="sc-section-label">회원 정보</div>
+      <div class="zeal-info-grid">
+        <span class="zeal-info-label">닉네임</span><span class="zeal-info-value" id="zealPanelNick">-</span>
+        <span class="zeal-info-label">짤ID</span><span class="zeal-info-value" id="zealPanelId">-</span>
+        <span class="zeal-info-label">연락처</span><span class="zeal-info-value" id="zealPanelPhone">-</span>
+        <span class="zeal-info-label">보유채널</span><span class="zeal-info-value" id="zealPanelChannels">-</span>
+        <span class="zeal-info-label">비고</span><span class="zeal-info-value" id="zealPanelNote">-</span>
+      </div>
+      <div class="zeal-memo-area">
+        <div class="zeal-memo-label">메모 히스토리</div>
+        <textarea class="zeal-memo-input" id="zealMemoInput" placeholder="메모를 입력하세요..."></textarea>
+        <button class="btn-new-campaign zeal-memo-submit" style="margin:0;padding:7px 16px;font-size:12px" data-fn="saveZealMemo">저장</button>
+        <div class="zeal-memo-history" id="zealMemoHistory"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 영상 테이블 체크박스 액션바 ── -->
+<div class="vid-action-bar" id="vidActionBar" hidden>
+  <span class="vid-action-count"><strong id="vidActionCount">0</strong>개 선택됨</span>
+  <div class="vid-action-btns">
+    <button class="vid-action-btn" id="vidActionChannel">채널보기</button>
+    <button class="vid-action-btn vid-action-btn--primary" id="vidActionVideo" hidden>영상보기</button>
+  </div>
+  <button class="vid-action-close" id="vidActionClose">&#x2715;</button>
+</div>
 
 <script src="channels.js"></script>
 <script src="admin.js"></script>

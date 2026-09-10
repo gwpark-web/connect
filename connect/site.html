@@ -79,7 +79,6 @@
       <p class="p0-hero-en-sub">쉽고 빠르게, 효과적인 광고를 시작하세요.</p>
       <div class="p0-display-btns">
         <button class="p0-btn-start" data-fn="goTo" data-args="p3">캠페인 문의하기 →</button>
-        <button class="p0-btn-case" data-fn="goToAuth" data-args="p-brochure">상품소개서 요청</button>
       </div>
     </div>
     <div class="p0-why-stats-grid">
@@ -245,7 +244,6 @@
 
         <!-- ── STEP 01: 광고주 ── -->
         <rect x="0" y="20" width="260" height="220" rx="24" fill="white" fill-opacity="0.07" stroke="white" stroke-opacity="0.18" stroke-width="1.5"/>
-        <text x="28" y="56" fill="#ff6200" font-family="'Noto Sans KR',sans-serif" font-size="11" font-weight="700" letter-spacing="2">STEP 01</text>
         <!-- 사람 아이콘 -->
         <circle cx="72" cy="128" r="24" fill="white" fill-opacity="0.1" stroke="white" stroke-opacity="0.25" stroke-width="1.5"/>
         <circle cx="72" cy="120" r="9" fill="white" fill-opacity="0.75"/>
@@ -260,7 +258,6 @@
 
         <!-- ── STEP 02: Connect Studio ── -->
         <rect x="330" y="0" width="300" height="260" rx="28" fill="#ff6200"/>
-        <text x="360" y="42" fill="rgba(255,255,255,0.6)" font-family="'Noto Sans KR',sans-serif" font-size="11" font-weight="700" letter-spacing="2">STEP 02</text>
         <text x="480" y="108" text-anchor="middle" fill="white" font-family="'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif" font-size="36" font-weight="900" letter-spacing="-1">CONNECT</text>
         <text x="480" y="148" text-anchor="middle" fill="white" font-family="'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif" font-size="36" font-weight="900" letter-spacing="-1">STUDIO</text>
         <line x1="360" y1="162" x2="620" y2="162" stroke="white" stroke-opacity="0.2" stroke-width="1"/>
@@ -270,25 +267,25 @@
         <line x1="638" y1="130" x2="684.88" y2="130" stroke="#ff6200" stroke-width="2.5" stroke-linecap="round"/>
         <polygon points="678,123 691,130 678,137" fill="#ff6200"/>
 
-        <!-- ── STEP 03: 확산 ── -->
+        <!-- ── BOX 3: 확산 ── -->
         <rect x="700" y="20" width="260" height="220" rx="24" fill="white" fill-opacity="0.07" stroke="white" stroke-opacity="0.18" stroke-width="1.5"/>
-        <text x="830" y="52" text-anchor="middle" fill="#ff6200" font-family="'Noto Sans KR',sans-serif" font-size="11" font-weight="700" letter-spacing="2">STEP 03</text>
 
-        <!-- YouTube -->
-        <rect x="742" y="82" width="48" height="48" rx="14" fill="#FF0000" opacity="0.9"/>
-        <polygon points="754,94 754,118 777,106" fill="white"/>
+        <!-- YouTube (40×40, centered group start x=758) -->
+        <rect x="758" y="68" width="40" height="40" rx="12" fill="#FF0000" opacity="0.9"/>
+        <polygon points="768,78 768,98 787,88" fill="white"/>
 
         <!-- Instagram -->
-        <rect x="806" y="82" width="48" height="48" rx="14" fill="#C13584" opacity="0.9"/>
-        <rect x="817" y="93" width="26" height="21" rx="4" fill="none" stroke="white" stroke-width="1.8"/>
-        <circle cx="830" cy="103" r="5.5" fill="none" stroke="white" stroke-width="1.8"/>
-        <circle cx="839" cy="94" r="2" fill="white"/>
+        <rect x="810" y="68" width="40" height="40" rx="12" fill="#C13584" opacity="0.9"/>
+        <rect x="819" y="77" width="22" height="17" rx="3" fill="none" stroke="white" stroke-width="1.6"/>
+        <circle cx="830" cy="86" r="4.5" fill="none" stroke="white" stroke-width="1.6"/>
+        <circle cx="838" cy="78" r="1.5" fill="white"/>
 
         <!-- TikTok -->
-        <rect x="870" y="82" width="48" height="48" rx="14" fill="#010101" opacity="0.9" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
-        <text x="894" y="113" text-anchor="middle" fill="white" font-family="sans-serif" font-size="22">♫</text>
+        <rect x="862" y="68" width="40" height="40" rx="12" fill="#010101" opacity="0.9" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+        <text x="882" y="93" text-anchor="middle" fill="white" font-family="sans-serif" font-size="18">♫</text>
 
-        <text x="830" y="160" text-anchor="middle" fill="white" font-family="'Noto Sans KR',sans-serif" font-size="18" font-weight="700">확산</text>
+        <text x="830" y="136" text-anchor="middle" fill="white" font-family="'Noto Sans KR',sans-serif" font-size="22" font-weight="700">확산</text>
+        <text x="830" y="162" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-family="'Noto Sans KR',sans-serif" font-size="12">노출 · 조회 · 반응</text>
 
       </svg>
     </div><!-- /p0-mindmap -->
@@ -1679,6 +1676,7 @@
             <th class="ch-sort-th" style="width:84px;text-align:center" data-fn="chSortBy" data-args="views">평균 조회수<br><small class="th-sub">최근 5개</small><span class="ch-sort-arrow" id="chSortArr-views">↕</span></th>
             <th class="ch-sort-th" style="width:138px" data-fn="chSortBy" data-args="rate">평균 참여율<span class="ch-sort-arrow" id="chSortArr-rate">↕</span></th>
             <th class="ch-sort-th" style="width:60px;text-align:center" data-fn="chSortBy" data-args="repeat">참여 이력<span class="ch-sort-arrow" id="chSortArr-repeat">↕</span></th>
+            <th style="width:52px;text-align:center">짤</th>
             <th style="width:148px;text-align:center">액션</th>
           </tr>
         </thead>
@@ -1816,39 +1814,28 @@
     </div>
   </div>
 
-  <!-- 2열 리포트 영역 -->
+  <!-- 3열 리포트 영역 -->
   <div class="cd-report-row">
 
-    <!-- 좌: 캠페인 결과 요약 (오렌지 카드) -->
-    <div class="cd-result-card">
-      <div class="cd-result-badge">🏆 조회수 목표 초과 달성!</div>
-      <div class="cd-result-hero">115%</div>
-      <div class="cd-result-list">
-        <div class="cd-result-item">
-          <span class="cd-result-lbl">목표 조회수</span>
-          <span class="cd-result-val">500,000회</span>
-        </div>
-        <div class="cd-result-item">
-          <span class="cd-result-lbl">달성 조회수</span>
-          <span class="cd-result-val cd-result-val--accent">574,260회</span>
-        </div>
-        <div class="cd-result-item">
-          <span class="cd-result-lbl">참여 영상</span>
-          <span class="cd-result-val">147개</span>
-        </div>
-        <div class="cd-result-item">
-          <span class="cd-result-lbl">집행 금액</span>
-          <span class="cd-result-val">5,000,000원</span>
-        </div>
+    <!-- 1열: 포스터 이미지 -->
+    <div class="cd-poster-col">
+      <div class="cd-poster-placeholder">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gray-light)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        <span>포스터 이미지</span>
       </div>
     </div>
 
-    <!-- 우: 리포트 타임라인 (화이트 카드) -->
+    <!-- 2열: 리포트 타임라인 -->
     <div class="cd-timeline-card">
-      <div class="cd-timeline-head">리포트 타임라인 <span class="cd-timeline-period">2026. 05. 26 ~ 06. 08</span></div>
+      <div class="cd-timeline-head">
+        <span>리포트 타임라인</span>
+        <button class="cd-add-round-btn" data-fn="openAddRoundModal">+ 회차 추가</button>
+      </div>
 
       <!-- 통합 진행바 -->
-      <div class="cd-tl-progress">
+      <div class="cd-tl-track-row">
+        <span class="cd-timeline-period">2026. 05. 26 ~ 06. 08</span>
+        <div class="cd-tl-progress">
         <div class="cd-tl-prog-track">
           <div class="cd-tl-prog-fill"></div>
           <div class="cd-tl-marker" style="left:24%">
@@ -1872,9 +1859,10 @@
             <div class="cd-tl-marker-tip">최종 · 574,260회 · 6. 08</div>
           </div>
         </div>
-      </div>
+        </div><!-- /cd-tl-progress -->
+      </div><!-- /cd-tl-track-row -->
 
-      <div class="cd-tl-list">
+      <div class="cd-tl-list" id="cdTlList">
 
         <div class="cd-tl-row">
           <div class="cd-tl-num">1</div>
@@ -1908,6 +1896,30 @@
           </div>
         </div>
 
+      </div>
+    </div>
+
+    <!-- 3열: 캠페인 결과 요약 (오렌지 카드) -->
+    <div class="cd-result-card">
+      <div class="cd-result-badge">🏆 조회수 목표 초과 달성!</div>
+      <div class="cd-result-hero">115%</div>
+      <div class="cd-result-list">
+        <div class="cd-result-item">
+          <span class="cd-result-lbl">목표 조회수</span>
+          <span class="cd-result-val">500,000회</span>
+        </div>
+        <div class="cd-result-item">
+          <span class="cd-result-lbl">달성 조회수</span>
+          <span class="cd-result-val cd-result-val--accent">574,260회</span>
+        </div>
+        <div class="cd-result-item">
+          <span class="cd-result-lbl">참여 영상</span>
+          <span class="cd-result-val">147개</span>
+        </div>
+        <div class="cd-result-item">
+          <span class="cd-result-lbl">집행 금액</span>
+          <span class="cd-result-val">5,000,000원</span>
+        </div>
       </div>
     </div>
 
@@ -1959,8 +1971,9 @@
       </div>
     </div>
     <div class="vid-table-wrap" id="vidTableWrap">
-      <table class="vid-table">
+      <table class="vid-table" data-vid-mode="premium">
         <colgroup>
+          <col style="width:36px">
           <col style="width:72px">
           <col style="width:34px">
           <col style="width:86px">
@@ -1971,10 +1984,12 @@
           <col style="width:52px">
           <col style="width:52px">
           <col style="width:44px">
+          <col style="width:44px">
           <col style="width:52px">
         </colgroup>
         <thead>
           <tr>
+            <th class="vid-cb-th"><input type="checkbox" class="vid-select-all" aria-label="전체선택"></th>
             <th><button class="vid-sort-btn">업로드일 ↓</button></th>
             <th></th>
             <th><button class="vid-sort-btn">채널명 ↕</button></th>
@@ -1986,10 +2001,12 @@
             <th><button class="vid-sort-btn">좋아요 ↕</button></th>
             <th><button class="vid-sort-btn">댓글 ↕</button></th>
             <th style="text-align:center">유료광고</th>
+            <th style="text-align:center">짤</th>
           </tr>
         </thead>
         <tbody>
           <tr>
+            <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="NOT NORMAL"></td>
             <td>26/06/06</td>
             <td><span class="vid-avatar" style="background:#e8eaf0;color:#666">N</span></td>
             <td title="NOT NORMAL">NOT NORMAL</td>
@@ -2000,8 +2017,10 @@
             <td class="vid-er">0.4%</td>
             <td>6</td><td>0</td>
             <td style="text-align:center;color:var(--gray-light)">-</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
           </tr>
           <tr>
+            <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="하봄"></td>
             <td>26/06/05</td>
             <td><span class="vid-avatar" style="background:#fff0e8;color:#e05000">하</span></td>
             <td title="하봄">하봄</td>
@@ -2012,8 +2031,10 @@
             <td class="vid-er">1.8%</td>
             <td>1,740</td><td>37</td>
             <td style="text-align:center;color:var(--gray-light)">-</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
           </tr>
           <tr>
+            <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="하씨네 CINE"></td>
             <td>26/06/05</td>
             <td><span class="vid-avatar" style="background:#eaf0e8;color:#3a7d44">하</span></td>
             <td title="하씨네 CINE">하씨네 CINE</td>
@@ -2024,8 +2045,10 @@
             <td class="vid-er">1.1%</td>
             <td>24</td><td>2</td>
             <td style="text-align:center;color:var(--gray-light)">-</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
           </tr>
           <tr>
+            <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="예고공식"></td>
             <td>26/06/04</td>
             <td><span class="vid-avatar" style="background:#eae8f0;color:#5e3ea0">예</span></td>
             <td title="예고공식">예고공식</td>
@@ -2036,8 +2059,10 @@
             <td class="vid-er">1.2%</td>
             <td>215</td><td>2</td>
             <td style="text-align:center;color:var(--gray-light)">-</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
           </tr>
           <tr>
+            <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="포브스튜디오"></td>
             <td>26/06/03</td>
             <td><span class="vid-avatar" style="background:#e8f0f0;color:#2a7070">포</span></td>
             <td title="포브스튜디오">포브스튜디오</td>
@@ -2047,6 +2072,7 @@
             <td>5,950 <span class="vid-contrib">· 1%</span></td>
             <td class="vid-er">0.4%</td>
             <td>21</td><td>3</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
             <td style="text-align:center;color:var(--gray-light)">-</td>
           </tr>
         </tbody>
@@ -2095,63 +2121,53 @@
     </div>
   </div>
 
-  <!-- 2열 리포트 영역 -->
+  <!-- 3열 리포트 영역 -->
   <div class="cd-report-row">
 
-    <!-- 좌: 캠페인 결과 요약 -->
-    <div class="cd-result-card">
-      <div class="cd-result-badge">🏆 업로드 목표 달성!</div>
-      <div class="cd-result-hero">100%</div>
-      <div class="cd-result-list">
-        <div class="cd-result-item">
-          <span class="cd-result-lbl">목표 업로드</span>
-          <span class="cd-result-val">2,500개</span>
-        </div>
-        <div class="cd-result-item">
-          <span class="cd-result-lbl">달성 업로드</span>
-          <span class="cd-result-val cd-result-val--accent">2,500개</span>
-        </div>
-        <div class="cd-result-item">
-          <span class="cd-result-lbl">총 조회수</span>
-          <span class="cd-result-val">9,576,412회</span>
-        </div>
-        <div class="cd-result-item">
-          <span class="cd-result-lbl">집행 금액</span>
-          <span class="cd-result-val">25,000,000원</span>
-        </div>
+    <!-- 1열: 포스터 이미지 -->
+    <div class="cd-poster-col">
+      <div class="cd-poster-placeholder">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gray-light)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        <span>포스터 이미지</span>
       </div>
     </div>
 
-    <!-- 우: 리포트 타임라인 -->
+    <!-- 2열: 리포트 타임라인 -->
     <div class="cd-timeline-card">
-      <div class="cd-timeline-head">리포트 타임라인 <span class="cd-timeline-period">2026. 04. 08 ~ 05. 06</span></div>
+      <div class="cd-timeline-head">
+        <span>리포트 타임라인</span>
+        <button class="cd-add-round-btn" data-fn="openAddRoundModal">+ 회차 추가</button>
+      </div>
 
       <!-- 통합 진행바 -->
-      <div class="cd-tl-progress">
-        <div class="cd-tl-prog-track">
-          <div class="cd-tl-prog-fill"></div>
-          <div class="cd-tl-marker" style="left:34%">
-            <div class="cd-tl-marker-dot"></div>
-            <div class="cd-tl-marker-lbl">1차</div>
-            <div class="cd-tl-marker-tip">1차 · 850개 · 4. 15</div>
+      <div class="cd-tl-track-row">
+        <span class="cd-timeline-period">2026. 04. 08 ~ 05. 06</span>
+        <div class="cd-tl-progress">
+          <div class="cd-tl-prog-track">
+            <div class="cd-tl-prog-fill"></div>
+            <div class="cd-tl-marker" style="left:34%">
+              <div class="cd-tl-marker-dot"></div>
+              <div class="cd-tl-marker-lbl">1차</div>
+              <div class="cd-tl-marker-tip">1차 · 850개 · 4. 15</div>
+            </div>
+            <div class="cd-tl-marker" style="left:65%">
+              <div class="cd-tl-marker-dot"></div>
+              <div class="cd-tl-marker-lbl">2차</div>
+              <div class="cd-tl-marker-tip">2차 · 1,620개 · 4. 22</div>
+            </div>
+            <div class="cd-tl-marker" style="left:87%">
+              <div class="cd-tl-marker-dot"></div>
+              <div class="cd-tl-marker-lbl">3차</div>
+              <div class="cd-tl-marker-tip">3차 · 2,180개 · 4. 29</div>
+            </div>
+            <div class="cd-tl-marker cd-tl-marker--final" style="left:100%">
+              <div class="cd-tl-marker-dot"></div>
+              <div class="cd-tl-marker-lbl">최종</div>
+              <div class="cd-tl-marker-tip">최종 · 2,500개 · 5. 06</div>
+            </div>
           </div>
-          <div class="cd-tl-marker" style="left:65%">
-            <div class="cd-tl-marker-dot"></div>
-            <div class="cd-tl-marker-lbl">2차</div>
-            <div class="cd-tl-marker-tip">2차 · 1,620개 · 4. 22</div>
-          </div>
-          <div class="cd-tl-marker" style="left:87%">
-            <div class="cd-tl-marker-dot"></div>
-            <div class="cd-tl-marker-lbl">3차</div>
-            <div class="cd-tl-marker-tip">3차 · 2,180개 · 4. 29</div>
-          </div>
-          <div class="cd-tl-marker cd-tl-marker--final" style="left:100%">
-            <div class="cd-tl-marker-dot"></div>
-            <div class="cd-tl-marker-lbl">최종</div>
-            <div class="cd-tl-marker-tip">최종 · 2,500개 · 5. 06</div>
-          </div>
-        </div>
-      </div>
+        </div><!-- /cd-tl-progress -->
+      </div><!-- /cd-tl-track-row -->
 
       <div class="cd-tl-list">
         <div class="cd-tl-row">
@@ -2181,6 +2197,30 @@
             <div class="cd-tl-title">최종 · 2,500개 <span class="cd-tl-pct">(100%)</span></div>
             <div class="cd-tl-meta">5. 06 기준 · 누적 조회수 9,576,412회</div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3열: 캠페인 결과 요약 -->
+    <div class="cd-result-card">
+      <div class="cd-result-badge">🏆 업로드 목표 달성!</div>
+      <div class="cd-result-hero">100%</div>
+      <div class="cd-result-list">
+        <div class="cd-result-item">
+          <span class="cd-result-lbl">목표 업로드</span>
+          <span class="cd-result-val">2,500개</span>
+        </div>
+        <div class="cd-result-item">
+          <span class="cd-result-lbl">달성 업로드</span>
+          <span class="cd-result-val cd-result-val--accent">2,500개</span>
+        </div>
+        <div class="cd-result-item">
+          <span class="cd-result-lbl">총 조회수</span>
+          <span class="cd-result-val">9,576,412회</span>
+        </div>
+        <div class="cd-result-item">
+          <span class="cd-result-lbl">집행 금액</span>
+          <span class="cd-result-val">25,000,000원</span>
         </div>
       </div>
     </div>
@@ -2223,8 +2263,9 @@
       </div>
     </div>
     <div class="vid-table-wrap">
-      <table class="vid-table">
+      <table class="vid-table" data-vid-mode="premium">
         <colgroup>
+          <col style="width:36px">
           <col style="width:72px">
           <col style="width:34px">
           <col style="width:86px">
@@ -2235,10 +2276,12 @@
           <col style="width:52px">
           <col style="width:52px">
           <col style="width:44px">
+          <col style="width:44px">
           <col style="width:52px">
         </colgroup>
         <thead>
           <tr>
+            <th class="vid-cb-th"><input type="checkbox" class="vid-select-all" aria-label="전체선택"></th>
             <th><button class="vid-sort-btn">업로드일 ↓</button></th>
             <th></th>
             <th><button class="vid-sort-btn">채널명 ↕</button></th>
@@ -2250,10 +2293,12 @@
             <th><button class="vid-sort-btn">좋아요 ↕</button></th>
             <th><button class="vid-sort-btn">댓글 ↕</button></th>
             <th style="text-align:center">유료광고</th>
+            <th style="text-align:center">짤</th>
           </tr>
         </thead>
         <tbody>
           <tr>
+            <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="핫클립"></td>
             <td>26/05/01</td>
             <td><span class="vid-avatar" style="background:#e8f0e8;color:#2a6030">핫</span></td>
             <td title="핫클립">핫클립</td>
@@ -2264,8 +2309,10 @@
             <td class="vid-er">0.4%</td>
             <td>12,400</td><td>380</td>
             <td style="text-align:center;color:var(--gray-light)">-</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
           </tr>
           <tr>
+            <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="뮤직트렌드"></td>
             <td>26/04/28</td>
             <td><span class="vid-avatar" style="background:#e8eaf0;color:#3a4080">뮤</span></td>
             <td title="뮤직트렌드">뮤직트렌드</td>
@@ -2276,8 +2323,10 @@
             <td class="vid-er">0.5%</td>
             <td>8,760</td><td>220</td>
             <td style="text-align:center;color:var(--gray-light)">-</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
           </tr>
           <tr>
+            <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="케이팝스탁"></td>
             <td>26/04/25</td>
             <td><span class="vid-avatar" style="background:#f0e8f0;color:#803060">케</span></td>
             <td title="케이팝스탁">케이팝스탁</td>
@@ -2288,8 +2337,10 @@
             <td class="vid-er">0.5%</td>
             <td>5,320</td><td>148</td>
             <td style="text-align:center;color:var(--orange)">✓</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
           </tr>
           <tr>
+            <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="숏클립뮤직"></td>
             <td>26/04/22</td>
             <td><span class="vid-avatar" style="background:#f0ede8;color:#806030">숏</span></td>
             <td title="숏클립뮤직">숏클립뮤직</td>
@@ -2300,8 +2351,10 @@
             <td class="vid-er">0.5%</td>
             <td>3,890</td><td>102</td>
             <td style="text-align:center;color:var(--gray-light)">-</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
           </tr>
           <tr>
+            <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="뮤직캐치"></td>
             <td>26/04/19</td>
             <td><span class="vid-avatar" style="background:#e8f0f0;color:#206060">뮤</span></td>
             <td title="뮤직캐치">뮤직캐치</td>
@@ -2312,6 +2365,7 @@
             <td class="vid-er">0.3%</td>
             <td>1,940</td><td>68</td>
             <td style="text-align:center;color:var(--orange)">✓</td>
+            <td style="text-align:center;color:var(--gray-light)">-</td>
           </tr>
         </tbody>
       </table>
@@ -2326,8 +2380,7 @@
 <!-- ════ AUTH — 로그인 ════ -->
 <div class="auth-page fullpage" id="p4">
   <div class="auth-top">
-    <div class="auth-top-logo" data-fn="goTo" data-args="p1">CRE<em>;</em>ABLE</div>
-    <h2>CONNECT STUDIO</em></h2>
+    <h2>CONNECT STUDIO</h2>
     <p>마케팅을 더 쉽고 빠르게 시작하세요.</p>
   </div>
   <div class="adm-box-wrap">
@@ -2986,11 +3039,16 @@
       <button class="status-chip" data-adm-tab="account">계정 관리 <span class="chip-count">4</span></button>
       <button class="status-chip" data-adm-tab="sales">영업 캘린더 <span class="chip-count" id="sc-tab-count">0</span></button>
     </div>
+    <button class="btn-new-campaign" data-fn="openCampaignRegModal" style="margin-left:auto">보고서 등록하기</button>
   </div>
 
   <!-- ── 패널 1: 캠페인 보고서 ── -->
       <div class="adm-panel active" id="adm-panel-report">
     <div class="adm-sort-bar">
+      <div class="adm-search-wrap">
+        <svg class="adm-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input class="adm-search-input" type="text" id="adm-report-search" placeholder="캠페인 검색...">
+      </div>
       <span class="adm-sort-label">정렬</span>
       <select class="adm-sort-select" id="adm-report-sort">
         <option value="default">기본순</option>
@@ -3001,9 +3059,14 @@
     </div>
     <div class="adm-report-grid">
 
-    <div class="campaign-card" data-fn="goTo" data-args="p-detail" data-campaign-type="view" data-campaign-status="done" data-pct="115">
+    <div class="campaign-card" data-fn="goTo" data-args="p-detail" data-campaign-type="view" data-campaign-status="done" data-pct="115"
+      data-edit-title="영화 〈토이 스토리 5〉" data-edit-client="월트디즈니 코리아" data-edit-product="조회수당"
+      data-edit-status="done" data-edit-start="2026-05-26" data-edit-end="2026-06-08"
+      data-edit-goal-type="조회수" data-edit-goal-value="500000" data-edit-current="524812"
+      data-edit-thumb="img/toy_story5.jpg" data-edit-platforms="yt">
       <div class="card-thumb">
         <img src="img/toy_story5.jpg" alt="토이 스토리 5" loading="lazy" width="1978" height="2835">
+        <button class="card-edit-btn">수정</button>
       </div>
       <div class="card-thumb-info">
         <div class="card-product-tag">조회수당</div>
@@ -3024,8 +3087,13 @@
       </div>
     </div>
 
-    <div class="campaign-card action-needed" data-fn="goTo" data-args="p-channels" data-campaign-type="connect" data-campaign-status="channel-select" data-pct="0">
+    <div class="campaign-card action-needed" data-fn="goTo" data-args="p-channels" data-campaign-type="connect" data-campaign-status="channel-select" data-pct="0"
+      data-edit-title="시리즈 〈다 이루어질지니〉" data-edit-client="카카오엔터테인먼트" data-edit-product="프리미엄"
+      data-edit-status="channel-select" data-edit-start="2026-05-01" data-edit-end="2026-06-30"
+      data-edit-goal-type="조회수" data-edit-goal-value="300000" data-edit-current="0"
+      data-edit-thumb="" data-edit-platforms="yt,ig">
       <div class="card-thumb" style="background:linear-gradient(160deg,#1a0828,#3d1060)">
+        <button class="card-edit-btn">수정</button>
       </div>
       <div class="card-thumb-info">
         <div class="card-product-tag">프리미엄</div>
@@ -3048,8 +3116,13 @@
       </div>
     </div>
 
-    <div class="campaign-card" data-fn="goTo" data-args="p-detail-upload" data-campaign-type="upload" data-campaign-status="progress" data-pct="65">
+    <div class="campaign-card" data-fn="goTo" data-args="p-detail-upload" data-campaign-type="upload" data-campaign-status="progress" data-pct="65"
+      data-edit-title="EPEX — UNIVERSE 음원 바이럴 캠페인" data-edit-client="SM엔터테인먼트" data-edit-product="업로드당"
+      data-edit-status="progress" data-edit-start="2026-06-15" data-edit-end="2026-07-15"
+      data-edit-goal-type="영상" data-edit-goal-value="2500" data-edit-current="1620"
+      data-edit-thumb="" data-edit-platforms="yt,tt">
       <div class="card-thumb" style="background:linear-gradient(160deg,#0a1628,#1a3060)">
+        <button class="card-edit-btn">수정</button>
       </div>
       <div class="card-thumb-info">
         <div class="card-product-tag">업로드당</div>
@@ -3533,6 +3606,301 @@
 <script src="emailjs.min.js"></script>
 <script src="channels.js"></script>
 <script src="emailjs.min.js"></script>
+<!-- ── 짤 회원 사이드패널 ── -->
+<div class="sc-sheet" id="zealSheet" hidden>
+  <div class="sc-sheet-scrim" data-fn="closeZealPanel"></div>
+  <div class="sc-sheet-panel">
+    <div class="sc-sheet-head">
+      <h2>짤 회원 정보</h2>
+      <button class="adm-modal-x" data-fn="closeZealPanel">&#x2715;</button>
+    </div>
+    <div class="sc-sheet-body">
+      <input type="hidden" id="zealPanelHandle">
+
+      <div class="sc-section-label">회원 정보</div>
+      <div class="zeal-info-grid">
+        <span class="zeal-info-label">닉네임</span><span class="zeal-info-value" id="zealPanelNick">-</span>
+        <span class="zeal-info-label">짤ID</span><span class="zeal-info-value" id="zealPanelId">-</span>
+        <span class="zeal-info-label">연락처</span><span class="zeal-info-value" id="zealPanelPhone">-</span>
+        <span class="zeal-info-label">보유채널</span><span class="zeal-info-value" id="zealPanelChannels">-</span>
+        <span class="zeal-info-label">비고</span><span class="zeal-info-value" id="zealPanelNote">-</span>
+      </div>
+
+      <div class="zeal-memo-area">
+        <div class="zeal-memo-label">메모 히스토리</div>
+        <textarea class="zeal-memo-input" id="zealMemoInput" placeholder="메모를 입력하세요..."></textarea>
+        <button class="btn-new-campaign zeal-memo-submit" style="margin:0;padding:7px 16px;font-size:12px" data-fn="saveZealMemo">저장</button>
+        <div class="zeal-memo-history" id="zealMemoHistory"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 영상 테이블 체크박스 액션바 ── -->
+<!-- ════ 회차 추가 모달 ════ -->
+<div class="p5-modal-overlay" id="addRoundModal">
+  <div class="p5-modal" style="max-width:480px">
+    <div class="creg-modal-head">
+      <span class="creg-modal-title">리포트 회차 추가</span>
+      <button class="creg-close-btn" data-fn="closeAddRoundModal">&#x2715;</button>
+    </div>
+    <form id="addRoundForm" onsubmit="return false">
+      <div class="p5-modal-grid">
+
+        <div class="p5-modal-field">
+          <label class="p5-modal-label">회차 *</label>
+          <input class="p5-modal-input" type="number" id="ar-round" min="1" placeholder="1, 2, 3...">
+        </div>
+        <div class="p5-modal-field">
+          <label class="p5-modal-label">유형</label>
+          <select class="p5-modal-select" id="ar-type">
+            <option value="interim">중간 리포트</option>
+            <option value="final">최종 리포트</option>
+          </select>
+        </div>
+
+        <div class="p5-modal-field">
+          <label class="p5-modal-label">현재 조회수</label>
+          <input class="p5-modal-input" type="text" id="ar-views" inputmode="numeric" placeholder="222,120">
+        </div>
+        <div class="p5-modal-field">
+          <label class="p5-modal-label">총 참여 영상 수</label>
+          <input class="p5-modal-input" type="text" id="ar-vids" inputmode="numeric" placeholder="111">
+        </div>
+
+        <div class="p5-modal-field full">
+          <label class="p5-modal-label">기준 시각 *</label>
+          <input class="p5-modal-input" type="text" id="ar-date" placeholder="예: 6월 15일 10:00">
+          <span style="font-size:11px;color:var(--gray-light);margin-top:3px">카카오톡 메시지에 표시될 형식으로 입력하세요</span>
+        </div>
+
+        <div class="p5-modal-field full">
+          <label class="p5-modal-label">비고</label>
+          <textarea class="p5-modal-input creg-textarea" id="ar-memo" rows="2" placeholder="추가 메모"></textarea>
+        </div>
+
+      </div>
+    </form>
+    <div class="p5-modal-footer">
+      <button class="p5-modal-btn-cancel" data-fn="closeAddRoundModal">취소</button>
+      <button class="p5-modal-btn-save" data-fn="submitAddRound">추가</button>
+    </div>
+  </div>
+</div>
+
+<div class="vid-action-bar" id="vidActionBar" hidden>
+  <span class="vid-action-count"><strong id="vidActionCount">0</strong>개 선택됨</span>
+  <div class="vid-action-btns">
+    <button class="vid-action-btn" id="vidActionChannel">채널보기</button>
+    <button class="vid-action-btn vid-action-btn--primary" id="vidActionVideo" hidden>영상보기</button>
+  </div>
+  <button class="vid-action-close" id="vidActionClose">&#x2715;</button>
+</div>
+
+<!-- ════ 캠페인 수정 사이드 패널 ════ -->
+<div class="card-edit-overlay" id="cardEditOverlay"></div>
+<div class="card-edit-panel" id="cardEditPanel">
+  <div class="card-edit-head">
+    <span class="card-edit-title">캠페인 수정</span>
+    <button class="card-edit-close" id="cardEditClose">&#x2715;</button>
+  </div>
+  <div class="card-edit-body">
+    <form id="cardEditForm" onsubmit="return false">
+      <div class="p5-modal-grid">
+
+        <div class="p5-modal-field full">
+          <label class="p5-modal-label">캠페인명 *</label>
+          <input class="p5-modal-input" type="text" id="ce-title">
+        </div>
+
+        <div class="p5-modal-field full">
+          <label class="p5-modal-label">광고주명</label>
+          <input class="p5-modal-input" type="text" id="ce-client">
+        </div>
+
+        <div class="p5-modal-field">
+          <label class="p5-modal-label">타입</label>
+          <select class="p5-modal-select" id="ce-product">
+            <option value="조회수당">조회수당</option>
+            <option value="업로드당">업로드당</option>
+            <option value="프리미엄">프리미엄</option>
+          </select>
+        </div>
+
+        <div class="p5-modal-field">
+          <label class="p5-modal-label">상태</label>
+          <select class="p5-modal-select" id="ce-status">
+            <option value="recruiting">모집중</option>
+            <option value="channel-select">채널 선정중</option>
+            <option value="progress">진행중</option>
+            <option value="done">완료</option>
+          </select>
+        </div>
+
+        <div class="p5-modal-field full">
+          <label class="p5-modal-label">플랫폼</label>
+          <div class="ce-platform-row">
+            <label class="ce-plat-item"><input type="checkbox" value="yt" class="ce-plat-cb"> 유튜브</label>
+            <label class="ce-plat-item"><input type="checkbox" value="ig" class="ce-plat-cb"> 인스타</label>
+            <label class="ce-plat-item"><input type="checkbox" value="tt" class="ce-plat-cb"> 틱톡</label>
+          </div>
+        </div>
+
+        <div class="p5-modal-field">
+          <label class="p5-modal-label">목표 타입</label>
+          <select class="p5-modal-select" id="ce-goal-type">
+            <option value="조회수">조회수</option>
+            <option value="영상">영상수</option>
+          </select>
+        </div>
+
+        <div class="p5-modal-field">
+          <label class="p5-modal-label">목표 수치</label>
+          <input class="p5-modal-input" type="text" id="ce-goal-value" inputmode="numeric">
+        </div>
+
+        <div class="p5-modal-field full">
+          <label class="p5-modal-label">현재 달성</label>
+          <input class="p5-modal-input" type="text" id="ce-current" inputmode="numeric">
+        </div>
+
+        <div class="p5-modal-field full">
+          <div class="ce-date-row">
+            <div class="p5-modal-field" style="flex:1">
+              <label class="p5-modal-label">시작일</label>
+              <input class="p5-modal-input" type="date" id="ce-start">
+            </div>
+            <div class="p5-modal-field" style="flex:1">
+              <label class="p5-modal-label">종료일</label>
+              <input class="p5-modal-input" type="date" id="ce-end">
+            </div>
+          </div>
+        </div>
+
+        <div class="p5-modal-field full">
+          <label class="p5-modal-label">썸네일 URL</label>
+          <input class="p5-modal-input" type="text" id="ce-thumb" placeholder="이미지 URL">
+        </div>
+
+      </div>
+    </form>
+  </div>
+  <div class="card-edit-footer">
+    <button class="p5-modal-btn-cancel" id="cardEditCancel">취소</button>
+    <button class="p5-modal-btn-save" id="cardEditSave">저장</button>
+  </div>
+</div>
+
+<div class="p5-modal-overlay" id="campaignRegModal">
+  <div class="p5-modal creg-modal">
+    <div class="creg-modal-head">
+      <span class="creg-modal-title">캠페인 등록</span>
+      <button class="creg-close-btn" data-fn="closeCampaignRegModal">&#x2715;</button>
+    </div>
+    <form id="campaignRegForm" onsubmit="return false">
+      <div class="p5-modal-grid">
+
+        <div class="p5-modal-field">
+          <label class="p5-modal-label">캠페인명 *</label>
+          <input class="p5-modal-input" type="text" id="creg-title" placeholder="예: 호퍼스 유튜브 캠페인">
+        </div>
+        <div class="p5-modal-field">
+          <label class="p5-modal-label">플랫폼 *</label>
+          <select class="p5-modal-select" id="creg-platform">
+            <option value="">플랫폼 선택</option>
+            <option value="yt">유튜브</option>
+            <option value="ig">인스타</option>
+            <option value="tt">틱톡</option>
+          </select>
+        </div>
+
+        <div class="p5-modal-field">
+          <label class="p5-modal-label">광고주명</label>
+          <input class="p5-modal-input" type="text" id="creg-client" placeholder="광고주 회사명">
+        </div>
+        <div class="p5-modal-field">
+          <label class="p5-modal-label">프리미엄 캠페인</label>
+          <div class="creg-toggle-row">
+            <button type="button" class="creg-toggle" id="cregPremiumToggle" data-on="false" data-fn="toggleCregPremium">
+              <span class="creg-toggle-thumb"></span>
+            </button>
+            <span class="creg-toggle-desc">채널 모집 → 선정 → 검수 단계</span>
+          </div>
+        </div>
+
+        <div class="p5-modal-field">
+          <label class="p5-modal-label">목표 조회수</label>
+          <input class="p5-modal-input" type="text" id="creg-goal-views" placeholder="500,000" inputmode="numeric">
+        </div>
+        <div class="p5-modal-field">
+          <label class="p5-modal-label">목표 업로드 영상수</label>
+          <input class="p5-modal-input" type="text" id="creg-goal-vids" placeholder="200" inputmode="numeric">
+        </div>
+
+        <div class="p5-modal-field full">
+          <label class="p5-modal-label">담당 매니저 (최대 2명)</label>
+          <div class="creg-manager-list">
+            <label class="creg-manager-item creg-manager-item--disabled">
+              <input type="checkbox" checked disabled> 박건우 (나) <span class="creg-manager-id">@gwpark</span>
+            </label>
+            <label class="creg-manager-item">
+              <input type="checkbox" id="creg-mgr-hmkim"> 김현묵 <span class="creg-manager-id">@hmkim</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="p5-modal-field full">
+          <label class="p5-modal-label">담당 에이전시(광고주)</label>
+          <select class="p5-modal-select" id="creg-agency">
+            <option value="">선택 안함</option>
+            <option value="투래빗">투래빗</option>
+            <option value="프리엠컴퍼니">프리엠컴퍼니</option>
+          </select>
+        </div>
+
+        <div class="p5-modal-field full">
+          <div class="creg-date-row">
+            <div class="p5-modal-field" style="flex:1">
+              <label class="p5-modal-label">진행 예정일</label>
+              <input class="p5-modal-input" type="datetime-local" id="creg-plan-date">
+            </div>
+            <div class="p5-modal-field" style="flex:1">
+              <label class="p5-modal-label">시작일</label>
+              <input class="p5-modal-input" type="date" id="creg-start">
+            </div>
+            <div class="p5-modal-field" style="flex:1">
+              <label class="p5-modal-label">종료일</label>
+              <input class="p5-modal-input" type="date" id="creg-end">
+            </div>
+          </div>
+        </div>
+
+        <div class="p5-modal-field full">
+          <label class="p5-modal-label">썸네일 이미지</label>
+          <div class="creg-thumb-row">
+            <input class="p5-modal-input" type="text" id="creg-thumb-url" placeholder="이미지 URL 붙여넣기 (자동 변환)" style="flex:1">
+            <input type="file" accept="image/*" id="creg-thumb-file" hidden>
+            <button type="button" class="creg-file-btn" onclick="document.getElementById('creg-thumb-file').click()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+              파일
+            </button>
+          </div>
+        </div>
+
+        <div class="p5-modal-field full">
+          <label class="p5-modal-label">메모</label>
+          <textarea class="p5-modal-input creg-textarea" id="creg-memo" rows="2" placeholder="기타 메모"></textarea>
+        </div>
+
+      </div>
+    </form>
+    <div class="p5-modal-footer">
+      <button class="p5-modal-btn-cancel" data-fn="closeCampaignRegModal">취소</button>
+      <button class="p5-modal-btn-save" data-fn="submitCampaignReg">등록</button>
+    </div>
+  </div>
+</div>
+
 <script src="site.js"></script>
 </body>
 </html>

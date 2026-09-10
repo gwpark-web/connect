@@ -17,6 +17,77 @@ const channels = [
 const GOAL = 30;
 let _chActiveTab = 0;
 
+// ── 짤 회원 데이터 (플랫폼 서버 연동 가정) ──────────────────────────
+const ZEAL_MEMBERS = {
+  '@궁금해소':    { id:'gung9@zeal.kr',     nick:'궁해소',   phone:'010-2341-5678', channels:['@궁금해소'],                 note:'VIP · 재참여 2회' },
+  '@jiwumung':    { id:'jiwu@zeal.kr',       nick:'지우멍',   phone:'010-9876-1234', channels:['@jiwumung'],                  note:'' },
+  '@gameman':     { id:'gameman@zeal.kr',    nick:'겜쟁남',   phone:'010-5555-7890', channels:['@gameman','@gameman_shorts'], note:'재참여 3회' },
+  '@ssul_wars':   { id:'ssul@zeal.kr',       nick:'썰전쟁',   phone:'010-1111-3344', channels:['@ssul_wars'],                 note:'' },
+  '@fashionsohi': { id:'sohi2@zeal.kr',      nick:'패피소희', phone:'010-7788-2211', channels:['@fashionsohi','@sohi_ig'],    note:'패션 카테고리 전문' },
+};
+
+function zealBadgeHtml(handle) {
+  if (ZEAL_MEMBERS[handle]) {
+    const enc = encodeURIComponent(handle);
+    return `<button class="zeal-badge zeal-badge--member" data-fn="openZealPanel" data-stop="1" data-args="${enc}">짤</button>`;
+  }
+  return `<span class="zeal-badge zeal-badge--none">-</span>`;
+}
+
+// ── 짤 회원 사이드패널 함수 (channels.js에서 공유 — admin/site 양쪽) ──
+function openZealPanel(keyEnc) {
+  const handle = decodeURIComponent(keyEnc);
+  const m = ZEAL_MEMBERS[handle];
+  if (!m) return;
+  document.getElementById('zealPanelNick').textContent     = m.nick;
+  document.getElementById('zealPanelId').textContent       = m.id;
+  document.getElementById('zealPanelPhone').textContent    = m.phone;
+  document.getElementById('zealPanelChannels').textContent = m.channels.join(', ');
+  document.getElementById('zealPanelNote').textContent     = m.note || '-';
+  document.getElementById('zealPanelHandle').value         = handle;
+  _renderZealMemoHistory(handle);
+  document.getElementById('zealSheet').removeAttribute('hidden');
+}
+
+function closeZealPanel() {
+  const el = document.getElementById('zealSheet');
+  if (el) el.setAttribute('hidden', '');
+}
+
+function saveZealMemo() {
+  const handle = document.getElementById('zealPanelHandle').value;
+  const ta = document.getElementById('zealMemoInput');
+  const text = (ta.value || '').trim();
+  if (!text) return;
+  const key = 'zealMemo:' + handle;
+  let history = [];
+  try { history = JSON.parse(localStorage.getItem(key) || '[]'); } catch(_) {}
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const dateStr = `${now.getFullYear()}.${pad(now.getMonth()+1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  history.unshift({ text, date: dateStr });
+  try { localStorage.setItem(key, JSON.stringify(history)); } catch(_) {}
+  ta.value = '';
+  _renderZealMemoHistory(handle);
+}
+
+function _renderZealMemoHistory(handle) {
+  const el = document.getElementById('zealMemoHistory');
+  if (!el) return;
+  let history = [];
+  try { history = JSON.parse(localStorage.getItem('zealMemo:' + handle) || '[]'); } catch(_) {}
+  if (!history.length) {
+    el.innerHTML = '<div class="zeal-memo-empty">작성된 메모가 없습니다.</div>';
+    return;
+  }
+  el.innerHTML = history.map(h => `
+    <div class="zeal-memo-item">
+      <div class="zeal-memo-date">${h.date}</div>
+      <div class="zeal-memo-text">${h.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>
+    </div>
+  `).join('');
+}
+
 // ── 채널별 검토용 영상 더미 데이터 (드라이브 링크) ──────────────────
 const CH_VIDEO = {
   0: { url: 'https://drive.google.com/file/d/dummy_0/view', title: '궁금해소 × 토이스토리5 공식 협업 영상', dur: '12:34' },
@@ -140,7 +211,7 @@ function renderChannels() {
   const isMaxed  = selCount >= GOAL;
 
   if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--gray-light)">검색 결과가 없습니다.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--gray-light)">검색 결과가 없습니다.</td></tr>`;
     return;
   }
 
@@ -183,6 +254,7 @@ function renderChannels() {
         <td class="n-cell">${ch.views}<div class="n-sub">평균</div></td>
         <td>${erBar(ch.rate)}</td>
         <td style="text-align:center">${ch.repeat ? `<span class="ch-hist-val ch-hist-val--on">${ch.repeat}</span>` : `<span class="ch-hist-val ch-hist-val--off">-</span>`}</td>
+        <td style="text-align:center">${zealBadgeHtml(ch.handle)}</td>
         <td class="ch-action-cell">${actionHtml}</td>
       </tr>`;
   }).join('');
@@ -312,7 +384,7 @@ function renderReviewPanel() {
     const badgeCls = REVIEW_BADGE_CLS[rs] || '';
     const SIM_BTN = {
       '최종 확정 중': `<button class="ch-rv-sim-btn" data-fn="advanceReviewState" data-args="${i}">관리자 확정 →</button><button class="ch-rv-sim-btn ch-rv-sim-btn--reject" data-fn="creatorRejectCh" data-args="${i}">크리에이터 거절</button>`,
-      '제작 중':      `<button class="ch-rv-sim-btn" data-fn="advanceReviewState" data-args="${i}">검토 요청 →</button>`,
+      '제작 중':      `<button class="ch-rv-sim-btn" data-fn="advanceReviewState" data-args="${i}">검토 요청 →</button><button class="ch-rv-sim-btn ch-rv-sim-btn--reject" data-fn="creatorRejectCh" data-args="${i}">반려</button>`,
       '검토 필요':    `<button class="ch-rv-review-btn" data-fn="openReviewModal" data-args="${i}">영상 검토</button>`,
       '수정 중':      `<button class="ch-rv-sim-btn" data-fn="advanceReviewState" data-args="${i}">재제작 완료 →</button>`,
     };
@@ -321,7 +393,7 @@ function renderReviewPanel() {
       <div class="ch-rv-left">
         <div class="ch-thumb">${ch.emoji}</div>
         <div class="ch-rv-info">
-          <div class="ch-rv-name">${ch.name}</div>
+          <div class="ch-rv-name">${ch.name}${ZEAL_MEMBERS[ch.handle] ? ' <span class="zeal-rv-badge">짤</span>' : ''}</div>
           <div class="ch-rv-meta">${ch.handle} · ${PLAT_LABEL[ch.platform] || ch.platform} · 구독자 ${fmtSubs(ch.subsNum)}</div>
         </div>
       </div>
@@ -386,7 +458,9 @@ function renderResultPanel() {
            <span class="ch-result-wait">업로드전</span>
            ${isAdmin ? `<button class="ch-sim-btn ch-sim-btn--off" data-fn="toggleSimPost" data-args="${i}">+ 등록</button>` : ''}
          </div>`;
+    const vidUrl = (post?.url && post.url !== '#') ? post.url : '';
     return `<tr>
+      <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="${encodeURIComponent(ch.handle)}" data-url="${vidUrl}"></td>
       <td>
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:18px">${ch.emoji}</span>
@@ -401,6 +475,7 @@ function renderResultPanel() {
       <td style="text-align:right;font-size:12px;color:var(--gray-light)">집계 예정</td>
       <td style="text-align:right;font-size:12px;color:var(--gray-light)">집계 예정</td>
       <td style="text-align:right;font-size:12px;color:var(--gray-light)">집계 예정</td>
+      <td style="text-align:center">${zealBadgeHtml(ch.handle)}</td>
     </tr>`;
   }).join('');
 
@@ -522,15 +597,17 @@ function renderResultPanel() {
         게시물 등록은 관리자가 설정합니다 · 아래 [+ 등록] 버튼은 표시 시뮬레이션용입니다
       </div>` : ''}
       <div class="vid-table-wrap">
-        <table class="vid-table">
+        <table class="vid-table" data-vid-mode="premium">
           <thead>
             <tr>
+              <th class="vid-cb-th"><input type="checkbox" class="vid-select-all" aria-label="전체선택"></th>
               <th style="min-width:140px">채널</th>
               <th style="text-align:center;width:50px">플랫폼</th>
               <th style="text-align:center;min-width:160px">게시물 (관리자 등록)</th>
               <th style="text-align:right;width:72px">조회수</th>
               <th style="text-align:right;width:64px">좋아요</th>
               <th style="text-align:right;width:52px">댓글</th>
+              <th style="text-align:center;width:52px">짤</th>
             </tr>
           </thead>
           <tbody>${tableRows}</tbody>

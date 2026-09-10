@@ -25,6 +25,77 @@ function switchPremiumTab(tab) {
   document.querySelectorAll('.pdp-tab').forEach((el, i) => el.classList.toggle('active', String(i+1) === String(tab)));
   document.querySelectorAll('.pdp-pane').forEach((el, i) => el.classList.toggle('active', String(i+1) === String(tab)));
   if (String(tab) === '2') renderChannels('pdpChTable');
+  if (String(tab) === '3') renderPdpReviewPanel();
+}
+
+// ── 프리미엄 검토 현황 ──────────────────────────────────────────────
+const PDP_REVIEW_CHANNELS = [
+  { idx:0,  emoji:'🎬', name:'궁금해소',   handle:'@궁금해소',    plat:'YT', subs:'99.7만', state:'제작 중' },
+  { idx:2,  emoji:'🌊', name:'지우멍',     handle:'@jiwumung',    plat:'YT', subs:'12.5만', state:'검토 필요' },
+  { idx:6,  emoji:'🎮', name:'겜쟁이남자', handle:'@gameman',     plat:'YT', subs:'44만',   state:'최종 확정 중' },
+  { idx:5,  emoji:'👗', name:'패피소희',   handle:'@fashionsohi', plat:'IG', subs:'18만',   state:'수정 중' },
+  { idx:9,  emoji:'📱', name:'썰전쟁',     handle:'@ssul_wars',   plat:'YT', subs:'53만',   state:'제작 중' },
+  { idx:11, emoji:'🌸', name:'뷰티일기',   handle:'@beauty_diary',plat:'IG', subs:'11.2만', state:'최종 확정 중' },
+];
+const PDP_BADGE_CLS = {
+  '최종 확정 중': 'ch-rv-badge--confirming',
+  '제작 중':      'ch-rv-badge--producing',
+  '검토 필요':    'ch-rv-badge--needcheck',
+  '수정 중':      'ch-rv-badge--revision',
+};
+const _pdpRejected = new Set();
+
+function renderPdpReviewPanel() {
+  const container = document.getElementById('pdpReviewList');
+  if (!container) return;
+  const active  = PDP_REVIEW_CHANNELS.filter(c => !_pdpRejected.has(c.idx));
+  const rejected = PDP_REVIEW_CHANNELS.filter(c => _pdpRejected.has(c.idx));
+  const cntEl = document.getElementById('pdpReviewCount');
+  if (cntEl) cntEl.textContent = `진행 중 ${active.length}개 · 반려 ${rejected.length}개`;
+
+  container.innerHTML = PDP_REVIEW_CHANNELS.map(c => {
+    const isRej = _pdpRejected.has(c.idx);
+    const zealTag = (typeof ZEAL_MEMBERS !== 'undefined' && ZEAL_MEMBERS[c.handle])
+      ? ' <span class="zeal-rv-badge">짤</span>' : '';
+    if (isRej) {
+      return `<div class="ch-rv-item pdp-rv-rejected">
+        <div class="ch-rv-left">
+          <div class="ch-thumb">${c.emoji}</div>
+          <div class="ch-rv-info">
+            <div class="ch-rv-name">${c.name}${zealTag}</div>
+            <div class="ch-rv-meta">${c.handle} · ${c.plat} · 구독자 ${c.subs}</div>
+          </div>
+        </div>
+        <span class="ch-rv-badge pdp-badge-rejected">반려됨</span>
+        <div class="ch-rv-sim">
+          <button class="ch-rv-sim-btn" data-fn="pdpUndoRejectCh" data-args="${c.idx}">되돌리기</button>
+        </div>
+      </div>`;
+    }
+    return `<div class="ch-rv-item">
+      <div class="ch-rv-left">
+        <div class="ch-thumb">${c.emoji}</div>
+        <div class="ch-rv-info">
+          <div class="ch-rv-name">${c.name}${zealTag}</div>
+          <div class="ch-rv-meta">${c.handle} · ${c.plat} · 구독자 ${c.subs}</div>
+        </div>
+      </div>
+      <span class="ch-rv-badge ${PDP_BADGE_CLS[c.state] || ''}">${c.state}</span>
+      <div class="ch-rv-sim">
+        <button class="pdp-reject-btn" data-fn="pdpRejectCh" data-args="${c.idx}">반려</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function pdpRejectCh(idx) {
+  _pdpRejected.add(Number(idx));
+  renderPdpReviewPanel();
+}
+
+function pdpUndoRejectCh(idx) {
+  _pdpRejected.delete(Number(idx));
+  renderPdpReviewPanel();
 }
 
 function setP5Filter(type, value) {
@@ -315,7 +386,9 @@ goTo('p5');
     goTo, goBackToList,
     toggleCh,
     openP5Edit, closeP5Edit, saveP5Edit, setP5Filter, switchPremiumTab,
-    ycaFetchComments, ycaSortComments, ycaSwitchTab, ycaAnalyzeComments
+    ycaFetchComments, ycaSortComments, ycaSwitchTab, ycaAnalyzeComments,
+    openZealPanel, closeZealPanel, saveZealMemo,
+    pdpRejectCh, pdpUndoRejectCh
   };
 
   document.addEventListener('change', function(e) {
@@ -348,5 +421,72 @@ goTo('p5');
     const el = e.target;
     if (!el.dataset.change) return;
     if (el.dataset.change === 'updateP5GoalUnit') { updateP5GoalUnit(); return; }
+  });
+})();
+
+// ── 영상 테이블 체크박스 액션바 ─────────────────────────────────────────
+(function() {
+  function getChecked() {
+    return [...document.querySelectorAll('.vid-row-cb:checked')];
+  }
+
+  function syncSelectAll(table) {
+    const all = table.querySelector('.vid-select-all');
+    const rows = [...table.querySelectorAll('.vid-row-cb')];
+    if (!all || !rows.length) return;
+    const checkedCount = rows.filter(r => r.checked).length;
+    all.checked = checkedCount === rows.length;
+    all.indeterminate = checkedCount > 0 && checkedCount < rows.length;
+  }
+
+  function updateBar() {
+    const bar = document.getElementById('vidActionBar');
+    if (!bar) return;
+    const checked = getChecked();
+    if (!checked.length) { bar.hidden = true; return; }
+    bar.hidden = false;
+    document.getElementById('vidActionCount').textContent = checked.length;
+    // 영상보기: 프리미엄 결과 테이블(data-vid-mode="premium") 행이 선택된 경우만
+    const hasPremium = checked.some(cb => cb.closest('table')?.dataset.vidMode === 'premium');
+    document.getElementById('vidActionVideo').hidden = !hasPremium;
+  }
+
+  document.addEventListener('change', function(e) {
+    const cb = e.target;
+    if (cb.classList.contains('vid-select-all')) {
+      const table = cb.closest('table');
+      if (table) table.querySelectorAll('.vid-row-cb').forEach(c => { c.checked = cb.checked; });
+      updateBar();
+      return;
+    }
+    if (cb.classList.contains('vid-row-cb')) {
+      const table = cb.closest('table');
+      if (table) syncSelectAll(table);
+      updateBar();
+    }
+  });
+
+  document.addEventListener('click', function(e) {
+    if (e.target.id === 'vidActionChannel') {
+      getChecked().forEach(cb => {
+        const cid = decodeURIComponent(cb.dataset.cid || '');
+        if (cid) window.open('https://www.youtube.com/' + cid, '_blank');
+      });
+      return;
+    }
+    if (e.target.id === 'vidActionVideo') {
+      getChecked().forEach(cb => {
+        const url = cb.dataset.url;
+        if (url) window.open(url, '_blank');
+      });
+      return;
+    }
+    if (e.target.id === 'vidActionClose') {
+      document.querySelectorAll('.vid-row-cb, .vid-select-all').forEach(c => {
+        c.checked = false;
+        c.indeterminate = false;
+      });
+      document.getElementById('vidActionBar').hidden = true;
+    }
   });
 })();

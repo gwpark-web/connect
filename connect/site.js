@@ -668,6 +668,277 @@ function p0CcToggle(mode) {
   if (track) track.style.transform = `translateX(-${mode === 'pre' ? 100 : 0}%)`;
 }
 
+// ── 캠페인 카드 수정 패널 ─────────────────────────────────────────────
+(function() {
+  var _card = null;
+
+  const STATUS_MAP = {
+    done:            { cls: 'done',      text: '완료' },
+    progress:        { cls: 'running',   text: '진행 중' },
+    'channel-select':{ cls: 'recruiting',text: '채널 선정 중' },
+    recruiting:      { cls: 'recruiting',text: '모집중' }
+  };
+
+  const PLAT_SVG = {
+    yt: `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브`,
+    ig: `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>인스타`,
+    tt: `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>틱톡`
+  };
+
+  function openPanel(card) {
+    _card = card;
+    const d = card.dataset;
+    document.getElementById('ce-title').value      = d.editTitle || '';
+    document.getElementById('ce-client').value     = d.editClient || '';
+    document.getElementById('ce-product').value    = d.editProduct || '조회수당';
+    document.getElementById('ce-status').value     = d.editStatus || 'recruiting';
+    document.getElementById('ce-goal-type').value  = d.editGoalType || '조회수';
+    document.getElementById('ce-goal-value').value = d.editGoalValue || '';
+    document.getElementById('ce-current').value    = d.editCurrent || '';
+    document.getElementById('ce-start').value      = d.editStart || '';
+    document.getElementById('ce-end').value        = d.editEnd || '';
+    document.getElementById('ce-thumb').value      = d.editThumb || '';
+
+    const plats = (d.editPlatforms || '').split(',').filter(Boolean);
+    document.querySelectorAll('.ce-plat-cb').forEach(cb => {
+      cb.checked = plats.includes(cb.value);
+    });
+
+    document.getElementById('cardEditPanel').classList.add('active');
+    document.getElementById('cardEditOverlay').classList.add('active');
+  }
+
+  function closePanel() {
+    document.getElementById('cardEditPanel').classList.remove('active');
+    document.getElementById('cardEditOverlay').classList.remove('active');
+    _card = null;
+  }
+
+  function savePanel() {
+    if (!_card) return;
+    const title     = document.getElementById('ce-title').value.trim();
+    if (!title) { alert('캠페인명을 입력해주세요.'); return; }
+
+    const client    = document.getElementById('ce-client').value.trim();
+    const product   = document.getElementById('ce-product').value;
+    const status    = document.getElementById('ce-status').value;
+    const goalType  = document.getElementById('ce-goal-type').value;
+    const goalValue = document.getElementById('ce-goal-value').value.replace(/,/g,'');
+    const current   = document.getElementById('ce-current').value.replace(/,/g,'');
+    const start     = document.getElementById('ce-start').value;
+    const end       = document.getElementById('ce-end').value;
+    const thumb     = document.getElementById('ce-thumb').value.trim();
+    const plats     = [...document.querySelectorAll('.ce-plat-cb:checked')].map(c => c.value);
+
+    // update data attrs
+    Object.assign(_card.dataset, {
+      editTitle:     title,
+      editClient:    client,
+      editProduct:   product,
+      editStatus:    status,
+      editGoalType:  goalType,
+      editGoalValue: goalValue,
+      editCurrent:   current,
+      editStart:     start,
+      editEnd:       end,
+      editThumb:     thumb,
+      editPlatforms: plats.join(','),
+      campaignStatus: status,
+    });
+
+    // title
+    const titleEl = _card.querySelector('.card-title');
+    if (titleEl) titleEl.textContent = title;
+
+    // product tag
+    const tagEl = _card.querySelector('.card-product-tag');
+    if (tagEl) tagEl.textContent = product;
+
+    // status badge
+    const badgeEl = _card.querySelector('.status-badge');
+    if (badgeEl) {
+      const s = STATUS_MAP[status] || { cls: status, text: status };
+      badgeEl.className = `status-badge ${s.cls}`;
+      badgeEl.textContent = s.text;
+    }
+
+    // platform badges
+    const platEl = _card.querySelector('.card-platform-badges');
+    if (platEl) {
+      platEl.innerHTML = plats.map(p => `<span class="platform-badge ${p}">${PLAT_SVG[p] || p}</span>`).join('');
+    }
+
+    // thumbnail
+    const thumbDiv = _card.querySelector('.card-thumb');
+    if (thumbDiv) {
+      const img = thumbDiv.querySelector('img');
+      if (thumb) {
+        if (img) { img.src = thumb; }
+        else { thumbDiv.style.backgroundImage = `url(${thumb})`; }
+        thumbDiv.style.background = '';
+      }
+    }
+
+    // progress
+    const gv = parseInt(goalValue) || 0;
+    const cv = parseInt(current) || 0;
+    const pct = gv > 0 ? Math.min(Math.round(cv / gv * 100), 100) : 0;
+    _card.dataset.pct = gv > 0 ? Math.round(cv / gv * 100) : 0;
+
+    const fillEl = _card.querySelector('.card-progress-fill');
+    if (fillEl) fillEl.style.width = pct + '%';
+
+    const textEl = _card.querySelector('.card-progress-text');
+    if (textEl) {
+      const unit = goalType === '조회수' ? '회' : '개';
+      const pctSpan = cv > gv
+        ? `<span class="card-progress-pct over">(${Math.round(cv/gv*100)}%)</span>`
+        : `<span class="card-progress-pct">(${pct}%)</span>`;
+      textEl.innerHTML = `${Number(cv).toLocaleString()} / ${Number(gv).toLocaleString()}${unit} ${pctSpan}`;
+    }
+
+    closePanel();
+  }
+
+  // 이벤트 바인딩
+  document.addEventListener('click', function(e) {
+    const editBtn = e.target.closest('.card-edit-btn');
+    if (editBtn) {
+      e.stopPropagation();
+      openPanel(editBtn.closest('.campaign-card'));
+      return;
+    }
+    if (e.target.closest('#cardEditClose') || e.target.closest('#cardEditCancel')) {
+      closePanel(); return;
+    }
+    if (e.target.closest('#cardEditSave')) { savePanel(); return; }
+    if (e.target.id === 'cardEditOverlay') { closePanel(); return; }
+  });
+})();
+
+// ── 회차 추가 모달 ───────────────────────────────────────────────────
+function openAddRoundModal() {
+  document.getElementById('addRoundForm')?.reset();
+  document.getElementById('addRoundModal').classList.add('active');
+}
+
+function closeAddRoundModal() {
+  document.getElementById('addRoundModal').classList.remove('active');
+}
+
+function submitAddRound() {
+  const round  = document.getElementById('ar-round')?.value.trim();
+  const type   = document.getElementById('ar-type')?.value;
+  const views  = document.getElementById('ar-views')?.value.trim();
+  const vids   = document.getElementById('ar-vids')?.value.trim();
+  const date   = document.getElementById('ar-date')?.value.trim();
+  const memo   = document.getElementById('ar-memo')?.value.trim();
+
+  if (!round) { alert('회차를 입력해주세요.'); return; }
+  if (!date)  { alert('기준 시각을 입력해주세요.'); return; }
+
+  const isFinal = type === 'final';
+  const list = document.getElementById('cdTlList');
+  if (!list) { closeAddRoundModal(); return; }
+
+  const viewsNum = parseInt((views || '0').replace(/,/g, '')) || 0;
+  const goalEl   = document.querySelector('#p-detail .cd-result-val');
+  const goalNum  = goalEl ? parseInt(goalEl.textContent.replace(/[^0-9]/g, '')) || 1 : 1;
+  const pct      = viewsNum && goalNum ? Math.round(viewsNum / goalNum * 100) : 0;
+  const viewsFmt = viewsNum ? viewsNum.toLocaleString() + '회' : '';
+  const vidsFmt  = vids ? `참여 영상 ${vids}개` : '';
+
+  const label = isFinal ? '최종' : `${round}차`;
+  const titleText = [label, viewsFmt ? `${viewsFmt}` : '', pct ? `(${pct}%)` : ''].filter(Boolean).join(' · ');
+  const metaText  = [date ? `${date} 기준` : '', vidsFmt].filter(Boolean).join(' · ');
+
+  const row = document.createElement('div');
+  row.className = isFinal ? 'cd-tl-row cd-tl-row--final' : 'cd-tl-row';
+  row.innerHTML = `
+    <div class="cd-tl-num${isFinal ? ' cd-tl-num--final' : ''}">${isFinal ? '🏆' : round}</div>
+    <div class="cd-tl-info">
+      <div class="cd-tl-title">${titleText}</div>
+      ${metaText ? `<div class="cd-tl-meta">${metaText}</div>` : ''}
+      ${memo ? `<div class="cd-tl-meta" style="color:var(--orange)">${memo}</div>` : ''}
+    </div>`;
+
+  if (isFinal) {
+    list.appendChild(row);
+  } else {
+    const finalRow = list.querySelector('.cd-tl-row--final');
+    finalRow ? list.insertBefore(row, finalRow) : list.appendChild(row);
+  }
+
+  closeAddRoundModal();
+}
+
+// ── 캠페인 등록 모달 ─────────────────────────────────────────────────
+function openCampaignRegModal() {
+  document.getElementById('campaignRegForm')?.reset();
+  const toggle = document.getElementById('cregPremiumToggle');
+  if (toggle) toggle.dataset.on = 'false';
+  document.getElementById('campaignRegModal').classList.add('active');
+}
+
+function closeCampaignRegModal() {
+  document.getElementById('campaignRegModal').classList.remove('active');
+}
+
+function toggleCregPremium() {
+  const btn = document.getElementById('cregPremiumToggle');
+  if (btn) btn.dataset.on = btn.dataset.on === 'true' ? 'false' : 'true';
+}
+
+function submitCampaignReg() {
+  const title    = document.getElementById('creg-title')?.value.trim();
+  const platform = document.getElementById('creg-platform')?.value;
+  if (!title)    { alert('캠페인명을 입력해주세요.'); return; }
+  if (!platform) { alert('플랫폼을 선택해주세요.'); return; }
+
+  const isPremium = document.getElementById('cregPremiumToggle')?.dataset.on === 'true';
+  const client    = document.getElementById('creg-client')?.value.trim() || '-';
+  const startDate = document.getElementById('creg-start')?.value || '';
+  const endDate   = document.getElementById('creg-end')?.value || '';
+  const goalViews = (document.getElementById('creg-goal-views')?.value || '').replace(/,/g, '');
+  const goalVids  = (document.getElementById('creg-goal-vids')?.value  || '').replace(/,/g, '');
+  const thumbUrl  = document.getElementById('creg-thumb-url')?.value.trim() || '';
+
+  const product = isPremium ? '프리미엄' : (goalViews ? '조회수당' : '업로드당');
+  const thumbBg = thumbUrl ? '' : 'background:linear-gradient(160deg,#1a1a2e,#16213e)';
+  const startFmt = startDate ? startDate.replace(/-/g, '.') : '-';
+  const endFmt   = endDate   ? endDate.replace(/-/g, '.')   : '-';
+  const goalLabel = goalViews
+    ? `목표 ${Number(goalViews).toLocaleString()} 조회수`
+    : goalVids ? `목표 ${Number(goalVids).toLocaleString()} 영상` : '';
+
+  const card = document.createElement('div');
+  card.className = 'campaign-card';
+  card.dataset.campaignStatus = 'recruiting';
+  card.dataset.pct = '0';
+  card.innerHTML = `
+    <div class="card-thumb">${thumbUrl
+      ? `<img src="${thumbUrl}" alt="${title}" loading="lazy">`
+      : `<div class="card-thumb-placeholder" style="${thumbBg}"></div>`}</div>
+    <div class="card-thumb-info">
+      <div class="card-product-tag">${product}</div>
+    </div>
+    <div class="card-body">
+      <div class="card-status-row">
+        <span class="card-status-badge status-recruiting">모집중</span>
+        <span class="card-client">${client}</span>
+      </div>
+      <div class="card-title">${title}</div>
+      <div class="card-meta-row">
+        <span class="card-meta">${startFmt} ~ ${endFmt}</span>
+        ${goalLabel ? `<span class="card-meta">${goalLabel}</span>` : ''}
+      </div>
+    </div>`;
+
+  const grid = document.querySelector('#adm-panel-report .adm-report-grid');
+  if (grid) grid.prepend(card);
+  closeCampaignRegModal();
+}
+
 // ── EVENT DISPATCHER (MV3 CSP: no inline handlers) ──
 (function() {
   const fnMap = {
@@ -691,7 +962,10 @@ function p0CcToggle(mode) {
     closeRefreshLimitModal,
     openReportUploadModal, closeReportUploadModal, ruSwitchTab,
     p0RoleToggle,
-    p0CcToggle
+    p0CcToggle,
+    openZealPanel, closeZealPanel, saveZealMemo,
+    openAddRoundModal, closeAddRoundModal, submitAddRound,
+    openCampaignRegModal, closeCampaignRegModal, submitCampaignReg, toggleCregPremium
   };
 
   document.addEventListener('click', function(e) {
@@ -1312,6 +1586,22 @@ document.addEventListener('click', function(e) {
   sel.addEventListener('change', admSortReport);
 })();
 
+// 캠페인 보고서 검색
+(function() {
+  var input = document.getElementById('adm-report-search');
+  if (!input) return;
+  input.addEventListener('input', function() {
+    var q = this.value.trim().toLowerCase();
+    var grid = document.querySelector('.adm-report-grid');
+    if (!grid) return;
+    grid.querySelectorAll('.campaign-card').forEach(function(card) {
+      var title = (card.querySelector('.card-title')?.textContent || '').toLowerCase();
+      var client = (card.dataset.editClient || '').toLowerCase();
+      card.hidden = q ? !(title.includes(q) || client.includes(q)) : false;
+    });
+  });
+})();
+
 // 정적 테이블(캠페인 생성, 계정 관리) 열 정렬
 (function() {
   var admSortState = {};
@@ -1378,3 +1668,68 @@ document.addEventListener('click', function(e) {
   requestAnimationFrame(function() { requestAnimationFrame(sync); });
 })();
 
+// ── 영상 테이블 체크박스 액션바 ─────────────────────────────────────────
+(function() {
+  function getChecked() {
+    return [...document.querySelectorAll('.vid-row-cb:checked')];
+  }
+
+  function syncSelectAll(table) {
+    const all = table.querySelector('.vid-select-all');
+    const rows = [...table.querySelectorAll('.vid-row-cb')];
+    if (!all || !rows.length) return;
+    const checkedCount = rows.filter(r => r.checked).length;
+    all.checked = checkedCount === rows.length;
+    all.indeterminate = checkedCount > 0 && checkedCount < rows.length;
+  }
+
+  function updateBar() {
+    const bar = document.getElementById('vidActionBar');
+    if (!bar) return;
+    const checked = getChecked();
+    if (!checked.length) { bar.hidden = true; return; }
+    bar.hidden = false;
+    document.getElementById('vidActionCount').textContent = checked.length;
+    const hasPremium = checked.some(cb => cb.closest('table')?.dataset.vidMode === 'premium');
+    document.getElementById('vidActionVideo').hidden = !hasPremium;
+  }
+
+  document.addEventListener('change', function(e) {
+    const cb = e.target;
+    if (cb.classList.contains('vid-select-all')) {
+      const table = cb.closest('table');
+      if (table) table.querySelectorAll('.vid-row-cb').forEach(c => { c.checked = cb.checked; });
+      updateBar();
+      return;
+    }
+    if (cb.classList.contains('vid-row-cb')) {
+      const table = cb.closest('table');
+      if (table) syncSelectAll(table);
+      updateBar();
+    }
+  });
+
+  document.addEventListener('click', function(e) {
+    if (e.target.id === 'vidActionChannel') {
+      getChecked().forEach(cb => {
+        const cid = decodeURIComponent(cb.dataset.cid || '');
+        if (cid) window.open('https://www.youtube.com/' + cid, '_blank');
+      });
+      return;
+    }
+    if (e.target.id === 'vidActionVideo') {
+      getChecked().forEach(cb => {
+        const url = cb.dataset.url;
+        if (url) window.open(url, '_blank');
+      });
+      return;
+    }
+    if (e.target.id === 'vidActionClose') {
+      document.querySelectorAll('.vid-row-cb, .vid-select-all').forEach(c => {
+        c.checked = false;
+        c.indeterminate = false;
+      });
+      document.getElementById('vidActionBar').hidden = true;
+    }
+  });
+})();

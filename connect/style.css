@@ -2231,70 +2231,6 @@ body.p0-active .auth-page.fullpage { background: linear-gradient(135deg, rgba(26
 .p5-radio-group { display:flex; gap:16px; }
 .p5-date-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
-/* ── 유튜브 댓글 분석기 (prefix: yca-) ── */
-.yca-wrap { background:var(--white); border-radius:14px; padding:20px; max-width:100%; color:var(--black); font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Apple SD Gothic Neo',sans-serif; margin-top:14px; }
-.yca-head-row { display:flex; align-items:baseline; gap:10px; margin-bottom:4px; }
-.yca-title { font-size:16px; font-weight:700; }
-.yca-subtitle { font-size:12px; color:var(--gray-light); margin-bottom:16px; }
-.yca-key-row { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
-.yca-key-label { font-size:12px; color:var(--gray-light); white-space:nowrap; min-width:48px; }
-.yca-key-row input { flex:1; height:36px; padding:0 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; font-family:monospace; background:var(--card-bg); color:var(--black); outline:none; transition:border-color .15s; }
-.yca-key-row input:focus { border-color:#aaa; }
-.yca-input-row { display:flex; gap:8px; margin-bottom:10px; }
-.yca-input-row input[type="text"] { flex:1; height:40px; padding:0 14px; border:1px solid var(--border); border-radius:8px; font-size:14px; background:var(--card-bg); color:var(--black); outline:none; transition:border-color .15s; }
-.yca-input-row input[type="text"]:focus { border-color:#aaa; }
-.yca-input-row select { height:40px; padding:0 10px; border:1px solid var(--border); border-radius:8px; font-size:13px; background:var(--card-bg); color:var(--black); outline:none; cursor:pointer; }
-.yca-btn-fetch { height:40px; padding:0 20px; font-size:14px; font-weight:600; border:none; border-radius:8px; background:var(--black); color:#fff; cursor:pointer; white-space:nowrap; transition:background .15s; }
-.yca-btn-fetch:hover { background:#333; }
-.yca-btn-fetch:disabled { background:#ccc; cursor:not-allowed; }
-.yca-status { font-size:13px; color:var(--gray-light); margin-bottom:14px; min-height:18px; }
-.yca-status.err { color:#c0392b; }
-.yca-stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
-.yca-stat-card { background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
-.yca-stat-label { font-size:11px; color:var(--gray-light); margin-bottom:4px; }
-.yca-stat-val { font-size:22px; font-weight:600; color:var(--black); }
-.yca-tab-row { display:flex; gap:4px; margin-bottom:14px; border-bottom:1px solid var(--border); }
-
-.pdp-tab.active { color:var(--black); border-bottom-color:var(--orange); font-weight:700; }
-
-.pdp-pane.active { display:block; }
-
-.yca-tab { font-size:14px; padding:8px 16px; border:none; background:transparent; color:var(--gray-light); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; font-weight:500; }
-.yca-tab.active { color:var(--black); border-bottom-color:var(--black); }
-.yca-panel { display:none; }
-.yca-panel.active { display:block; }
-.yca-sort-row { display:flex; gap:6px; align-items:center; margin-bottom:10px; }
-.yca-sort-row span { font-size:12px; color:var(--gray-light); }
-.yca-sort-btn { font-size:12px; padding:4px 12px; border:1px solid var(--border); border-radius:20px; background:transparent; color:var(--gray-light); cursor:pointer; }
-.yca-sort-btn.on { background:var(--black); color:#fff; border-color:var(--black); }
-.yca-comment-list { max-height:320px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; margin-bottom:16px; }
-.yca-comment-item { padding:12px 16px; border-bottom:1px solid var(--border); }
-.yca-comment-item:last-child { border-bottom:none; }
-.yca-comment-meta { display:flex; justify-content:space-between; margin-bottom:4px; }
-.yca-comment-author { font-size:12px; font-weight:600; color:var(--gray-dark); }
-.yca-comment-likes { font-size:11px; color:var(--gray-light); }
-.yca-comment-text { font-size:13px; color:var(--black); line-height:1.6; }
-.yca-btn-analyze { width:100%; height:42px; font-size:14px; font-weight:600; border:1.5px solid var(--border); border-radius:8px; background:var(--card-bg); color:var(--black); cursor:pointer; margin-bottom:16px; transition:background .15s; }
-.yca-btn-analyze:hover { background:var(--border); }
-.yca-btn-analyze:disabled { opacity:.4; cursor:not-allowed; }
-.yca-sentiment-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
-.yca-sent-card { border-radius:10px; padding:14px 16px; border:1px solid var(--border); }
-.yca-sent-pos { background:#f0faf0; }
-.yca-sent-neu { background:var(--card-bg); }
-.yca-sent-neg { background:#fff5f5; }
-.yca-sent-label { font-size:11px; margin-bottom:4px; }
-.yca-sent-pos .yca-sent-label { color:#2e7d32; }
-.yca-sent-neu .yca-sent-label { color:var(--gray-light); }
-.yca-sent-neg .yca-sent-label { color:#c62828; }
-.yca-sent-val { font-size:24px; font-weight:700; }
-.yca-sent-pos .yca-sent-val { color:#2e7d32; }
-.yca-sent-neu .yca-sent-val { color:var(--black); }
-.yca-sent-neg .yca-sent-val { color:#c62828; }
-.yca-section-label { font-size:11px; font-weight:600; color:var(--gray-light); letter-spacing:.06em; text-transform:uppercase; margin-bottom:8px; }
-.yca-keyword-grid { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
-.yca-kw-tag { font-size:12px; padding:4px 12px; border-radius:20px; background:var(--card-bg); border:1px solid var(--border); color:var(--black); }
-.yca-analysis-box { border:1px solid var(--border); border-radius:10px; padding:14px 16px; background:var(--card-bg); margin-bottom:14px; }
-.yca-analysis-box p { font-size:14px; color:var(--black); line-height:1.8; white-space:pre-wrap; margin:0; }
 
 /* ── 새 캠페인 요청 버튼 ── */
 .btn-new-campaign {
@@ -2737,8 +2673,6 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
 
 /* ── 프리미엄 검토 현황 ── */
 
-.pdp-rv-rejected .ch-rv-name,
-.pdp-rv-rejected .ch-rv-meta { color:var(--gray-light); }
 
 /* 영상 검토 버튼 (검토 필요 행) */
 .ch-rv-review-btn { font-size:11px; padding:5px 12px; border-radius:5px; border:1.5px solid var(--orange); background:var(--orange-pale); color:var(--orange); font-weight:700; cursor:pointer; white-space:nowrap; font-family:inherit; }

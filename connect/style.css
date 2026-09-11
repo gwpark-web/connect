@@ -3912,6 +3912,17 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
   white-space: pre-wrap; word-break: break-word; margin: 0;
 }
 
+/* 채널 CID (유튜브 채널 ID) 열 — 유튜브·어드민 조회의 조인 키 */
+.ch-cid-cell { max-width: 150px; }
+.ch-cid {
+  font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11px;
+  color: var(--gray-mid); background: var(--gray-bg);
+  padding: 2px 6px; border-radius: 5px;
+  display: inline-block; max-width: 100%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle;
+}
+.ch-cid-none { color: var(--gray-light); }
+
 /* 프리미엄 캠페인 전용 표 열 (공유/평균시청/국가/연령대) */
 .pm-cell { font-size: 12px; color: var(--gray-dark); white-space: nowrap; }
 .pm-cell--num { text-align: right; }

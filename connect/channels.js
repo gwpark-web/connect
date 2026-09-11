@@ -1,23 +1,26 @@
 // ── 채널 데이터 ──────────────────────────────────────────────────────
 const channels = [
-  { emoji:'🎬', name:'궁금해소',   handle:'@궁금해소',       cat:'엔터테인먼트', platform:'yt', subsNum:997000,  subs:'99.7만', views:'85만',  rate:12.4, repeat:4 },
-  { emoji:'🍜', name:'평양냉면',   handle:'@pyeongyang',     cat:'엔터테인먼트', platform:'yt', subsNum:350000,  subs:'35만',   views:'42만',  rate:9.8,  repeat:0 },
-  { emoji:'🌊', name:'지우멍',     handle:'@jiwumung',       cat:'커뮤니티·썰', platform:'yt', subsNum:125000,  subs:'12.5만', views:'18만',  rate:14.2, repeat:2 },
-  { emoji:'😸', name:'확고냥쇼츠', handle:'@hwakgocat',      cat:'엔터테인먼트', platform:'yt', subsNum:67000,   subs:'6.7만',  views:'9만',   rate:11.1, repeat:0 },
-  { emoji:'🎤', name:'쇼쇼짱',     handle:'@showshowjjang',  cat:'음악',         platform:'ig', subsNum:24000,   subs:'2.4만',  views:'3.2만', rate:8.7,  repeat:1 },
-  { emoji:'👗', name:'패피소희',   handle:'@fashionsohi',    cat:'패션·뷰티',   platform:'ig', subsNum:180000,  subs:'18만',   views:'22만',  rate:13.5, repeat:0 },
-  { emoji:'🎮', name:'겜쟁이남자', handle:'@gameman',        cat:'게임·IT',      platform:'yt', subsNum:440000,  subs:'44만',   views:'61만',  rate:10.2, repeat:3 },
-  { emoji:'🍳', name:'요리하는곰', handle:'@cooking_bear',   cat:'음식·요리',   platform:'yt', subsNum:270000,  subs:'27만',   views:'38만',  rate:15.1, repeat:0 },
-  { emoji:'💪', name:'헬스왕김씨', handle:'@healthking',     cat:'운동·헬스',   platform:'tt', subsNum:91000,   subs:'9.1만',  views:'13만',  rate:11.8, repeat:1 },
-  { emoji:'📱', name:'썰전쟁',     handle:'@ssul_wars',      cat:'커뮤니티·썰', platform:'yt', subsNum:530000,  subs:'53만',   views:'71만',  rate:16.3, repeat:0 },
-  { emoji:'🌸', name:'뷰티일기',   handle:'@beauty_diary',   cat:'패션·뷰티',   platform:'ig', subsNum:112000,  subs:'11.2만', views:'14만',  rate:12.9, repeat:2 },
-  { emoji:'🎵', name:'뮤직박스',   handle:'@musicbox_kr',    cat:'음악',         platform:'yt', subsNum:83000,   subs:'8.3만',  views:'11만',  rate:9.4,  repeat:0 },
+  { emoji:'🎬', name:'궁금해소',   handle:'@궁금해소', cid:'',       cat:'엔터테인먼트', platform:'yt', subsNum:997000,  subs:'99.7만', views:'85만',  rate:12.4, repeat:4 },
+  { emoji:'🍜', name:'평양냉면',   handle:'@pyeongyang', cid:'',     cat:'엔터테인먼트', platform:'yt', subsNum:350000,  subs:'35만',   views:'42만',  rate:9.8,  repeat:0 },
+  { emoji:'🌊', name:'지우멍',     handle:'@jiwumung', cid:'',       cat:'커뮤니티·썰', platform:'yt', subsNum:125000,  subs:'12.5만', views:'18만',  rate:14.2, repeat:2 },
+  { emoji:'😸', name:'확고냥쇼츠', handle:'@hwakgocat', cid:'',      cat:'엔터테인먼트', platform:'yt', subsNum:67000,   subs:'6.7만',  views:'9만',   rate:11.1, repeat:0 },
+  { emoji:'🎤', name:'쇼쇼짱',     handle:'@showshowjjang', cid:'',  cat:'음악',         platform:'ig', subsNum:24000,   subs:'2.4만',  views:'3.2만', rate:8.7,  repeat:1 },
+  { emoji:'👗', name:'패피소희',   handle:'@fashionsohi', cid:'',    cat:'패션·뷰티',   platform:'ig', subsNum:180000,  subs:'18만',   views:'22만',  rate:13.5, repeat:0 },
+  { emoji:'🎮', name:'겜쟁이남자', handle:'@gameman', cid:'',        cat:'게임·IT',      platform:'yt', subsNum:440000,  subs:'44만',   views:'61만',  rate:10.2, repeat:3 },
+  { emoji:'🍳', name:'요리하는곰', handle:'@cooking_bear', cid:'',   cat:'음식·요리',   platform:'yt', subsNum:270000,  subs:'27만',   views:'38만',  rate:15.1, repeat:0 },
+  { emoji:'💪', name:'헬스왕김씨', handle:'@healthking', cid:'',     cat:'운동·헬스',   platform:'tt', subsNum:91000,   subs:'9.1만',  views:'13만',  rate:11.8, repeat:1 },
+  { emoji:'📱', name:'썰전쟁',     handle:'@ssul_wars', cid:'',      cat:'커뮤니티·썰', platform:'yt', subsNum:530000,  subs:'53만',   views:'71만',  rate:16.3, repeat:0 },
+  { emoji:'🌸', name:'뷰티일기',   handle:'@beauty_diary', cid:'',   cat:'패션·뷰티',   platform:'ig', subsNum:112000,  subs:'11.2만', views:'14만',  rate:12.9, repeat:2 },
+  { emoji:'🎵', name:'뮤직박스',   handle:'@musicbox_kr', cid:'',    cat:'음악',         platform:'yt', subsNum:83000,   subs:'8.3만',  views:'11만',  rate:9.4,  repeat:0 },
+  { emoji:'🎯', name:'삽시간',     handle:'@asaptime',      cid:'UCnLwQwwn3Q4NaTjfEPB9Brg', cat:'미분류',       platform:'yt', subsNum:274,     subs:'274',    views:'87.2만', rate:0,    repeat:0 },
 ];
 
 const GOAL = 30;
 let _chActiveTab = 0;
 
-// ── 짤 회원 데이터 (플랫폼 서버 연동 가정) ──────────────────────────
+// ── 짤 회원 데이터 ──────────────────────────────────────────────────
+// 아래는 폴백용 샘플. 실데이터는 data-zeal.json 을 두면 통째로 대체된다
+// (수집 도구가 관리자 어드민에서 뽑아 만든 파일 — 저장소에는 커밋하지 않는다).
 const ZEAL_MEMBERS = {
   '@궁금해소':    { id:'gung9@zeal.kr',     nick:'궁해소',   phone:'010-2341-5678', channels:['@궁금해소'],                 note:'VIP · 재참여 2회' },
   '@jiwumung':    { id:'jiwu@zeal.kr',       nick:'지우멍',   phone:'010-9876-1234', channels:['@jiwumung'],                  note:'' },
@@ -26,17 +29,44 @@ const ZEAL_MEMBERS = {
   '@fashionsohi': { id:'sohi2@zeal.kr',      nick:'패피소희', phone:'010-7788-2211', channels:['@fashionsohi','@sohi_ig'],    note:'패션 카테고리 전문' },
 };
 
+// data-zeal.json 은 로컬(localhost) 에만 둔다. 공개 배포에는 없으므로
+// 거기서는 fetch 자체를 건너뛰어 404 콘솔 노이즈를 남기지 않는다.
+(async function loadZealMembers() {
+  var h = location.hostname;
+  if (h !== 'localhost' && h !== '127.0.0.1') return;   // 공개 배포 → 샘플 폴백
+  try {
+    const r = await fetch('data-zeal.json', { cache: 'no-store' });
+    if (!r.ok) return;
+    const data = await r.json();
+    if (!data || typeof data !== 'object' || !Object.keys(data).length) return;
+    Object.keys(ZEAL_MEMBERS).forEach(k => delete ZEAL_MEMBERS[k]);
+    Object.assign(ZEAL_MEMBERS, data);
+    // 관리자가 이미 결과 화면을 보고 있으면 새 데이터로 다시 그린다
+    if (document.getElementById('chResultContent') && typeof renderResultPanel === 'function') {
+      try { renderResultPanel(); } catch (e) {}
+    }
+  } catch (e) { /* 폴백 유지 */ }
+})();
+
 // 상세 페이지는 광고주·관리자가 공유하므로 진입 경로로 역할을 판정한다.
 // 짤 회원 정보는 연락처·이메일을 포함하므로 광고주 화면에는 마크업 자체를 내보내지 않는다.
 function isAdminViewer() {
   return document.body.dataset.viewerRole === 'admin';
 }
 
-function zealBadgeHtml(handle) {
+// 짤 회원 조회 키 — CID(유튜브 채널 ID) 우선, 없으면 핸들(데모 폴백).
+// 실데이터 data-zeal.json 은 CID 로 키가 잡히고, 샘플은 핸들로 잡혀 둘 다 맞는다.
+function zealKey(ch) {
+  if (ch && ch.cid && ZEAL_MEMBERS[ch.cid]) return ch.cid;
+  if (ch && ZEAL_MEMBERS[ch.handle]) return ch.handle;
+  return '';
+}
+
+function zealBadgeHtml(ch) {
   if (!isAdminViewer()) return '';
-  if (ZEAL_MEMBERS[handle]) {
-    const enc = encodeURIComponent(handle);
-    return `<button class="zeal-badge zeal-badge--member" data-fn="openZealPanel" data-stop="1" data-args="${enc}">짤</button>`;
+  const key = zealKey(ch);
+  if (key) {
+    return `<button class="zeal-badge zeal-badge--member" data-fn="openZealPanel" data-stop="1" data-args="${encodeURIComponent(key)}">짤</button>`;
   }
   return `<span class="zeal-badge zeal-badge--none">-</span>`;
 }
@@ -143,7 +173,7 @@ channels.forEach((_, i) => { chState[i] = 'pending'; });
 const chReviewState = {}; // '최종 확정 중'→'제작 중'→'검토 필요'→[수정시]'수정 중'→'검토 필요'→[승인]'업로드 대기'→'업로드 완료'
 
 // ── 데모 초기 상태 (탭2·탭3 바로 확인 가능하도록 일부 시딩) ─────────────
-[0, 2, 5, 6, 9, 11].forEach(i => { chState[i] = 'selected'; chReviewState[i] = '승인 완료'; });
+[0, 2, 5, 6, 9, 11, 12].forEach(i => { chState[i] = 'selected'; chReviewState[i] = '승인 완료'; });
 [1, 3, 4, 7].forEach(i => { chState[i] = 'selected'; chReviewState[i] = '제작 중'; });
 
 let _chChecked      = new Set();
@@ -219,7 +249,7 @@ function renderChannels() {
   const isMaxed  = selCount >= GOAL;
 
   if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--gray-light)">검색 결과가 없습니다.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:32px;color:var(--gray-light)">검색 결과가 없습니다.</td></tr>`;
     return;
   }
 
@@ -257,12 +287,13 @@ function renderChannels() {
             </div>
           </div>
         </td>
+        <td class="ch-cid-cell">${ch.cid ? `<span class="ch-cid">${ch.cid}</span>` : '<span class="ch-cid-none">-</span>'}</td>
         <td style="text-align:center"><span class="cat-tag">${ch.cat}</span></td>
         <td class="n-cell">${fmtSubs(ch.subsNum)}</td>
         <td class="n-cell">${ch.views}<div class="n-sub">평균</div></td>
         <td>${erBar(ch.rate)}</td>
         <td style="text-align:center">${ch.repeat ? `<span class="ch-hist-val ch-hist-val--on">${ch.repeat}</span>` : `<span class="ch-hist-val ch-hist-val--off">-</span>`}</td>
-        <td class="zeal-col" style="text-align:center">${zealBadgeHtml(ch.handle)}</td>
+        <td class="zeal-col" style="text-align:center">${zealBadgeHtml(ch)}</td>
         <td class="ch-action-cell">${actionHtml}</td>
       </tr>`;
   }).join('');
@@ -401,7 +432,7 @@ function renderReviewPanel() {
       <div class="ch-rv-left">
         <div class="ch-thumb">${ch.emoji}</div>
         <div class="ch-rv-info">
-          <div class="ch-rv-name">${ch.name}${isAdminViewer() && ZEAL_MEMBERS[ch.handle] ? ' <span class="zeal-rv-badge">짤</span>' : ''}</div>
+          <div class="ch-rv-name">${ch.name}${isAdminViewer() && zealKey(ch) ? ' <span class="zeal-rv-badge">짤</span>' : ''}</div>
           <div class="ch-rv-meta">${ch.handle} · ${PLAT_LABEL[ch.platform] || ch.platform} · 구독자 ${fmtSubs(ch.subsNum)}</div>
         </div>
       </div>
@@ -478,13 +509,14 @@ function renderResultPanel() {
           </div>
         </div>
       </td>
+      <td class="ch-cid-cell">${ch.cid ? `<span class="ch-cid">${ch.cid}</span>` : '<span class="ch-cid-none">-</span>'}</td>
       <td style="text-align:center;padding:0 4px">${platBadge(ch.platform)}</td>
       <td style="text-align:center">${postCell}</td>
       <td style="text-align:right;font-size:12px;color:var(--gray-light)">집계 예정</td>
       <td style="text-align:right;font-size:12px;color:var(--gray-light)">집계 예정</td>
       <td style="text-align:right;font-size:12px;color:var(--gray-light)">집계 예정</td>
       ${premiumCells(i)}
-      <td class="zeal-col" style="text-align:center">${zealBadgeHtml(ch.handle)}</td>
+      <td class="zeal-col" style="text-align:center">${zealBadgeHtml(ch)}</td>
     </tr>`;
   }).join('');
 
@@ -642,6 +674,7 @@ function renderResultPanel() {
               <tr>
                 <th class="vid-cb-th"><input type="checkbox" class="vid-select-all" aria-label="전체선택"></th>
                 <th style="min-width:140px">채널</th>
+                <th style="width:150px">CID</th>
                 <th style="text-align:center;width:50px">플랫폼</th>
                 <th style="text-align:center;min-width:160px">게시물 (관리자 등록)</th>
                 <th style="text-align:right;width:72px">조회수</th>

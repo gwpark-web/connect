@@ -6,3 +6,9 @@ __pycache__/
 *.pyo
 .env
 *.bak
+
+# 짤 회원 실데이터 — PII(이메일·전화). 공개 저장소에 절대 올리지 않는다.
+data-zeal.json
+connect/data-zeal.json
+# 내부 어드민 API 경로를 담은 수집 도구
+connect/tools/

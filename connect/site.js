@@ -787,6 +787,7 @@ function p0CcToggle(mode) {
 
 // ── 회차 추가 모달 ───────────────────────────────────────────────────
 function openAddRoundModal() {
+  if (!isAdminViewer()) return;
   document.getElementById('addRoundForm')?.reset();
   document.getElementById('addRoundModal').classList.add('active');
 }

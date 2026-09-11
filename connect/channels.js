@@ -26,7 +26,14 @@ const ZEAL_MEMBERS = {
   '@fashionsohi': { id:'sohi2@zeal.kr',      nick:'패피소희', phone:'010-7788-2211', channels:['@fashionsohi','@sohi_ig'],    note:'패션 카테고리 전문' },
 };
 
+// 상세 페이지는 광고주·관리자가 공유하므로 진입 경로로 역할을 판정한다.
+// 짤 회원 정보는 연락처·이메일을 포함하므로 광고주 화면에는 마크업 자체를 내보내지 않는다.
+function isAdminViewer() {
+  return document.body.dataset.viewerRole === 'admin';
+}
+
 function zealBadgeHtml(handle) {
+  if (!isAdminViewer()) return '';
   if (ZEAL_MEMBERS[handle]) {
     const enc = encodeURIComponent(handle);
     return `<button class="zeal-badge zeal-badge--member" data-fn="openZealPanel" data-stop="1" data-args="${enc}">짤</button>`;
@@ -36,6 +43,7 @@ function zealBadgeHtml(handle) {
 
 // ── 짤 회원 사이드패널 함수 (channels.js에서 공유 — admin/site 양쪽) ──
 function openZealPanel(keyEnc) {
+  if (!isAdminViewer()) return;
   const handle = decodeURIComponent(keyEnc);
   const m = ZEAL_MEMBERS[handle];
   if (!m) return;
@@ -254,7 +262,7 @@ function renderChannels() {
         <td class="n-cell">${ch.views}<div class="n-sub">평균</div></td>
         <td>${erBar(ch.rate)}</td>
         <td style="text-align:center">${ch.repeat ? `<span class="ch-hist-val ch-hist-val--on">${ch.repeat}</span>` : `<span class="ch-hist-val ch-hist-val--off">-</span>`}</td>
-        <td style="text-align:center">${zealBadgeHtml(ch.handle)}</td>
+        <td class="zeal-col" style="text-align:center">${zealBadgeHtml(ch.handle)}</td>
         <td class="ch-action-cell">${actionHtml}</td>
       </tr>`;
   }).join('');
@@ -475,7 +483,7 @@ function renderResultPanel() {
       <td style="text-align:right;font-size:12px;color:var(--gray-light)">집계 예정</td>
       <td style="text-align:right;font-size:12px;color:var(--gray-light)">집계 예정</td>
       <td style="text-align:right;font-size:12px;color:var(--gray-light)">집계 예정</td>
-      <td style="text-align:center">${zealBadgeHtml(ch.handle)}</td>
+      <td class="zeal-col" style="text-align:center">${zealBadgeHtml(ch.handle)}</td>
     </tr>`;
   }).join('');
 
@@ -607,7 +615,7 @@ function renderResultPanel() {
               <th style="text-align:right;width:72px">조회수</th>
               <th style="text-align:right;width:64px">좋아요</th>
               <th style="text-align:right;width:52px">댓글</th>
-              <th style="text-align:center;width:52px">짤</th>
+              <th class="zeal-col" style="text-align:center;width:52px">짤</th>
             </tr>
           </thead>
           <tbody>${tableRows}</tbody>

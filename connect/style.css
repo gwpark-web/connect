@@ -607,6 +607,8 @@ body.p0-active .p7-cta-sub { color: rgba(255,255,255,0.4); }
 .card-amount { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--black); letter-spacing: 1px; line-height: 1; }
 .card-amount-label { font-size: 11px; color: var(--gray-light); text-align: right; }
 .card-btn { padding: 13px 24px; border-radius: 9px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; border: none; transition: all 0.2s; width: 100%; text-align: center; }
+/* 본문 길이가 달라도(진행률 바 vs 한 줄 안내) 카드 간 버튼 높이를 맞춘다 */
+.card-body > .card-btn { margin-top: auto; }
 .card-btn.primary { background: var(--orange); color: var(--white); }
 .card-btn.primary:hover { background: var(--orange-light); }
 .card-btn.secondary { background: var(--gray-bg); color: var(--gray-dark); border: 1px solid var(--border); }
@@ -4118,6 +4120,12 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
 
 /* ── 사이드시트 ── */
 /* ── 짤 회원 뱃지 ── */
+/* 관리자로 진입했을 때만 노출되는 요소 (짤 회원 열 .zeal-col, 회차 추가 버튼 등).
+   관리자일 때는 규칙이 아예 적용되지 않으므로 각자의 display 값이 그대로 유지된다.
+   viewerRole은 상세 페이지 진입 시 정해지므로, 미설정 상태에서도 숨겨지도록 :not() 으로 판정한다. */
+body:not([data-viewer-role="admin"]) .zeal-col,
+body:not([data-viewer-role="admin"]) .admin-only { display: none; }
+
 .zeal-badge { display:inline-flex; align-items:center; padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700; line-height:1; }
 .zeal-badge--member { background:#FFF0E6; color:#D95C00; border:none; cursor:pointer; }
 .zeal-badge--member:hover { background:#FFE0C8; }

@@ -573,6 +573,11 @@ body.p0-active .p7-cta-sub { color: rgba(255,255,255,0.4); }
 .meta-item { font-size: 13px; color: var(--gray-light); }
 .meta-item strong { color: var(--gray-dark); font-weight: 600; font-size: 14px; }
 .card-platform-badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+/* 보고서 등록 시 지정한 광고주(에이전시) 계정 — 플랫폼 행 우측 끝 */
+.card-agency {
+  margin-left: auto; font-size: 11px; font-weight: 600; color: var(--gray-mid);
+  max-width: 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 .platform-badge {
   display: inline-flex; align-items: center; gap: 5px;
   padding: 4px 10px; border-radius: 100px; font-size: 12px; font-weight: 600;
@@ -2144,7 +2149,10 @@ body.p0-active .auth-page.fullpage { background: linear-gradient(135deg, rgba(26
 .creg-manager-item--disabled { opacity:.55; cursor:default; }
 .creg-manager-item input { accent-color:var(--orange); cursor:pointer; flex-shrink:0; }
 .creg-manager-id { font-size:11px; color:var(--gray-light); margin-left:auto; }
+/* 날짜 칸은 동일 폭으로 나누고, 입력이 칸보다 넓어지지 않게 min-width 를 푼다 */
 .creg-date-row { display:flex; gap:12px; }
+.creg-date-row > .p5-modal-field { flex:1 1 0; min-width:0; }
+.creg-date-row input { width:100%; min-width:0; }
 .creg-thumb-row { display:flex; gap:8px; align-items:center; }
 .creg-file-btn { display:inline-flex; align-items:center; gap:6px; height:40px; padding:0 14px; border:1px solid var(--border); border-radius:8px; background:var(--card-bg); color:var(--gray-light); font-size:13px; cursor:pointer; white-space:nowrap; font-family:'Noto Sans KR',sans-serif; flex-shrink:0; transition:border-color .15s,color .15s; }
 .creg-file-btn:hover { border-color:var(--orange); color:var(--orange); }
@@ -3875,6 +3883,119 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
   color: var(--gray-light); cursor: pointer; line-height: 1;
 }
 .adm-modal-x:hover { color: var(--black); }
+/* ── 리포트 타임라인 회차별 수정/삭제 ── */
+.cd-tl-row { position: relative; }
+.cd-tl-act { display: flex; gap: 4px; margin-left: auto; align-self: center; opacity: 0; transition: opacity .15s; }
+.cd-tl-row:hover .cd-tl-act, .cd-tl-act:focus-within { opacity: 1; }
+.cd-tl-act-btn {
+  width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center;
+  background: var(--white); border: 1px solid var(--border); border-radius: 7px;
+  color: var(--gray-mid); cursor: pointer; transition: border-color .15s, color .15s;
+}
+.cd-tl-act-btn:hover { border-color: var(--orange); color: var(--orange); }
+.cd-tl-act-btn--del:hover { border-color: #DC2626; color: #DC2626; }
+
+/* 메시지 미리보기 */
+.ar-preview { background: var(--gray-bg); border: 1px solid var(--border); border-radius: 9px; padding: 11px 12px; }
+.ar-preview-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; }
+.ar-preview-lbl { font-size: 11px; font-weight: 700; color: var(--gray-light); }
+.ar-copy-btn {
+  display: inline-flex; align-items: center; gap: 4px; font-family: inherit;
+  font-size: 11px; font-weight: 600; color: var(--orange);
+  background: none; border: none; cursor: pointer; padding: 2px 4px;
+}
+.ar-copy-btn:hover { text-decoration: underline; }
+.ar-preview-body {
+  font-family: inherit; font-size: 12.5px; line-height: 1.6; color: var(--gray-dark);
+  white-space: pre-wrap; word-break: break-word; margin: 0;
+}
+
+/* 프리미엄 캠페인 전용 표 열 (공유/평균시청/국가/연령대) */
+.pm-cell { font-size: 12px; color: var(--gray-dark); white-space: nowrap; }
+.pm-cell--num { text-align: right; }
+.pm-cell-none { color: var(--gray-light); }
+.pm-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 700; line-height: 1;
+  padding: 3px 7px; border-radius: 100px;
+  color: var(--c); background: color-mix(in srgb, var(--c) 12%, transparent);
+}
+.pm-chip--plain { color: var(--gray-dark); background: var(--gray-bg); font-weight: 600; }
+
+/* ── 프리미엄 지표 (prefix: pm-) ── */
+.pm-tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin: 0 0 14px; }
+.pm-tab {
+  font-family: inherit; font-size: 13px; font-weight: 600; color: var(--gray-light);
+  background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  padding: 8px 12px; cursor: pointer; transition: color .15s, border-color .15s;
+}
+.pm-tab:hover { color: var(--gray-dark); }
+.pm-tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+.pm-pane { display: none; }
+.pm-pane.active { display: block; }
+.pm-empty { padding: 32px; text-align: center; font-size: 13px; color: var(--gray-light); }
+
+.pm-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 22px; }
+.pm-stat { border-radius: 10px; padding: 14px 12px; text-align: center; }
+.pm-stat-lbl { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+.pm-stat-num { font-size: 21px; font-weight: 800; line-height: 1.15; }
+.pm-stat-sub { font-size: 11px; margin-top: 3px; opacity: .75; }
+.pm-stat--a { background: var(--orange-pale); }
+.pm-stat--a .pm-stat-lbl, .pm-stat--a .pm-stat-sub { color: #C43A00; }
+.pm-stat--a .pm-stat-num { color: var(--orange); }
+.pm-stat--b { background: #EFF6FF; }
+.pm-stat--b .pm-stat-lbl, .pm-stat--b .pm-stat-sub { color: #1D4ED8; }
+.pm-stat--b .pm-stat-num { color: #2563EB; }
+.pm-stat--c { background: #F0FDF4; }
+.pm-stat--c .pm-stat-lbl, .pm-stat--c .pm-stat-sub { color: #15803D; }
+.pm-stat--c .pm-stat-num { color: #16A34A; }
+.pm-stat--d { background: #FDF2F8; }
+.pm-stat--d .pm-stat-lbl, .pm-stat--d .pm-stat-sub { color: #BE185D; }
+.pm-stat--d .pm-stat-num { color: #DB2777; }
+
+.pm-section { margin-bottom: 22px; }
+.pm-section:last-child { margin-bottom: 0; }
+.pm-section-title { font-size: 12px; font-weight: 700; color: var(--gray-mid); margin-bottom: 12px; }
+
+/* 막대: 값 라벨을 항상 붙여 색에만 의존하지 않게 한다 */
+.pm-bar-row { display: flex; gap: 6px; align-items: flex-end; height: 104px; }
+.pm-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px; }
+.pm-bar-val { font-size: 11.5px; font-weight: 700; color: var(--gray-dark); }
+.pm-bar { width: 100%; border-radius: 4px 4px 0 0; }
+.pm-bar-lbl-row { display: flex; gap: 6px; margin-top: 5px; }
+.pm-bar-lbl {
+  flex: 1; text-align: center; font-size: 11px; color: var(--gray-light);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.pm-legend {
+  display: flex; flex-wrap: wrap; gap: 4px 14px;
+  margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);
+}
+.pm-legend-item { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--gray-mid); }
+.pm-legend-item i { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+.pm-cty-hero {
+  background: linear-gradient(140deg, var(--orange-pale), #FFF7F2);
+  border: 1px solid rgba(255,69,0,.16); border-radius: 14px;
+  padding: 18px; text-align: center; margin-bottom: 14px;
+}
+.pm-cty-hero-flag { font-size: 30px; line-height: 1; margin-bottom: 4px; }
+.pm-cty-hero-pct { font-size: 30px; font-weight: 800; color: var(--orange); line-height: 1.1; }
+.pm-cty-hero-name { font-size: 13px; font-weight: 700; color: #C43A00; margin-top: 2px; }
+.pm-cty-hero-sub { font-size: 11px; color: var(--gray-mid); margin-top: 3px; }
+.pm-cty-row { display: flex; align-items: center; gap: 9px; margin-bottom: 9px; }
+.pm-cty-row:last-child { margin-bottom: 0; }
+.pm-cty-flag { font-size: 17px; line-height: 1; flex-shrink: 0; }
+.pm-cty-body { flex: 1; min-width: 0; }
+.pm-cty-top { display: flex; justify-content: space-between; font-size: 11.5px; margin-bottom: 3px; }
+.pm-cty-name { font-weight: 600; color: var(--gray-dark); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pm-cty-pct { font-weight: 700; margin-left: 6px; flex-shrink: 0; }
+.pm-cty-track { height: 7px; background: var(--gray-bg); border-radius: 100px; overflow: hidden; }
+.pm-cty-fill { height: 100%; border-radius: 100px; }
+.pm-cty-cnt { font-size: 11px; color: var(--gray-light); flex-shrink: 0; width: 34px; text-align: right; }
+
+@media (max-width: 900px) { .pm-stat-grid { grid-template-columns: repeat(2, 1fr); } }
+
 /* ── 캠페인 행 관리 버튼 ── */
 .adm-act-cell { white-space: nowrap; }
 .adm-act-btn {

@@ -692,7 +692,7 @@ function p0CcToggle(mode) {
     _card = card;
     const d = card.dataset;
     document.getElementById('ce-title').value      = d.editTitle || '';
-    document.getElementById('ce-client').value     = d.editClient || '';
+    fillAccountSelect(document.getElementById('ce-client'), d.editClient, '계정 선택');
     document.getElementById('ce-product').value    = d.editProduct || '조회수당';
     document.getElementById('ce-status').value     = d.editStatus || 'recruiting';
     document.getElementById('ce-goal-type').value  = d.editGoalType || '조회수';
@@ -766,9 +766,13 @@ function p0CcToggle(mode) {
     }
 
     // platform badges
+    // 플랫폼 배지 + 광고주 계정(우측)을 함께 다시 그린다.
+    // 배지만 덮어쓰면 같은 행에 있던 계정 칩이 지워진다.
     const platEl = _card.querySelector('.card-platform-badges');
     if (platEl) {
-      platEl.innerHTML = plats.map(p => `<span class="platform-badge ${p}">${PLAT_SVG[p] || p}</span>`).join('');
+      platEl.innerHTML =
+        plats.map(p => `<span class="platform-badge ${p}">${PLAT_SVG[p] || p}</span>`).join('') +
+        (client ? `<span class="card-agency" title="광고주 계정">${client}</span>` : '');
     }
 
     // thumbnail
@@ -820,13 +824,123 @@ function p0CcToggle(mode) {
 })();
 
 // ── 회차 추가 모달 ───────────────────────────────────────────────────
+// 수정 중인 회차 행. null 이면 추가 모드.
+let _editRoundRow = null;
+
+function arSetMode(isEdit) {
+  const t = document.getElementById('ar-title');
+  const s = document.getElementById('ar-submit');
+  if (t) t.textContent = isEdit ? '리포트 수정' : '리포트 회차 추가';
+  if (s) s.textContent = isEdit ? '수정' : '추가';
+}
+
 function openAddRoundModal() {
   if (!isAdminViewer()) return;
+  _editRoundRow = null;
   document.getElementById('addRoundForm')?.reset();
+  arSetMode(false);
+  updateRoundPreview();
   document.getElementById('addRoundModal').classList.add('active');
 }
 
+// 타임라인 회차 버튼 — fnMap 은 문자열만 넘겨서 버튼 참조를 못 받으므로 위임으로 처리한다
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-tl-act]');
+  if (!btn) return;
+  e.stopPropagation();
+  if (btn.dataset.tlAct === 'edit') openEditRoundModal(btn);
+  else deleteRound(btn);
+});
+
+// 폼 입력이 바뀌면 미리보기를 다시 만든다
+document.addEventListener('input', function(e) {
+  if (e.target.closest('#addRoundForm')) updateRoundPreview();
+});
+document.addEventListener('change', function(e) {
+  if (e.target.closest('#addRoundForm')) updateRoundPreview();
+});
+
+// 타임라인 행의 표시 문자열을 되읽어 폼을 채운다 (행이 정적 HTML이라 별도 저장소가 없다)
+function openEditRoundModal(btn) {
+  if (!isAdminViewer()) return;
+  const row = btn?.closest('.cd-tl-row');
+  if (!row) return;
+  _editRoundRow = row;
+
+  const title = row.querySelector('.cd-tl-title')?.textContent.trim() || '';
+  const metas = [...row.querySelectorAll('.cd-tl-meta')].map(e => e.textContent.trim());
+  const isFinal = row.classList.contains('cd-tl-row--final');
+
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+  set('ar-round', isFinal ? '' : (title.match(/^(\d+)차/) || [, ''])[1]);
+  set('ar-type', isFinal ? 'final' : 'interim');
+  set('ar-views', (title.match(/([\d,]+)회/) || [, ''])[1]);
+  set('ar-vids', (metas.join(' ').match(/참여 영상\s*([\d,]+)개/) || [, ''])[1]);
+  set('ar-date', (metas[0] || '').replace(/\s*기준.*$/, '').trim());
+  // 두 번째 meta 줄은 비고(주황색)로만 쓰인다
+  set('ar-memo', metas.length > 1 ? metas[1] : '');
+
+  arSetMode(true);
+  updateRoundPreview();
+  document.getElementById('addRoundModal').classList.add('active');
+}
+
+function deleteRound(btn) {
+  if (!isAdminViewer()) return;
+  const row = btn?.closest('.cd-tl-row');
+  if (!row) return;
+  const label = row.querySelector('.cd-tl-title')?.textContent.trim().split('·')[0].trim() || '이 회차';
+  if (!confirm(`${label} 리포트를 삭제할까요?`)) return;
+  row.remove();
+}
+
+// 카카오톡으로 보낼 문구 미리보기 — 입력값이 비면 자리표시자로 두고 NaN 이 나오지 않게 한다
+function updateRoundPreview() {
+  const pre = document.getElementById('ar-preview');
+  if (!pre) return;
+  const val = id => (document.getElementById(id)?.value || '').trim();
+  const num = s => { const n = parseInt(String(s).replace(/,/g, ''), 10); return Number.isFinite(n) ? n : null; };
+
+  const isFinal = val('ar-type') === 'final';
+  const label = isFinal ? '최종' : (val('ar-round') ? val('ar-round') + '차' : '□차');
+  const page = _editRoundRow?.closest('.page-wrapper') || document.querySelector('.page-wrapper.active');
+  const name = page?.querySelector('.cd-name')?.textContent.trim() || '캠페인';
+
+  // 목표 항목은 캠페인 유형마다 다르다 (조회수당=목표 조회수, 프리미엄=목표 영상 수).
+  // 결과 카드의 실제 라벨을 그대로 읽어 문구가 어긋나지 않게 한다.
+  const goalItem = [...(page?.querySelectorAll('.cd-result-item') || [])]
+    .find(el => (el.querySelector('.cd-result-lbl')?.textContent || '').includes('목표'));
+  const goalLbl = goalItem?.querySelector('.cd-result-lbl')?.textContent.trim() || '목표';
+  const goalRaw = goalItem?.querySelector('.cd-result-val')?.textContent.trim() || '';
+  const goalUnit = /개/.test(goalRaw) ? '개' : '회';
+  const goal = num(goalRaw);
+  const views = num(val('ar-views'));
+  const vids = num(val('ar-vids'));
+
+  // 캠페인명에 이미 〈 〉/< > 가 있으면 겹치지 않게 그대로 쓴다
+  const nameText = /[<〈]/.test(name) ? name : `<${name}>`;
+
+  pre.textContent = [
+    `${label} ${nameText} 캠페인 현황 안내드립니다.`,
+    `${goalLbl}: ${goal != null ? goal.toLocaleString() : '—'} ${goalUnit}`,
+    `현재 조회수: ${views != null ? views.toLocaleString() : '—'} 회` +
+      (val('ar-date') ? `(${val('ar-date')} 기준)` : ''),
+    `총 참여 영상: ${vids != null ? vids.toLocaleString() : '—'} 개`,
+    val('ar-memo') ? '\n' + val('ar-memo') : ''
+  ].filter(Boolean).join('\n');
+}
+
+function copyRoundPreview() {
+  const pre = document.getElementById('ar-preview');
+  if (!pre) return;
+  navigator.clipboard?.writeText(pre.textContent).then(
+    () => admToast('메시지를 복사했습니다'),
+    () => admToast('복사에 실패했습니다')
+  );
+}
+
 function closeAddRoundModal() {
+  _editRoundRow = null;
   document.getElementById('addRoundModal').classList.remove('active');
 }
 
@@ -842,18 +956,30 @@ function submitAddRound() {
   if (!date)  { alert('기준 시각을 입력해주세요.'); return; }
 
   const isFinal = type === 'final';
-  const list = document.getElementById('cdTlList');
+  // 수정 중이면 그 행이 속한 타임라인, 아니면 현재 보고 있는 페이지의 타임라인
+  const page = _editRoundRow?.closest('.page-wrapper') || document.querySelector('.page-wrapper.active');
+  const list = _editRoundRow?.closest('.cd-tl-list') || page?.querySelector('.cd-tl-list');
   if (!list) { closeAddRoundModal(); return; }
 
   const viewsNum = parseInt((views || '0').replace(/,/g, '')) || 0;
-  const goalEl   = document.querySelector('#p-detail .cd-result-val');
-  const goalNum  = goalEl ? parseInt(goalEl.textContent.replace(/[^0-9]/g, '')) || 1 : 1;
-  const pct      = viewsNum && goalNum ? Math.round(viewsNum / goalNum * 100) : 0;
+  const vidsNum  = parseInt((vids || '0').replace(/,/g, '')) || 0;
+
+  // 달성률은 목표와 같은 단위로 비교한다.
+  // 조회수당은 목표가 "회"(조회수), 프리미엄은 "개"(영상 수)라 비교 대상이 다르다.
+  const goalItem = [...(page?.querySelectorAll('.cd-result-item') || [])]
+    .find(el => (el.querySelector('.cd-result-lbl')?.textContent || '').includes('목표'));
+  const goalRaw  = goalItem?.querySelector('.cd-result-val')?.textContent || '';
+  const goalNum  = parseInt(goalRaw.replace(/[^0-9]/g, '')) || 0;
+  const byVideos = /개/.test(goalRaw);
+  const actual   = byVideos ? vidsNum : viewsNum;
+  const pct      = actual && goalNum ? Math.round(actual / goalNum * 100) : 0;
   const viewsFmt = viewsNum ? viewsNum.toLocaleString() + '회' : '';
   const vidsFmt  = vids ? `참여 영상 ${vids}개` : '';
 
   const label = isFinal ? '최종' : `${round}차`;
-  const titleText = [label, viewsFmt ? `${viewsFmt}` : '', pct ? `(${pct}%)` : ''].filter(Boolean).join(' · ');
+  // 기존 정적 행과 같은 형식: "2차 · 355,305회 (71%)" — 조회수와 퍼센트 사이는 공백
+  const viewsPart = [viewsFmt, pct ? `<span class="cd-tl-pct">(${pct}%)</span>` : ''].filter(Boolean).join(' ');
+  const titleText = [label, viewsPart].filter(Boolean).join(' · ');
   const metaText  = [date ? `${date} 기준` : '', vidsFmt].filter(Boolean).join(' · ');
 
   const row = document.createElement('div');
@@ -864,9 +990,17 @@ function submitAddRound() {
       <div class="cd-tl-title">${titleText}</div>
       ${metaText ? `<div class="cd-tl-meta">${metaText}</div>` : ''}
       ${memo ? `<div class="cd-tl-meta" style="color:var(--orange)">${memo}</div>` : ''}
+    </div>
+    <div class="cd-tl-act admin-only">
+      <button class="cd-tl-act-btn" data-tl-act="edit" title="수정" aria-label="회차 수정"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+      <button class="cd-tl-act-btn cd-tl-act-btn--del" data-tl-act="delete" title="삭제" aria-label="회차 삭제"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
     </div>`;
 
-  if (isFinal) {
+  if (_editRoundRow) {
+    // 수정 — 자리를 유지한 채 내용만 바꾼다
+    _editRoundRow.className = row.className;
+    _editRoundRow.innerHTML = row.innerHTML;
+  } else if (isFinal) {
     list.appendChild(row);
   } else {
     const finalRow = list.querySelector('.cd-tl-row--final');
@@ -879,6 +1013,7 @@ function submitAddRound() {
 // ── 캠페인 등록 모달 ─────────────────────────────────────────────────
 function openCampaignRegModal() {
   document.getElementById('campaignRegForm')?.reset();
+  fillAccountSelect(document.getElementById('creg-agency'), '', '선택 안함');
   const toggle = document.getElementById('cregPremiumToggle');
   if (toggle) toggle.dataset.on = 'false';
   document.getElementById('campaignRegModal').classList.add('active');
@@ -893,6 +1028,28 @@ function toggleCregPremium() {
   if (btn) btn.dataset.on = btn.dataset.on === 'true' ? 'false' : 'true';
 }
 
+// 광고주(에이전시) 계정 — 등록 모달과 수정 사이드패널이 같은 목록을 쓴다.
+// TODO: 계정 관리 탭/서버에서 받아오도록 교체
+const AGENCY_ACCOUNTS = ['투래빗', '프리엠컴퍼니', '월트디즈니 코리아', '카카오엔터테인먼트', 'SM엔터테인먼트'];
+
+// 목록을 select 에 채우고 현재 값을 선택한다. 목록에 없는 값이면 그 값도 옵션으로 남겨
+// 기존 카드 데이터가 사라지지 않게 한다.
+function fillAccountSelect(sel, current, placeholder) {
+  if (!sel) return;
+  const cur = (current || '').trim();
+  const opts = AGENCY_ACCOUNTS.slice();
+  if (cur && !opts.includes(cur)) opts.unshift(cur);
+  sel.innerHTML = `<option value="">${placeholder}</option>` +
+    opts.map(o => `<option value="${o}"${o === cur ? ' selected' : ''}>${o}</option>`).join('');
+  sel.value = cur;
+}
+
+const CREG_PLAT = {
+  yt: `<span class="platform-badge yt"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>쇼츠</span>`,
+  ig: `<span class="platform-badge ig"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>릴스</span>`,
+  tt: `<span class="platform-badge tt"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>틱톡</span>`,
+};
+
 function submitCampaignReg() {
   const title    = document.getElementById('creg-title')?.value.trim();
   const platform = document.getElementById('creg-platform')?.value;
@@ -901,6 +1058,9 @@ function submitCampaignReg() {
 
   const isPremium = document.getElementById('cregPremiumToggle')?.dataset.on === 'true';
   const client    = document.getElementById('creg-client')?.value.trim() || '-';
+  // 카드 플랫폼 행에 노출할 광고주 계정 — 에이전시를 고르면 그쪽을 우선한다
+  const agency    = document.getElementById('creg-agency')?.value.trim() || '';
+  const acct      = agency || (client !== '-' ? client : '');
   const startDate = document.getElementById('creg-start')?.value || '';
   const endDate   = document.getElementById('creg-end')?.value || '';
   const goalViews = (document.getElementById('creg-goal-views')?.value || '').replace(/,/g, '');
@@ -919,10 +1079,24 @@ function submitCampaignReg() {
   card.className = 'campaign-card';
   card.dataset.campaignStatus = 'recruiting';
   card.dataset.pct = '0';
+  // 수정 사이드패널이 읽는 값들 — 없으면 등록한 카드를 편집할 수 없다
+  Object.assign(card.dataset, {
+    editTitle: title,
+    editClient: acct,
+    editProduct: product,
+    editStatus: 'recruiting',
+    editGoalType: goalViews ? '조회수' : '영상수',
+    editGoalValue: goalViews || goalVids || '',
+    editCurrent: '0',
+    editStart: startDate,
+    editEnd: endDate,
+    editThumb: thumbUrl,
+    editPlatforms: platform,
+  });
   card.innerHTML = `
-    <div class="card-thumb">${thumbUrl
+    <div class="card-thumb"${thumbUrl ? '' : ` style="${thumbBg}"`}>${thumbUrl
       ? `<img src="${thumbUrl}" alt="${title}" loading="lazy">`
-      : `<div class="card-thumb-placeholder" style="${thumbBg}"></div>`}</div>
+      : ''}<button class="card-edit-btn">수정</button></div>
     <div class="card-thumb-info">
       <div class="card-product-tag">${product}</div>
     </div>
@@ -932,6 +1106,10 @@ function submitCampaignReg() {
         <span class="card-client">${client}</span>
       </div>
       <div class="card-title">${title}</div>
+      <div class="card-platform-badges">
+        ${CREG_PLAT[platform] || ''}
+        ${acct ? `<span class="card-agency" title="광고주 계정">${acct}</span>` : ''}
+      </div>
       <div class="card-meta-row">
         <span class="card-meta">${startFmt} ~ ${endFmt}</span>
         ${goalLabel ? `<span class="card-meta">${goalLabel}</span>` : ''}
@@ -968,7 +1146,7 @@ function submitCampaignReg() {
     p0RoleToggle,
     p0CcToggle,
     openZealPanel, closeZealPanel, saveZealMemo,
-    openAddRoundModal, closeAddRoundModal, submitAddRound,
+    openAddRoundModal, closeAddRoundModal, submitAddRound, copyRoundPreview,
     openCampaignRegModal, closeCampaignRegModal, submitCampaignReg, toggleCregPremium,
   };
 

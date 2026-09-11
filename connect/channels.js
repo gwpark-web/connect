@@ -483,6 +483,7 @@ function renderResultPanel() {
       <td style="text-align:right;font-size:12px;color:var(--gray-light)">집계 예정</td>
       <td style="text-align:right;font-size:12px;color:var(--gray-light)">집계 예정</td>
       <td style="text-align:right;font-size:12px;color:var(--gray-light)">집계 예정</td>
+      ${premiumCells(i)}
       <td class="zeal-col" style="text-align:center">${zealBadgeHtml(ch.handle)}</td>
     </tr>`;
   }).join('');
@@ -500,7 +501,7 @@ function renderResultPanel() {
 
       <!-- 2열: 리포트 타임라인 -->
       <div class="cd-timeline-card">
-        <div class="cd-timeline-head">리포트 타임라인 <span class="cd-timeline-period">성과 집계 예정</span></div>
+        <div class="cd-timeline-head"><span>리포트 타임라인</span><span class="cd-timeline-period" style="margin-right:auto;margin-left:8px">성과 집계 예정</span><button class="cd-add-round-btn admin-only" data-fn="openAddRoundModal">+ 회차 추가</button></div>
         <div class="cd-tl-progress">
           <div class="cd-tl-prog-track">
             <div class="cd-tl-prog-fill" style="width:${pct >= 100 ? 84 : 0}%"></div>
@@ -528,6 +529,11 @@ function renderResultPanel() {
               <div class="cd-tl-title">1차 <span class="cd-tl-pct">집계 예정</span></div>
               <div class="cd-tl-meta">전체 승인 완료 시점 기준</div>
             </div>
+          
+            <div class="cd-tl-act admin-only">
+              <button class="cd-tl-act-btn" data-tl-act="edit" title="수정" aria-label="회차 수정"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+              <button class="cd-tl-act-btn cd-tl-act-btn--del" data-tl-act="delete" title="삭제" aria-label="회차 삭제"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+            </div>
           </div>
           <div class="cd-tl-row">
             <div class="cd-tl-num">2</div>
@@ -535,12 +541,22 @@ function renderResultPanel() {
               <div class="cd-tl-title">2차 <span class="cd-tl-pct">집계 예정</span></div>
               <div class="cd-tl-meta">완료 2주 후 기준</div>
             </div>
+          
+            <div class="cd-tl-act admin-only">
+              <button class="cd-tl-act-btn" data-tl-act="edit" title="수정" aria-label="회차 수정"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+              <button class="cd-tl-act-btn cd-tl-act-btn--del" data-tl-act="delete" title="삭제" aria-label="회차 삭제"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+            </div>
           </div>
           <div class="cd-tl-row cd-tl-row--final">
             <div class="cd-tl-num cd-tl-num--final">🏆</div>
             <div class="cd-tl-info">
               <div class="cd-tl-title">최종 <span class="cd-tl-pct">집계 예정</span></div>
               <div class="cd-tl-meta">완료 4주 후 기준</div>
+            </div>
+          
+            <div class="cd-tl-act admin-only">
+              <button class="cd-tl-act-btn" data-tl-act="edit" title="수정" aria-label="회차 수정"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+              <button class="cd-tl-act-btn cd-tl-act-btn--del" data-tl-act="delete" title="삭제" aria-label="회차 삭제"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
             </div>
           </div>
         </div>
@@ -614,23 +630,176 @@ function renderResultPanel() {
         <span class="ch-sim-notice-icon">🔧</span>
         게시물 등록은 관리자가 설정합니다 · 아래 [+ 등록] 버튼은 표시 시뮬레이션용입니다
       </div>` : ''}
-      <div class="vid-table-wrap">
-        <table class="vid-table" data-vid-mode="premium">
-          <thead>
-            <tr>
-              <th class="vid-cb-th"><input type="checkbox" class="vid-select-all" aria-label="전체선택"></th>
-              <th style="min-width:140px">채널</th>
-              <th style="text-align:center;width:50px">플랫폼</th>
-              <th style="text-align:center;min-width:160px">게시물 (관리자 등록)</th>
-              <th style="text-align:right;width:72px">조회수</th>
-              <th style="text-align:right;width:64px">좋아요</th>
-              <th style="text-align:right;width:52px">댓글</th>
-              <th class="zeal-col" style="text-align:center;width:52px">짤</th>
-            </tr>
-          </thead>
-          <tbody>${tableRows}</tbody>
-        </table>
+      <div class="pm-tabs">
+        <button class="pm-tab active" data-pm-tab="videos">참여 영상</button>
+        <button class="pm-tab" data-pm-tab="metrics">프리미엄 지표</button>
       </div>
+
+      <div class="pm-pane active" id="pmPaneVideos">
+        <div class="vid-table-wrap">
+          <table class="vid-table" data-vid-mode="premium">
+            <thead>
+              <tr>
+                <th class="vid-cb-th"><input type="checkbox" class="vid-select-all" aria-label="전체선택"></th>
+                <th style="min-width:140px">채널</th>
+                <th style="text-align:center;width:50px">플랫폼</th>
+                <th style="text-align:center;min-width:160px">게시물 (관리자 등록)</th>
+                <th style="text-align:right;width:72px">조회수</th>
+                <th style="text-align:right;width:72px">좋아요</th>
+                <th style="text-align:right;width:72px">댓글</th>
+                <th class="pm-cell--num" style="width:56px">공유</th>
+                <th class="pm-cell--num" style="width:68px">평균 시청</th>
+                <th style="width:72px">국가</th>
+                <th style="width:74px">연령대</th>
+                <th class="zeal-col" style="text-align:center;width:52px">짤</th>
+              </tr>
+            </thead>
+            <tbody>${tableRows}</tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="pm-pane" id="pmPaneMetrics">${renderPremiumMetrics(doneItems)}</div>
+    </div>`;
+}
+
+// 참여 영상 ↔ 프리미엄 지표 전환. 결과 패널은 매번 새로 그려지므로 위임으로 처리한다.
+document.addEventListener('click', function(e) {
+  const tab = e.target.closest('[data-pm-tab]');
+  if (!tab) return;
+  const card = tab.closest('.vid-card');
+  if (!card) return;
+  card.querySelectorAll('[data-pm-tab]').forEach(b => b.classList.toggle('active', b === tab));
+  const want = tab.dataset.pmTab === 'metrics' ? 'pmPaneMetrics' : 'pmPaneVideos';
+  card.querySelectorAll('.pm-pane').forEach(p => p.classList.toggle('active', p.id === want));
+});
+
+// ── 프리미엄 지표 ─────────────────────────────────────────────────────
+// 채널별 상세 지표. CH_POST 와 같은 형태로 두어 실제 API 수신값으로 교체하기 쉽게 한다.
+// watch=평균 시청 시간(초), reach=도달, shares=공유수, age=연령대, country=국가코드
+// age/country 가 null 이면 "조회 불가"(크리에이터가 데이터를 제공하지 않은 경우)
+const CH_PREMIUM = {
+  0:  { watch: 34, reach: 128400, shares: 412, age: '25-34', country: 'KR' },
+  1:  { watch: 21, reach:  46200, shares: 133, age: '25-34', country: 'KR' },
+  2:  { watch: 29, reach:  31800, shares:  96, age: '35-44', country: 'KR' },
+  3:  { watch: 18, reach:  14900, shares:  51, age: '25-34', country: 'KR' },
+  4:  { watch: 26, reach:   9800, shares:  38, age: '25-34', country: 'KR' },
+  5:  { watch: 41, reach:  52300, shares: 187, age: '45-54', country: 'KR' },
+  6:  { watch: 33, reach:  74100, shares: 260, age: '25-34', country: 'KR' },
+  7:  { watch: 37, reach:  43600, shares: 155, age: '35-44', country: 'KR' },
+  8:  { watch: 24, reach:  18700, shares:  62, age: '45-54', country: 'KR' },
+  9:  { watch: 45, reach:  96500, shares: 331, age: '25-34', country: 'KR' },
+  10: { watch: 30, reach:  22400, shares:  79, age: null,    country: null },
+  11: { watch: null, reach: 11200, shares:  44, age: null,   country: null },
+};
+
+// 연령대 색 — dataviz 검증(전체 쌍, CVD 포함)을 통과한 조합.
+// 참조 시안의 indigo/purple/blue 조합은 적록색맹에서 ΔE 0.9~6.9 로 구분이 안 돼 교체했다.
+const AGE_ORDER  = ['25-34', '35-44', '45-54', '55+'];
+const AGE_COLOR  = { '25-34': '#FF4500', '35-44': '#2563EB', '45-54': '#16A34A', '55+': '#DB2777' };
+const NO_DATA_COLOR = '#94A3B8';
+const COUNTRY_NAME = { KR: '대한민국', US: '미국', JP: '일본' };
+const COUNTRY_FLAG = { KR: '🇰🇷', US: '🇺🇸', JP: '🇯🇵' };
+
+function fmtNum(n) { return n.toLocaleString('ko-KR'); }
+
+// 프리미엄 캠페인 전용 열. 프리미엄 지표 탭이 바로 이 값들을 집계한다.
+// 조회수당(p-detail)·업로드당(p-detail-upload) 표에는 넣지 않는다.
+function premiumCells(i) {
+  const d = CH_PREMIUM[i];
+  const none = '<span class="pm-cell-none">–</span>';
+  if (!d) return `<td class="pm-cell">${none}</td><td class="pm-cell">${none}</td><td class="pm-cell">${none}</td><td class="pm-cell">${none}</td>`;
+  const age = d.age
+    ? `<span class="pm-chip" style="--c:${AGE_COLOR[d.age] || NO_DATA_COLOR}">${d.age}</span>` : none;
+  const cty = d.country
+    ? `<span class="pm-chip pm-chip--plain">${COUNTRY_FLAG[d.country] || '🌐'} ${d.country}</span>` : none;
+  return `
+      <td class="pm-cell pm-cell--num">${d.shares != null ? fmtNum(d.shares) : none}</td>
+      <td class="pm-cell pm-cell--num">${d.watch != null ? d.watch + '초' : none}</td>
+      <td class="pm-cell">${cty}</td>
+      <td class="pm-cell">${age}</td>`;
+}
+
+function renderPremiumMetrics(doneItems) {
+  const total = doneItems.length;
+  if (!total) {
+    return `<div class="pm-empty">승인 완료된 영상이 없어 지표를 집계할 수 없습니다.</div>`;
+  }
+
+  const rows = doneItems.map(({ i }) => CH_PREMIUM[i]).filter(Boolean);
+  const provided = rows.length;
+  const watchRows = rows.filter(r => r.watch != null);
+  const avgWatch = watchRows.length
+    ? Math.round(watchRows.reduce((s, r) => s + r.watch, 0) / watchRows.length) : 0;
+  const totalReach  = rows.reduce((s, r) => s + (r.reach || 0), 0);
+  const totalShares = rows.reduce((s, r) => s + (r.shares || 0), 0);
+
+  // 연령대 집계 — 고정 순서 유지, 값이 있는 구간만 표시하고 미제공은 맨 뒤 중립색
+  const ageCount = {};
+  rows.forEach(r => { const k = r.age || '조회 불가'; ageCount[k] = (ageCount[k] || 0) + 1; });
+  const ageKeys = AGE_ORDER.filter(k => ageCount[k]).concat(ageCount['조회 불가'] ? ['조회 불가'] : []);
+  const ageMax = Math.max(...ageKeys.map(k => ageCount[k]));
+  const agePct = k => Math.round(ageCount[k] / provided * 100);
+  const ageColor = k => (k === '조회 불가' ? NO_DATA_COLOR : AGE_COLOR[k]);
+
+  const ageBars = ageKeys.map(k => `
+    <div class="pm-bar-col">
+      <span class="pm-bar-val">${agePct(k)}%</span>
+      <div class="pm-bar" style="height:${Math.round(ageCount[k] / ageMax * 82)}px;background:${ageColor(k)}"></div>
+    </div>`).join('');
+  const ageLabels = ageKeys.map(k => `<div class="pm-bar-lbl" title="${k}">${k}</div>`).join('');
+  const ageLegend = ageKeys.map(k =>
+    `<span class="pm-legend-item"><i style="background:${ageColor(k)}"></i>${k} · ${ageCount[k]}개</span>`).join('');
+
+  // 국가 집계 — 최다 국가를 대표로 보여준다
+  const ctyCount = {};
+  rows.forEach(r => { const k = r.country || '조회 불가'; ctyCount[k] = (ctyCount[k] || 0) + 1; });
+  const ctyKeys = Object.keys(ctyCount).sort((a, b) => ctyCount[b] - ctyCount[a]);
+  const topCty = ctyKeys[0];
+  const topPct = Math.round(ctyCount[topCty] / provided * 100);
+  const ctyRows = ctyKeys.map(k => {
+    const pct = Math.round(ctyCount[k] / provided * 100);
+    const isNo = k === '조회 불가';
+    return `
+      <div class="pm-cty-row">
+        <span class="pm-cty-flag">${isNo ? '🌐' : (COUNTRY_FLAG[k] || '🌐')}</span>
+        <div class="pm-cty-body">
+          <div class="pm-cty-top">
+            <span class="pm-cty-name">${isNo ? '조회 불가' : (COUNTRY_NAME[k] || k)}</span>
+            <span class="pm-cty-pct" style="color:${isNo ? NO_DATA_COLOR : 'var(--orange)'}">${pct}%</span>
+          </div>
+          <div class="pm-cty-track">
+            <div class="pm-cty-fill" style="width:${pct}%;background:${isNo ? NO_DATA_COLOR : 'var(--orange)'}"></div>
+          </div>
+        </div>
+        <span class="pm-cty-cnt">${ctyCount[k]}개</span>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="pm-stat-grid">
+      <div class="pm-stat pm-stat--a"><p class="pm-stat-lbl">데이터 제공 영상</p><p class="pm-stat-num">${provided}개</p><p class="pm-stat-sub">전체 ${total}개 중</p></div>
+      <div class="pm-stat pm-stat--b"><p class="pm-stat-lbl">평균 시청 시간</p><p class="pm-stat-num">${avgWatch}초</p><p class="pm-stat-sub">${watchRows.length}개 영상 기준</p></div>
+      <div class="pm-stat pm-stat--c"><p class="pm-stat-lbl">총 도달</p><p class="pm-stat-num">${fmtNum(totalReach)}</p></div>
+      <div class="pm-stat pm-stat--d"><p class="pm-stat-lbl">총 공유수</p><p class="pm-stat-num">${fmtNum(totalShares)}</p></div>
+    </div>
+
+    <div class="pm-section">
+      <p class="pm-section-title">주요 연령대 분포</p>
+      <div class="pm-bar-row">${ageBars}</div>
+      <div class="pm-bar-lbl-row">${ageLabels}</div>
+      <div class="pm-legend">${ageLegend}</div>
+    </div>
+
+    <div class="pm-section">
+      <p class="pm-section-title">주요 국가 분포</p>
+      <div class="pm-cty-hero">
+        <div class="pm-cty-hero-flag">${topCty === '조회 불가' ? '🌐' : (COUNTRY_FLAG[topCty] || '🌐')}</div>
+        <p class="pm-cty-hero-pct">${topPct}%</p>
+        <p class="pm-cty-hero-name">${topCty === '조회 불가' ? '조회 불가' : (COUNTRY_NAME[topCty] || topCty)}</p>
+        <p class="pm-cty-hero-sub">${ctyCount[topCty]}개 영상${topCty === 'KR' ? ' · 국내 집중 캠페인' : ''}</p>
+      </div>
+      ${ctyRows}
     </div>`;
 }
 

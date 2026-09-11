@@ -651,6 +651,7 @@ function renderResultPanel() {
                 <th class="pm-cell--num" style="width:68px">평균 시청</th>
                 <th style="width:72px">국가</th>
                 <th style="width:74px">연령대</th>
+                <th style="width:64px">성별</th>
                 <th class="zeal-col" style="text-align:center;width:52px">짤</th>
               </tr>
             </thead>
@@ -679,19 +680,22 @@ document.addEventListener('click', function(e) {
 // watch=평균 시청 시간(초), reach=도달, shares=공유수, age=연령대, country=국가코드
 // age/country 가 null 이면 "조회 불가"(크리에이터가 데이터를 제공하지 않은 경우)
 const CH_PREMIUM = {
-  0:  { watch: 34, reach: 128400, shares: 412, age: '25-34', country: 'KR' },
-  1:  { watch: 21, reach:  46200, shares: 133, age: '25-34', country: 'KR' },
-  2:  { watch: 29, reach:  31800, shares:  96, age: '35-44', country: 'KR' },
-  3:  { watch: 18, reach:  14900, shares:  51, age: '25-34', country: 'KR' },
-  4:  { watch: 26, reach:   9800, shares:  38, age: '25-34', country: 'KR' },
-  5:  { watch: 41, reach:  52300, shares: 187, age: '45-54', country: 'KR' },
-  6:  { watch: 33, reach:  74100, shares: 260, age: '25-34', country: 'KR' },
-  7:  { watch: 37, reach:  43600, shares: 155, age: '35-44', country: 'KR' },
-  8:  { watch: 24, reach:  18700, shares:  62, age: '45-54', country: 'KR' },
-  9:  { watch: 45, reach:  96500, shares: 331, age: '25-34', country: 'KR' },
-  10: { watch: 30, reach:  22400, shares:  79, age: null,    country: null },
-  11: { watch: null, reach: 11200, shares:  44, age: null,   country: null },
+  0:  { watch: 34, reach: 128400, shares: 412, age: '25-34', country: 'KR', gender: 'F' },
+  1:  { watch: 21, reach:  46200, shares: 133, age: '25-34', country: 'KR', gender: 'M' },
+  2:  { watch: 29, reach:  31800, shares:  96, age: '35-44', country: 'KR', gender: 'F' },
+  3:  { watch: 18, reach:  14900, shares:  51, age: '25-34', country: 'KR', gender: 'F' },
+  4:  { watch: 26, reach:   9800, shares:  38, age: '25-34', country: 'KR', gender: 'M' },
+  5:  { watch: 41, reach:  52300, shares: 187, age: '45-54', country: 'KR', gender: 'M' },
+  6:  { watch: 33, reach:  74100, shares: 260, age: '25-34', country: 'KR', gender: 'F' },
+  7:  { watch: 37, reach:  43600, shares: 155, age: '35-44', country: 'KR', gender: 'M' },
+  8:  { watch: 24, reach:  18700, shares:  62, age: '45-54', country: 'KR', gender: 'F' },
+  9:  { watch: 45, reach:  96500, shares: 331, age: '25-34', country: 'KR', gender: 'F' },
+  10: { watch: 30, reach:  22400, shares:  79, age: null,    country: null, gender: null },
+  11: { watch: null, reach: 11200, shares:  44, age: null,   country: null, gender: null },
 };
+
+const GENDER_LABEL = { F: '여성', M: '남성' };
+const GENDER_COLOR = { F: '#DB2777', M: '#2563EB' };
 
 // 연령대 색 — dataviz 검증(전체 쌍, CVD 포함)을 통과한 조합.
 // 참조 시안의 indigo/purple/blue 조합은 적록색맹에서 ΔE 0.9~6.9 로 구분이 안 돼 교체했다.
@@ -708,16 +712,19 @@ function fmtNum(n) { return n.toLocaleString('ko-KR'); }
 function premiumCells(i) {
   const d = CH_PREMIUM[i];
   const none = '<span class="pm-cell-none">–</span>';
-  if (!d) return `<td class="pm-cell">${none}</td><td class="pm-cell">${none}</td><td class="pm-cell">${none}</td><td class="pm-cell">${none}</td>`;
+  if (!d) return `<td class="pm-cell">${none}</td>`.repeat(5);
   const age = d.age
     ? `<span class="pm-chip" style="--c:${AGE_COLOR[d.age] || NO_DATA_COLOR}">${d.age}</span>` : none;
   const cty = d.country
     ? `<span class="pm-chip pm-chip--plain">${COUNTRY_FLAG[d.country] || '🌐'} ${d.country}</span>` : none;
+  const gen = d.gender
+    ? `<span class="pm-chip" style="--c:${GENDER_COLOR[d.gender] || NO_DATA_COLOR}">${GENDER_LABEL[d.gender] || d.gender}</span>` : none;
   return `
       <td class="pm-cell pm-cell--num">${d.shares != null ? fmtNum(d.shares) : none}</td>
       <td class="pm-cell pm-cell--num">${d.watch != null ? d.watch + '초' : none}</td>
       <td class="pm-cell">${cty}</td>
-      <td class="pm-cell">${age}</td>`;
+      <td class="pm-cell">${age}</td>
+      <td class="pm-cell">${gen}</td>`;
 }
 
 function renderPremiumMetrics(doneItems) {
@@ -750,6 +757,22 @@ function renderPremiumMetrics(doneItems) {
   const ageLabels = ageKeys.map(k => `<div class="pm-bar-lbl" title="${k}">${k}</div>`).join('');
   const ageLegend = ageKeys.map(k =>
     `<span class="pm-legend-item"><i style="background:${ageColor(k)}"></i>${k} · ${ageCount[k]}개</span>`).join('');
+
+  // 성별 집계 — 연령대와 같은 막대 형태. 미제공은 중립색으로 맨 뒤.
+  const genCount = {};
+  rows.forEach(r => { const k = r.gender || '조회 불가'; genCount[k] = (genCount[k] || 0) + 1; });
+  const genKeys = ['F', 'M'].filter(k => genCount[k]).concat(genCount['조회 불가'] ? ['조회 불가'] : []);
+  const genMax = Math.max(...genKeys.map(k => genCount[k]));
+  const genName = k => GENDER_LABEL[k] || k;
+  const genColor = k => (k === '조회 불가' ? NO_DATA_COLOR : GENDER_COLOR[k]);
+  const genBars = genKeys.map(k => `
+    <div class="pm-bar-col">
+      <span class="pm-bar-val">${Math.round(genCount[k] / provided * 100)}%</span>
+      <div class="pm-bar" style="height:${Math.round(genCount[k] / genMax * 82)}px;background:${genColor(k)}"></div>
+    </div>`).join('');
+  const genLabels = genKeys.map(k => `<div class="pm-bar-lbl" title="${genName(k)}">${genName(k)}</div>`).join('');
+  const genLegend = genKeys.map(k =>
+    `<span class="pm-legend-item"><i style="background:${genColor(k)}"></i>${genName(k)} · ${genCount[k]}개</span>`).join('');
 
   // 국가 집계 — 최다 국가를 대표로 보여준다
   const ctyCount = {};
@@ -789,6 +812,13 @@ function renderPremiumMetrics(doneItems) {
       <div class="pm-bar-row">${ageBars}</div>
       <div class="pm-bar-lbl-row">${ageLabels}</div>
       <div class="pm-legend">${ageLegend}</div>
+    </div>
+
+    <div class="pm-section">
+      <p class="pm-section-title">주요 성별 분포</p>
+      <div class="pm-bar-row">${genBars}</div>
+      <div class="pm-bar-lbl-row">${genLabels}</div>
+      <div class="pm-legend">${genLegend}</div>
     </div>
 
     <div class="pm-section">

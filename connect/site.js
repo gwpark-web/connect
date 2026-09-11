@@ -1226,6 +1226,34 @@ function mcParseDate(md) {
   return m ? '2026-' + m[1] + '-' + m[2] : '';
 }
 
+// 팝업 표는 열 구성이 달라(팝업명/순서/…) 캠페인 모달을 채울 수 없다. 전용 모달로 보낸다.
+function openPopupModalFromRow(tr) {
+  if (!tr) return;
+  const cell = i => (tr.children[i]?.textContent || '').trim();
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+  set('mp-name', cell(0));
+  set('mp-order', cell(1));
+  set('mp-visible', cell(4) || '숨김');
+
+  const t = document.getElementById('mp-title');
+  const s = document.getElementById('mp-submit');
+  if (t) t.textContent = '짤 팝업 수정';
+  if (s) s.textContent = '수정';
+
+  hideRowMenu();
+  document.getElementById('modal-studio-popup')?.classList.add('open');
+}
+
+function resetPopupModal() {
+  ['mp-name', 'mp-order'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  const v = document.getElementById('mp-visible');
+  if (v) v.selectedIndex = 0;
+  const t = document.getElementById('mp-title');
+  const s = document.getElementById('mp-submit');
+  if (t) t.textContent = '짤 팝업 생성';
+  if (s) s.textContent = '생성';
+}
+
 function openCampaignModalFromRow(tr) {
   if (!tr) return;
   const cell = i => (tr.children[i]?.textContent || '').trim();
@@ -1364,10 +1392,12 @@ document.addEventListener('click', function(e) {
     restageRow(restageBtn);
     return;
   }
-  // 캠페인 행 — 수정 → 해당 행 값으로 채운 모달
+  // 행 수정 → 그 표에 맞는 모달을 채워서 연다
   const rowBtn = e.target.closest('[data-adm-edit-row]');
   if (rowBtn) {
-    openCampaignModalFromRow(rowBtn.closest('tr'));
+    const tr = rowBtn.closest('tr');
+    if (tr?.closest('#adm-sub-studio-popup')) openPopupModalFromRow(tr);
+    else openCampaignModalFromRow(tr);
     return;
   }
   // 캠페인 행 — 더보기 메뉴
@@ -1396,6 +1426,7 @@ document.addEventListener('click', function(e) {
   if (modalTrigger) {
     const overlay = document.getElementById(modalTrigger.dataset.admModal);
     if (modalTrigger.dataset.admModal === 'modal-studio-campaign') resetCampaignModal();
+    if (modalTrigger.dataset.admModal === 'modal-studio-popup') resetPopupModal();
     if (overlay) overlay.classList.add('open');
     return;
   }

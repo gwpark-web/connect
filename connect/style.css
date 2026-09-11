@@ -2019,7 +2019,7 @@ body.p0-active .auth-page.fullpage { background: linear-gradient(135deg, rgba(26
   border-radius: 50%; font-size: 11px; font-weight: 700; display: grid; place-items: center; flex-shrink: 0;
 }
 .inq-section-title { font-size: 14px; font-weight: 700; color: var(--black); }
-.inq-section-sub { font-size: 11px; color: var(--gray-light); margin-left: auto; }
+.inq-section-sub { font-size: 12px; color: var(--gray-light); margin-left: auto; }
 .inq-divider { height: 1px; background: var(--border); margin-bottom: 32px; }
 
 /* Checkbox grid */
@@ -2283,9 +2283,11 @@ body.p0-active .auth-page.fullpage { background: linear-gradient(135deg, rgba(26
 .ncr-body { padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
 
 .ncr-field { display: flex; flex-direction: column; gap: 8px; }
-.ncr-label { font-size: 13px; font-weight: 700; color: var(--black); }
+/* 라벨을 flex 행으로 둬야 보조 문구를 우측 끝으로 보낼 수 있다
+   (문의 페이지 .inq-section-head 와 같은 배치) */
+.ncr-label { font-size: 13px; font-weight: 700; color: var(--black); display: flex; align-items: center; }
 .ncr-req { color: var(--orange); font-weight: 700; margin-left: 4px; }
-.ncr-opt { color: var(--gray-light); font-weight: 400; font-size: 12px; margin-left: 4px; }
+.ncr-opt { color: var(--gray-light); font-weight: 400; font-size: 12px; margin-left: auto; }
 .ncr-input {
   border: 1px solid var(--border); border-radius: 9px;
   padding: 10px 14px; font-size: 14px; font-family: 'Noto Sans KR', sans-serif;

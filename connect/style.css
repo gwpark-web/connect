@@ -3709,6 +3709,13 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
   padding: 9px 12px; border-bottom: 1px solid var(--border);
   color: var(--gray-dark); vertical-align: middle;
 }
+/* 캠페인 표: 브랜드명이 길면(예: "월트디즈니 컴퍼니 코리아") nowrap 때문에
+   열이 벌어져 표 전체가 가로 스크롤된다. 이 열만 줄이고 말줄임 처리한다. */
+#adm-sub-studio-campaign .adm-table th:nth-child(2),
+#adm-sub-studio-campaign .adm-table td:nth-child(2) {
+  max-width: 108px; overflow: hidden; text-overflow: ellipsis;
+}
+
 .adm-table tr:last-child td { border-bottom: none; }
 .adm-table tr:hover td { background: #fafafa; }
 
@@ -3868,6 +3875,75 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
   color: var(--gray-light); cursor: pointer; line-height: 1;
 }
 .adm-modal-x:hover { color: var(--black); }
+/* ── 캠페인 행 관리 버튼 ── */
+.adm-act-cell { white-space: nowrap; }
+.adm-act-btn {
+  font-family: inherit; font-size: 11px; font-weight: 700; color: var(--gray-dark);
+  background: var(--white); border: 1px solid var(--border); border-radius: 100px;
+  padding: 5px 11px; cursor: pointer; transition: border-color .15s, color .15s;
+}
+.adm-act-btn:hover { border-color: var(--orange); color: var(--orange); }
+.adm-act-btn:disabled { color: var(--gray-light); border-color: var(--border); cursor: wait; }
+.adm-act-icon {
+  width: 24px; height: 24px; margin-left: 4px; vertical-align: middle;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--white); border: 1px solid var(--border); border-radius: 7px;
+  color: var(--gray-mid); cursor: pointer; transition: border-color .15s, color .15s;
+}
+.adm-act-icon:hover { border-color: var(--orange); color: var(--orange); }
+
+/* 행 더보기 메뉴 — 고정 배치라 테이블 overflow 에 잘리지 않는다 */
+.adm-rowmenu {
+  position: fixed; z-index: 900; min-width: 148px; padding: 5px;
+  background: var(--white); border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.14);
+}
+.adm-rowmenu[hidden] { display: none; }
+.adm-rowmenu button {
+  width: 100%; text-align: left; font-family: inherit; font-size: 12.5px; font-weight: 600;
+  padding: 8px 10px; border: none; border-radius: 7px; background: none;
+  color: var(--gray-dark); cursor: pointer;
+}
+.adm-rowmenu button:hover { background: var(--gray-bg); }
+.adm-rowmenu button.danger { color: var(--orange); }
+.adm-rowmenu button.danger:hover { background: var(--orange-pale); }
+.adm-rowmenu button:disabled { color: var(--gray-light); cursor: not-allowed; background: none; }
+
+/* ── 접이식 모달 (캠페인 생성) ── */
+.adm-modal--tall { max-width: 660px; max-height: 90vh; display: flex; flex-direction: column; padding: 0; }
+.adm-modal--tall .adm-modal-h3 {
+  position: sticky; top: 0; z-index: 2; background: var(--white);
+  padding: 22px 26px 16px; margin: 0; border-bottom: 1px solid var(--border);
+  border-radius: 16px 16px 0 0;
+}
+.adm-modal-body { overflow-y: auto; padding: 16px 26px; display: flex; flex-direction: column; gap: 8px; }
+.adm-modal--tall .adm-modal-actions { padding: 14px 26px 20px; margin: 0; border-top: 1px solid var(--border); }
+
+/* flex-shrink:0 — 없으면 스크롤 대신 각 섹션이 눌려 헤더가 겹친다 */
+.adm-acc { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+.adm-modal-divider, .adm-modal-body > * { flex-shrink: 0; }
+.adm-acc-head {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; background: var(--gray-bg); border: none; cursor: pointer;
+  font-family: inherit; font-size: 13px; font-weight: 700; color: var(--gray-dark);
+  transition: background .15s;
+}
+.adm-acc-head:hover { background: var(--border); }
+.adm-acc-head::after {
+  content: ''; width: 7px; height: 7px; flex-shrink: 0;
+  border-right: 2px solid var(--gray-light); border-bottom: 2px solid var(--gray-light);
+  transform: rotate(45deg) translate(-2px, -2px); transition: transform .2s;
+}
+.adm-acc.open .adm-acc-head { background: var(--orange-pale); color: var(--orange); }
+.adm-acc.open .adm-acc-head::after { transform: rotate(-135deg) translate(-3px, -3px); border-color: var(--orange); }
+.adm-acc-body { display: none; padding: 14px; }
+.adm-acc.open .adm-acc-body { display: block; }
+.adm-acc-note { font-size: 11px; color: var(--gray-light); margin: -4px 0 10px; }
+.adm-modal-divider {
+  border-top: 1px solid var(--border); margin: 6px 0 2px; padding-top: 12px;
+  font-size: 11px; font-weight: 700; color: var(--orange);
+}
+
 .adm-field { display: flex; flex-direction: column; gap: 5px; flex: 1; margin-bottom: 12px; }
 .adm-field label { font-size: 11px; font-weight: 700; color: var(--gray-mid); }
 .adm-field input, .adm-field select {
@@ -3876,6 +3952,12 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
   width: 100%;
 }
 .adm-field input:focus, .adm-field select:focus { outline: none; border-color: var(--orange); }
+.adm-textarea {
+  font-family: inherit; font-size: 13px; padding: 8px 12px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--white); color: var(--black);
+  width: 100%; resize: vertical;
+}
+.adm-textarea:focus { outline: none; border-color: var(--orange); }
 .adm-field-row { display: flex; gap: 10px; }
 .adm-field-row .adm-field { margin-bottom: 12px; }
 .adm-modal-actions {
@@ -4182,8 +4264,13 @@ body[data-viewer-role="admin"] span.admin-only { display: inline !important; }
 .sc-link:hover { opacity: 1; }
 
 /* 갱신 버튼 */
+/* 동기화 버튼 아이콘 회전 — 영업 캘린더 갱신 버튼도 이 키프레임을 쓴다 */
+@keyframes spin { to { transform: rotate(360deg); } }
+
 .sc-sync-btn { background: var(--white); color: var(--orange); border: 1.5px solid var(--orange); font-size: 12px; }
 .sc-sync-btn:hover { background: var(--orange-pale); }
+.sc-sync-btn:disabled { color: var(--gray-light); border-color: var(--border); background: var(--white); cursor: wait; }
+.adm-refresh-time { font-size: 11.5px; color: var(--gray-light); font-weight: 500; align-self: center; }
 
 /* 자동완성 드롭다운 */
 .sc-ac-drop {

@@ -607,7 +607,7 @@
   <div class="campaign-list">
 
     <!-- 완료 -->
-    <div class="campaign-card" data-fn="goTo" data-args="p-detail" data-campaign-type="view" data-campaign-status="done">
+    <div class="campaign-card" data-fn="goTo" data-args="p-detail" data-campaign-type="view" data-campaign-status="done" data-edit-start="2026-05-26" data-edit-end="2026-06-08">
       <div class="card-thumb">
         <img src="img/toy_story5.jpg" alt="토이 스토리 5" loading="lazy" width="1978" height="2835">
       </div>
@@ -634,7 +634,7 @@
     </div>
 
     <!-- 채널 선정 -->
-    <div class="campaign-card action-needed" data-fn="goTo" data-args="p-channels" data-campaign-type="connect" data-campaign-status="channel-select">
+    <div class="campaign-card action-needed" data-fn="goTo" data-args="p-channels" data-campaign-type="connect" data-campaign-status="channel-select" data-edit-start="2026-05-01" data-edit-end="2026-06-30">
       <div class="card-thumb" style="background:linear-gradient(160deg,#1a0828,#3d1060)">
       </div>
       <div class="card-thumb-info">
@@ -665,7 +665,7 @@
     </div>
 
     <!-- 진행 중 -->
-    <div class="campaign-card" data-fn="goTo" data-args="p-detail-upload" data-campaign-type="upload" data-campaign-status="progress">
+    <div class="campaign-card" data-fn="goTo" data-args="p-detail-upload" data-campaign-type="upload" data-campaign-status="progress" data-edit-start="2026-06-15" data-edit-end="2026-07-15">
       <div class="card-thumb" style="background:linear-gradient(160deg,#0a1628,#1a3060)">
       </div>
       <div class="card-thumb-info">
@@ -1943,7 +1943,7 @@
       </div>
 
       <div class="ncr-field">
-        <label class="ncr-label">집행 플랫폼 <span class="ncr-req">필수</span></label>
+        <label class="ncr-label">집행 플랫폼 <span class="ncr-req">필수</span> <span class="ncr-opt">중복 선택 가능</span></label>
         <div class="ncr-plat-row" id="ncr-platforms">
           <button class="ncr-plat-btn" data-fn="toggleCampaignPlatform" data-args="youtube" data-stop="1">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
@@ -2015,7 +2015,14 @@
       <button class="status-chip" data-adm-tab="account">계정 관리 <span class="chip-count">4</span></button>
       <button class="status-chip" data-adm-tab="sales">영업 캘린더 <span class="chip-count" id="sc-tab-count">0</span></button>
     </div>
-    <button class="btn-new-campaign" data-fn="openCampaignRegModal" style="margin-left:auto">보고서 등록하기</button>
+    <!-- 상단 행은 4개 탭이 공유한다. 탭별로 해당하는 버튼만 노출 (site.js 탭 핸들러에서 토글) -->
+    <button class="btn-new-campaign" id="adm-report-btn" data-fn="openCampaignRegModal" style="margin-left:auto">보고서 등록하기</button>
+    <span class="adm-refresh-time" id="adm-refresh-time" style="margin-left:auto" hidden></span>
+    <button class="btn-new-campaign sc-sync-btn" id="adm-refresh-btn" hidden>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      새로고침
+    </button>
+    <button class="btn-new-campaign" id="adm-create-btn" data-adm-modal="modal-studio-campaign" hidden>+ 캠페인 생성</button>
   </div>
 
   <!-- ── 패널 1: 캠페인 보고서 ── -->
@@ -2129,9 +2136,6 @@
         <button class="status-chip active" data-adm-sub="studio-campaign">캠페인 <span class="chip-count">17</span></button>
         <button class="status-chip" data-adm-sub="studio-popup">팝업 <span class="chip-count">6</span></button>
       </div>
-      <div class="list-filter-right">
-        <button class="btn-new-campaign" data-adm-modal="modal-studio-campaign">+ 캠페인 생성</button>
-      </div>
     </div>
 
     <div class="adm-subpanel active" id="adm-sub-studio-campaign">
@@ -2148,25 +2152,26 @@
               <th><button class="adm-th-sort" data-adm-col="6">기간</button></th>
               <th>스테이징</th>
               <th>본서버</th>
+              <th style="width:210px">관리</th>
             </tr></thead>
             <tbody>
-              <tr><td>영화 〈도그 스타: 마지막 희망〉</td><td>월트디즈니</td><td><span class="platform-badge ig"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>인스타</span></td><td>CPV</td><td>5원</td><td>500,000</td><td>08.24~09.24</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td></tr>
-              <tr><td>영화 〈도그 스타: 마지막 희망〉</td><td>월트디즈니</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>500,000</td><td>08.18~09.17</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td></tr>
-              <tr><td>넷플릭스 〈동궁〉</td><td>넷플릭스</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>550,000</td><td>07.17~08.17</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td></tr>
-              <tr><td>디즈니+ 〈더 베어〉 시즌5</td><td>디즈니+</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>500,000</td><td>06.22~07.21</td><td><span class="adm-badge adm-no">미반영</span></td><td><span class="adm-badge adm-no">미반영</span></td></tr>
-              <tr><td>디즈니+ 〈더 베어〉 시즌5</td><td>디즈니+</td><td><span class="platform-badge ig"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>인스타</span></td><td>CPV</td><td>5원</td><td>300,000</td><td>06.18~07.30</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-no">미반영</span></td></tr>
-              <tr><td>영화 〈모아나〉</td><td>월트디즈니</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>500,000</td><td>06.12~07.11</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-no">미반영</span></td></tr>
-              <tr><td>디즈니+ 〈더 베어〉 시즌5</td><td>디즈니+</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>500,000</td><td>06.11~07.10</td><td><span class="adm-badge adm-no">미반영</span></td><td><span class="adm-badge adm-no">미반영</span></td></tr>
-              <tr><td>영화 〈토이 스토리 5〉</td><td>월트디즈니</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>500,000</td><td>05.26~06.25</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-no">미반영</span></td></tr>
-              <tr><td>넷플릭스 〈원더풀스〉</td><td>넷플릭스</td><td><span class="platform-badge tt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>틱톡</span></td><td>CPV</td><td>5원</td><td>300,000</td><td>05.15~06.14</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td></tr>
-              <tr><td>넷플릭스 〈원더풀스〉</td><td>넷플릭스</td><td><span class="platform-badge ig"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>인스타</span></td><td>CPV</td><td>5원</td><td>450,000</td><td>05.15~06.14</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td></tr>
-              <tr><td>넷플릭스 〈원더풀스〉</td><td>넷플릭스</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>750,000</td><td>05.15~06.14</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-no">미반영</span></td></tr>
-              <tr><td>넷플릭스 〈원더풀스〉_순간이동</td><td>넷플릭스</td><td><span class="platform-badge ig"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>인스타</span></td><td>업로드당</td><td>10,000원</td><td>55</td><td>04.30~05.29</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td></tr>
-              <tr><td>넷플릭스 〈원더풀스〉_염력</td><td>넷플릭스</td><td><span class="platform-badge ig"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>인스타</span></td><td>업로드당</td><td>10,000원</td><td>55</td><td>04.30~05.29</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td></tr>
-              <tr><td>넷플릭스 〈원더풀스〉_염력</td><td>넷플릭스</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>업로드당</td><td>10,000원</td><td>55</td><td>04.30~05.30</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td></tr>
-              <tr><td>넷플릭스 〈원더풀스〉_순간이동</td><td>넷플릭스</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>업로드당</td><td>10,000원</td><td>55</td><td>04.30~05.30</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td></tr>
-              <tr><td>영화 〈만달로리안과 그로구〉</td><td>월트디즈니</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>500,000</td><td>04.23~05.23</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td></tr>
-              <tr><td>만달로리안과 그로구</td><td>월트디즈니 컴퍼니 코리아</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>500,000</td><td>04.22~05.07</td><td><span class="adm-badge adm-no">미반영</span></td><td><span class="adm-badge adm-ok">연동완료</span></td></tr>
+              <tr><td>영화 〈도그 스타: 마지막 희망〉</td><td title="월트디즈니">월트디즈니</td><td><span class="platform-badge ig"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>인스타</span></td><td>CPV</td><td>5원</td><td>500,000</td><td>08.24~09.24</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td><td class="adm-act-cell"><button class="adm-act-btn" data-adm-restage>스테이징 재연동</button><button class="adm-act-icon" data-adm-edit-row title="수정" aria-label="수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon" data-adm-rowmenu title="더보기" aria-label="더보기"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></td></tr>
+              <tr><td>영화 〈도그 스타: 마지막 희망〉</td><td title="월트디즈니">월트디즈니</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>500,000</td><td>08.18~09.17</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td><td class="adm-act-cell"><button class="adm-act-btn" data-adm-restage>스테이징 재연동</button><button class="adm-act-icon" data-adm-edit-row title="수정" aria-label="수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon" data-adm-rowmenu title="더보기" aria-label="더보기"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></td></tr>
+              <tr><td>넷플릭스 〈동궁〉</td><td title="넷플릭스">넷플릭스</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>550,000</td><td>07.17~08.17</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td><td class="adm-act-cell"><button class="adm-act-btn" data-adm-restage>스테이징 재연동</button><button class="adm-act-icon" data-adm-edit-row title="수정" aria-label="수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon" data-adm-rowmenu title="더보기" aria-label="더보기"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></td></tr>
+              <tr><td>디즈니+ 〈더 베어〉 시즌5</td><td title="디즈니+">디즈니+</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>500,000</td><td>06.22~07.21</td><td><span class="adm-badge adm-no">미반영</span></td><td><span class="adm-badge adm-no">미반영</span></td><td class="adm-act-cell"><button class="adm-act-btn" data-adm-restage>스테이징 재연동</button><button class="adm-act-icon" data-adm-edit-row title="수정" aria-label="수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon" data-adm-rowmenu title="더보기" aria-label="더보기"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></td></tr>
+              <tr><td>디즈니+ 〈더 베어〉 시즌5</td><td title="디즈니+">디즈니+</td><td><span class="platform-badge ig"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>인스타</span></td><td>CPV</td><td>5원</td><td>300,000</td><td>06.18~07.30</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-no">미반영</span></td><td class="adm-act-cell"><button class="adm-act-btn" data-adm-restage>스테이징 재연동</button><button class="adm-act-icon" data-adm-edit-row title="수정" aria-label="수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon" data-adm-rowmenu title="더보기" aria-label="더보기"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></td></tr>
+              <tr><td>영화 〈모아나〉</td><td title="월트디즈니">월트디즈니</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>500,000</td><td>06.12~07.11</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-no">미반영</span></td><td class="adm-act-cell"><button class="adm-act-btn" data-adm-restage>스테이징 재연동</button><button class="adm-act-icon" data-adm-edit-row title="수정" aria-label="수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon" data-adm-rowmenu title="더보기" aria-label="더보기"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></td></tr>
+              <tr><td>디즈니+ 〈더 베어〉 시즌5</td><td title="디즈니+">디즈니+</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>500,000</td><td>06.11~07.10</td><td><span class="adm-badge adm-no">미반영</span></td><td><span class="adm-badge adm-no">미반영</span></td><td class="adm-act-cell"><button class="adm-act-btn" data-adm-restage>스테이징 재연동</button><button class="adm-act-icon" data-adm-edit-row title="수정" aria-label="수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon" data-adm-rowmenu title="더보기" aria-label="더보기"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></td></tr>
+              <tr><td>영화 〈토이 스토리 5〉</td><td title="월트디즈니">월트디즈니</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>500,000</td><td>05.26~06.25</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-no">미반영</span></td><td class="adm-act-cell"><button class="adm-act-btn" data-adm-restage>스테이징 재연동</button><button class="adm-act-icon" data-adm-edit-row title="수정" aria-label="수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon" data-adm-rowmenu title="더보기" aria-label="더보기"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></td></tr>
+              <tr><td>넷플릭스 〈원더풀스〉</td><td title="넷플릭스">넷플릭스</td><td><span class="platform-badge tt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>틱톡</span></td><td>CPV</td><td>5원</td><td>300,000</td><td>05.15~06.14</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td><td class="adm-act-cell"><button class="adm-act-btn" data-adm-restage>스테이징 재연동</button><button class="adm-act-icon" data-adm-edit-row title="수정" aria-label="수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon" data-adm-rowmenu title="더보기" aria-label="더보기"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></td></tr>
+              <tr><td>넷플릭스 〈원더풀스〉</td><td title="넷플릭스">넷플릭스</td><td><span class="platform-badge ig"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>인스타</span></td><td>CPV</td><td>5원</td><td>450,000</td><td>05.15~06.14</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td><td class="adm-act-cell"><button class="adm-act-btn" data-adm-restage>스테이징 재연동</button><button class="adm-act-icon" data-adm-edit-row title="수정" aria-label="수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon" data-adm-rowmenu title="더보기" aria-label="더보기"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></td></tr>
+              <tr><td>넷플릭스 〈원더풀스〉</td><td title="넷플릭스">넷플릭스</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>750,000</td><td>05.15~06.14</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-no">미반영</span></td><td class="adm-act-cell"><button class="adm-act-btn" data-adm-restage>스테이징 재연동</button><button class="adm-act-icon" data-adm-edit-row title="수정" aria-label="수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon" data-adm-rowmenu title="더보기" aria-label="더보기"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></td></tr>
+              <tr><td>넷플릭스 〈원더풀스〉_순간이동</td><td title="넷플릭스">넷플릭스</td><td><span class="platform-badge ig"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>인스타</span></td><td>업로드당</td><td>10,000원</td><td>55</td><td>04.30~05.29</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td><td class="adm-act-cell"><button class="adm-act-btn" data-adm-restage>스테이징 재연동</button><button class="adm-act-icon" data-adm-edit-row title="수정" aria-label="수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon" data-adm-rowmenu title="더보기" aria-label="더보기"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></td></tr>
+              <tr><td>넷플릭스 〈원더풀스〉_염력</td><td title="넷플릭스">넷플릭스</td><td><span class="platform-badge ig"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>인스타</span></td><td>업로드당</td><td>10,000원</td><td>55</td><td>04.30~05.29</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td><td class="adm-act-cell"><button class="adm-act-btn" data-adm-restage>스테이징 재연동</button><button class="adm-act-icon" data-adm-edit-row title="수정" aria-label="수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon" data-adm-rowmenu title="더보기" aria-label="더보기"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></td></tr>
+              <tr><td>넷플릭스 〈원더풀스〉_염력</td><td title="넷플릭스">넷플릭스</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>업로드당</td><td>10,000원</td><td>55</td><td>04.30~05.30</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td><td class="adm-act-cell"><button class="adm-act-btn" data-adm-restage>스테이징 재연동</button><button class="adm-act-icon" data-adm-edit-row title="수정" aria-label="수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon" data-adm-rowmenu title="더보기" aria-label="더보기"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></td></tr>
+              <tr><td>넷플릭스 〈원더풀스〉_순간이동</td><td title="넷플릭스">넷플릭스</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>업로드당</td><td>10,000원</td><td>55</td><td>04.30~05.30</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td><td class="adm-act-cell"><button class="adm-act-btn" data-adm-restage>스테이징 재연동</button><button class="adm-act-icon" data-adm-edit-row title="수정" aria-label="수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon" data-adm-rowmenu title="더보기" aria-label="더보기"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></td></tr>
+              <tr><td>영화 〈만달로리안과 그로구〉</td><td title="월트디즈니">월트디즈니</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>500,000</td><td>04.23~05.23</td><td><span class="adm-badge adm-ok">연동완료</span></td><td><span class="adm-badge adm-ok">연동완료</span></td><td class="adm-act-cell"><button class="adm-act-btn" data-adm-restage>스테이징 재연동</button><button class="adm-act-icon" data-adm-edit-row title="수정" aria-label="수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon" data-adm-rowmenu title="더보기" aria-label="더보기"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></td></tr>
+              <tr><td>만달로리안과 그로구</td><td title="월트디즈니 컴퍼니 코리아">월트디즈니 컴퍼니 코리아</td><td><span class="platform-badge yt"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>유튜브</span></td><td>CPV</td><td>5원</td><td>500,000</td><td>04.22~05.07</td><td><span class="adm-badge adm-no">미반영</span></td><td><span class="adm-badge adm-ok">연동완료</span></td><td class="adm-act-cell"><button class="adm-act-btn" data-adm-restage>스테이징 재연동</button><button class="adm-act-icon" data-adm-edit-row title="수정" aria-label="수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon" data-adm-rowmenu title="더보기" aria-label="더보기"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></td></tr>
             </tbody>
           </table>
         </div>
@@ -2325,27 +2330,177 @@
 
   </div>
 
+  <div class="ncr-toast" id="admToast"></div>
+
+  <!-- 캠페인 행 더보기 메뉴 (열린 행 옆에 배치) -->
+  <div class="adm-rowmenu" id="admRowMenu" hidden>
+    <button type="button" data-rowmenu-act="end">스테이징 종료</button>
+    <button type="button" class="danger" data-rowmenu-act="delete">스테이징 삭제</button>
+    <button type="button" disabled>목록에서 삭제</button>
+  </div>
+
   <!-- 모달: 캠페인 생성 -->
   <div class="adm-overlay" id="modal-studio-campaign">
-    <div class="adm-modal">
-      <h3 class="adm-modal-h3">짤 캠페인 생성 <button class="adm-modal-x" data-adm-close>&#x2715;</button></h3>
-      <div class="adm-field"><label>캠페인명</label><input type="text" placeholder="예: 영화 〈도그 스타〉 조회수당"></div>
-      <div class="adm-field-row">
-        <div class="adm-field"><label>브랜드</label><input type="text" placeholder="예: 월트디즈니"></div>
-        <div class="adm-field"><label>플랫폼</label><select><option>YouTube</option><option>Instagram</option><option>TikTok</option></select></div>
+    <div class="adm-modal adm-modal--tall">
+      <h3 class="adm-modal-h3"><span id="mc-title">짤 캠페인 생성</span> <button class="adm-modal-x" data-adm-close>&#x2715;</button></h3>
+
+      <div class="adm-modal-body">
+
+        <!-- 기본 정보 (기본 펼침) -->
+        <div class="adm-acc open">
+          <button type="button" class="adm-acc-head" data-adm-acc>기본 정보</button>
+          <div class="adm-acc-body">
+            <div class="adm-field"><label>캠페인명 *</label><input type="text" id="mc-name" placeholder="예: 영화 〈도그 스타: 마지막 희망〉"></div>
+            <div class="adm-field"><label>브랜드명 *</label><input type="text" id="mc-brand" placeholder="예: 월트디즈니"></div>
+            <div class="adm-field-row">
+              <div class="adm-field"><label>서비스 타입</label><select id="mc-service"><option>ZS</option><option>Playist</option></select></div>
+              <div class="adm-field"><label>플랫폼</label><select id="mc-platform"><option>YouTube</option><option>Instagram</option><option>TikTok</option><option>기타</option></select></div>
+            </div>
+            <div class="adm-field-row">
+              <div class="adm-field"><label>콘텐츠 타입</label><select id="mc-content"><option>Shorts</option><option>Long</option></select></div>
+              <div class="adm-field"><label>캠페인 타입</label><select id="mc-type"><option>CPV</option><option>업로드당</option><option>입찰</option><option>인플루언서</option></select></div>
+            </div>
+            <div class="adm-field-row">
+              <div class="adm-field"><label>승인 방식</label><select id="mc-approve"><option>누구나</option><option>승인필요</option></select></div>
+              <div class="adm-field" style="margin-bottom:0"><label>상태</label><select id="mc-status"><option>정상</option><option>종료</option><option>삭제</option></select></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 목표 & 가격 -->
+        <div class="adm-acc">
+          <button type="button" class="adm-acc-head" data-adm-acc>목표 &amp; 가격</button>
+          <div class="adm-acc-body">
+            <div class="adm-field-row">
+              <div class="adm-field"><label>목표 수량</label><input type="number" id="mc-goal" placeholder="500000"></div>
+              <div class="adm-field"><label>단가</label><input type="text" id="mc-price" placeholder="예: 5원"></div>
+            </div>
+            <div class="adm-field" style="margin-bottom:0"><label>총 예산</label><input type="text" placeholder="예: 45,000,000원"></div>
+          </div>
+        </div>
+
+        <!-- 일정 -->
+        <div class="adm-acc">
+          <button type="button" class="adm-acc-head" data-adm-acc>일정</button>
+          <div class="adm-acc-body">
+            <div class="adm-field-row">
+              <div class="adm-field"><label>시작일</label><input type="date" id="mc-start"></div>
+              <div class="adm-field"><label>종료일</label><input type="date" id="mc-end"></div>
+            </div>
+            <div class="adm-field" style="margin-bottom:0"><label>모집 마감일</label><input type="date"></div>
+          </div>
+        </div>
+
+        <!-- 상세 정보 -->
+        <div class="adm-acc">
+          <button type="button" class="adm-acc-head" data-adm-acc>상세 정보</button>
+          <div class="adm-acc-body">
+            <div class="adm-field" style="margin-bottom:0"><label>캠페인 설명</label><textarea class="adm-textarea" rows="3" placeholder="크리에이터에게 보여질 캠페인 설명"></textarea></div>
+          </div>
+        </div>
+
+        <!-- 음원 제한 -->
+        <div class="adm-acc">
+          <button type="button" class="adm-acc-head" data-adm-acc>음원 제한</button>
+          <div class="adm-acc-body">
+            <div class="adm-field"><label>사용 방식</label><select><option>제한 없음</option><option>지정 음원만 사용</option><option>지정 음원 사용 금지</option></select></div>
+            <div class="adm-field" style="margin-bottom:0"><label>음원 링크</label><input type="text" placeholder="https://"></div>
+          </div>
+        </div>
+
+        <!-- 채널 제한 -->
+        <div class="adm-acc">
+          <button type="button" class="adm-acc-head" data-adm-acc>채널 제한</button>
+          <div class="adm-acc-body">
+            <div class="adm-field-row">
+              <div class="adm-field"><label>최소 구독자</label><input type="number" placeholder="10000"></div>
+              <div class="adm-field"><label>최대 구독자</label><input type="number" placeholder="제한 없음"></div>
+            </div>
+            <div class="adm-field" style="margin-bottom:0"><label>허용 카테고리</label><input type="text" placeholder="예: 엔터테인먼트, 음악 (비우면 전체)"></div>
+          </div>
+        </div>
+
+        <!-- 일일 참여 제한 -->
+        <div class="adm-acc">
+          <button type="button" class="adm-acc-head" data-adm-acc>일일 참여 제한</button>
+          <div class="adm-acc-body">
+            <div class="adm-field-row" style="margin-bottom:0">
+              <div class="adm-field" style="margin-bottom:0"><label>일일 최대 참여 수</label><input type="number" placeholder="제한 없음"></div>
+              <div class="adm-field" style="margin-bottom:0"><label>채널당 최대 영상 수</label><input type="number" placeholder="1"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="adm-modal-divider">상세 페이지 속성 (campaign_properties)</div>
+
+        <!-- 메인 배너 -->
+        <div class="adm-acc">
+          <button type="button" class="adm-acc-head" data-adm-acc>메인 배너</button>
+          <div class="adm-acc-body">
+            <div class="adm-field" style="margin-bottom:0"><label>배너 이미지 URL</label><input type="text" placeholder="https://"></div>
+          </div>
+        </div>
+
+        <!-- 작품 정보 -->
+        <div class="adm-acc">
+          <button type="button" class="adm-acc-head" data-adm-acc>작품 정보</button>
+          <div class="adm-acc-body">
+            <div class="adm-field-row">
+              <div class="adm-field"><label>작품명</label><input type="text" placeholder="예: 도그 스타: 마지막 희망"></div>
+              <div class="adm-field"><label>장르</label><input type="text" placeholder="예: 애니메이션"></div>
+            </div>
+            <div class="adm-field" style="margin-bottom:0"><label>공개일</label><input type="date"></div>
+          </div>
+        </div>
+
+        <!-- 참여 안내 -->
+        <div class="adm-acc">
+          <button type="button" class="adm-acc-head" data-adm-acc>참여 안내</button>
+          <div class="adm-acc-body">
+            <div class="adm-field" style="margin-bottom:0"><label>안내 문구</label><textarea class="adm-textarea" rows="3" placeholder="참여 방법과 절차"></textarea></div>
+          </div>
+        </div>
+
+        <!-- 영상 가이드 -->
+        <div class="adm-acc">
+          <button type="button" class="adm-acc-head" data-adm-acc>영상 가이드</button>
+          <div class="adm-acc-body">
+            <div class="adm-field" style="margin-bottom:0"><label>제작 가이드</label><textarea class="adm-textarea" rows="3" placeholder="필수 포함 요소, 길이, 톤앤매너 등"></textarea></div>
+          </div>
+        </div>
+
+        <!-- 유의사항 -->
+        <div class="adm-acc">
+          <button type="button" class="adm-acc-head" data-adm-acc>유의사항</button>
+          <div class="adm-acc-body">
+            <div class="adm-field" style="margin-bottom:0"><label>유의사항</label><textarea class="adm-textarea" rows="3" placeholder="금지 사항, 저작권 안내 등"></textarea></div>
+          </div>
+        </div>
+
+        <!-- 영상 소스 -->
+        <div class="adm-acc">
+          <button type="button" class="adm-acc-head" data-adm-acc>영상 소스</button>
+          <div class="adm-acc-body">
+            <div class="adm-field" style="margin-bottom:0"><label>소스 영상 링크</label><input type="text" placeholder="https:// (줄바꿈으로 여러 개)"></div>
+          </div>
+        </div>
+
+        <!-- 표시 설정 -->
+        <div class="adm-acc">
+          <button type="button" class="adm-acc-head" data-adm-acc>표시 설정</button>
+          <div class="adm-acc-body">
+            <div class="adm-field-row" style="margin-bottom:0">
+              <div class="adm-field" style="margin-bottom:0"><label>목록 노출</label><select><option>노출</option><option>숨김</option></select></div>
+              <div class="adm-field" style="margin-bottom:0"><label>정렬 순서</label><input type="number" placeholder="0"></div>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <div class="adm-field-row">
-        <div class="adm-field"><label>타입</label><select><option>CPV</option><option>업로드당</option></select></div>
-        <div class="adm-field"><label>단가</label><input type="text" placeholder="예: 5원"></div>
-        <div class="adm-field"><label>목표</label><input type="number" placeholder="500000"></div>
-      </div>
-      <div class="adm-field-row">
-        <div class="adm-field"><label>시작일</label><input type="date"></div>
-        <div class="adm-field"><label>종료일</label><input type="date"></div>
-      </div>
+
       <div class="adm-modal-actions">
         <button class="adm-btn adm-btn-outline" data-adm-close>취소</button>
-        <button class="btn-new-campaign" style="margin:0">생성</button>
+        <button class="btn-new-campaign" id="mc-submit" style="margin:0">생성</button>
       </div>
     </div>
   </div>

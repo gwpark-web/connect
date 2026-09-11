@@ -8,6 +8,42 @@ const ctaPages = ['p-channels'];
 const p0ActivePages = ['p1','p3','p4'];
 const DETAIL_PAGES = ['p-detail', 'p-detail-upload', 'p-channels'];
 
+// ── 캠페인 카드 정렬 (광고주 p-list · 관리자 p-admin 공통) ──────────────────
+
+// 진행 상황 우선순위 — 작을수록 왼쪽. 진행 중을 맨 앞에 둔다.
+var CAMPAIGN_STATUS_ORDER = {
+  progress: 0, running: 0,            // 진행 중
+  'channel-select': 1, recruiting: 1, // 채널 선정 중
+  ready: 2, open: 2,                  // 오픈 준비
+  done: 3                             // 완료
+};
+
+// 1순위 진행 상황, 2순위 시작일(최신 우선)
+function compareCampaignCards(a, b) {
+  var sa = CAMPAIGN_STATUS_ORDER[(a.dataset.campaignStatus || '').toLowerCase()];
+  var sb = CAMPAIGN_STATUS_ORDER[(b.dataset.campaignStatus || '').toLowerCase()];
+  if (sa === undefined) sa = 99;
+  if (sb === undefined) sb = 99;
+  if (sa !== sb) return sa - sb;
+  var da = a.dataset.editStart || '';
+  var db = b.dataset.editStart || '';
+  if (da !== db) return db.localeCompare(da);
+  return 0;
+}
+
+function sortCampaignGrid(grid) {
+  if (!grid) return;
+  Array.from(grid.querySelectorAll('.campaign-card'))
+    .sort(compareCampaignCards)
+    .forEach(function(c) { grid.appendChild(c); });
+}
+
+function sortAllCampaignGrids() {
+  document.querySelectorAll('#p-list .campaign-list, .adm-report-grid')
+    .forEach(sortCampaignGrid);
+}
+
+
 let campaignReturnPage = 'p-list';
 
 function goBackToList() { goTo(campaignReturnPage); }
@@ -964,6 +1000,7 @@ function submitCampaignReg() {
   });
 
   initCampaignFilter();
+  sortAllCampaignGrids();
   setTimeout(runStatCountUp, 300);
 
   // Fluent Emoji CDN 로드 실패 → 시스템 이모지로 폴백 (MV3 CSP: addEventListener만 사용)
@@ -1000,6 +1037,126 @@ function runStatCountUp() {
 }
 
 // ── ADMIN PAGE: 탭 / 서브탭 / 모달 ──
+// ── 캠페인 행 → 생성/수정 모달 채우기 ──────────────────────────────────
+// 행이 정적 HTML이라 별도 데이터 배열 없이 셀 값을 그대로 읽는다.
+const MC_PLATFORM = { '유튜브': 'YouTube', '인스타': 'Instagram', '틱톡': 'TikTok' };
+
+// 표의 기간은 "08.24~09.24" 처럼 연도가 없다. date 입력을 채우려면 연도가 필요해
+// 목록의 다른 캠페인과 같은 2026년으로 본다.
+function mcParseDate(md) {
+  const m = /^(\d{2})\.(\d{2})$/.exec((md || '').trim());
+  return m ? '2026-' + m[1] + '-' + m[2] : '';
+}
+
+function openCampaignModalFromRow(tr) {
+  if (!tr) return;
+  const cell = i => (tr.children[i]?.textContent || '').trim();
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+
+  const period = cell(6).split('~');
+  set('mc-name',  cell(0));
+  set('mc-brand', cell(1));
+  set('mc-platform', MC_PLATFORM[cell(2)] || 'YouTube');
+  set('mc-type',  cell(3));
+  set('mc-price', cell(4));
+  set('mc-goal',  cell(5).replace(/,/g, ''));
+  set('mc-start', mcParseDate(period[0]));
+  set('mc-end',   mcParseDate(period[1]));
+
+  const title = document.getElementById('mc-title');
+  const submit = document.getElementById('mc-submit');
+  if (title)  title.textContent = '짤 캠페인 수정';
+  if (submit) submit.textContent = '수정';
+
+  hideRowMenu();
+  document.getElementById('modal-studio-campaign')?.classList.add('open');
+}
+
+// [+ 캠페인 생성] 으로 열 때는 빈 폼 + 생성 모드로 되돌린다
+function resetCampaignModal() {
+  ['mc-name', 'mc-brand', 'mc-price', 'mc-goal', 'mc-start', 'mc-end']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['mc-service', 'mc-platform', 'mc-content', 'mc-type', 'mc-approve', 'mc-status']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.selectedIndex = 0; });
+  const title = document.getElementById('mc-title');
+  const submit = document.getElementById('mc-submit');
+  if (title)  title.textContent = '짤 캠페인 생성';
+  if (submit) submit.textContent = '생성';
+}
+
+function admToast(msg) {
+  const el = document.getElementById('admToast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// 캠페인 목록 새로고침 — 외부 서버에서 다시 내려받는다.
+// TODO: 실제 수신 API 연결 (지금은 로딩 표현 + 수신 시각 갱신까지만)
+const ADM_REFRESH_ICON = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%SPIN%><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>';
+
+function admRefreshCampaigns() {
+  const btn = document.getElementById('adm-refresh-btn');
+  if (!btn || btn.disabled) return;
+  btn.disabled = true;
+  btn.innerHTML = ADM_REFRESH_ICON.replace('%SPIN%', ' style="animation:spin .6s linear infinite"') + '불러오는 중…';
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerHTML = ADM_REFRESH_ICON.replace('%SPIN%', '') + '새로고침';
+    const stamp = document.getElementById('adm-refresh-time');
+    if (stamp) {
+      const d = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      stamp.textContent = '최근 수신 ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+    }
+    admToast('캠페인 목록을 새로 받았습니다');
+  }, 1100);
+}
+
+// 스테이징 재연동 — 외부 서버로 나가는 작업이라 모달 없이 버튼에서 바로 처리한다.
+// TODO: 실제 연동 API 연결 (지금은 요청 접수까지만 표현)
+function restageRow(btn) {
+  if (btn.disabled) return;
+  const row = btn.closest('tr');
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '재연동 중…';
+
+  admToast('스테이징 재연동을 요청했습니다');
+
+  setTimeout(() => {
+    const badge = row?.children[7]?.querySelector('.adm-badge');
+    if (badge) {
+      badge.className = 'adm-badge adm-ok';
+      badge.textContent = '연동완료';
+    }
+    btn.disabled = false;
+    btn.textContent = label;
+  }, 1200);
+}
+
+function hideRowMenu() {
+  const m = document.getElementById('admRowMenu');
+  if (m) { m.hidden = true; m._row = null; }
+}
+
+function toggleRowMenu(btn) {
+  const menu = document.getElementById('admRowMenu');
+  if (!menu) return;
+  const row = btn.closest('tr');
+  if (!menu.hidden && menu._row === row) { hideRowMenu(); return; }
+  const r = btn.getBoundingClientRect();
+  menu.hidden = false;
+  menu._row = row;
+  // 아래 공간이 부족하면 버튼 위쪽으로 띄운다
+  const below = window.innerHeight - r.bottom;
+  menu.style.left = Math.max(8, r.right - menu.offsetWidth) + 'px';
+  menu.style.top = (below < menu.offsetHeight + 12 ? r.top - menu.offsetHeight - 6 : r.bottom + 6) + 'px';
+}
+
 document.addEventListener('click', function(e) {
   // 메인 탭
   const tabbtn = e.target.closest('[data-adm-tab]');
@@ -1007,7 +1164,45 @@ document.addEventListener('click', function(e) {
     const tab = tabbtn.dataset.admTab;
     document.querySelectorAll('#p-admin [data-adm-tab]').forEach(b => b.classList.toggle('active', b.dataset.admTab === tab));
     document.querySelectorAll('.adm-panel').forEach(p => p.classList.toggle('active', p.id === 'adm-panel-' + tab));
+    // 상단 우측 버튼은 탭마다 다르다 — 해당 탭에서만 노출
+    const tabBtn = { report: ['adm-report-btn'], create: ['adm-refresh-time', 'adm-refresh-btn', 'adm-create-btn'] };
+    Object.entries(tabBtn).forEach(function([t, ids]) {
+      ids.forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el) el.hidden = (tab !== t);
+      });
+    });
     if (tab === 'sales' && window.scRender) window.scRender();
+    return;
+  }
+  // 캠페인 목록 새로고침 (외부 서버 수신)
+  if (e.target.closest('#adm-refresh-btn')) {
+    admRefreshCampaigns();
+    return;
+  }
+  // 캠페인 행 — 스테이징 재연동 (외부 서버 연동, 모달 없음)
+  const restageBtn = e.target.closest('[data-adm-restage]');
+  if (restageBtn) {
+    restageRow(restageBtn);
+    return;
+  }
+  // 캠페인 행 — 수정 → 해당 행 값으로 채운 모달
+  const rowBtn = e.target.closest('[data-adm-edit-row]');
+  if (rowBtn) {
+    openCampaignModalFromRow(rowBtn.closest('tr'));
+    return;
+  }
+  // 캠페인 행 — 더보기 메뉴
+  const menuBtn = e.target.closest('[data-adm-rowmenu]');
+  if (menuBtn) {
+    toggleRowMenu(menuBtn);
+    return;
+  }
+  if (!e.target.closest('#admRowMenu')) hideRowMenu();
+  // 모달 접이식 섹션
+  const accBtn = e.target.closest('[data-adm-acc]');
+  if (accBtn) {
+    accBtn.closest('.adm-acc')?.classList.toggle('open');
     return;
   }
   // 서브탭
@@ -1022,7 +1217,26 @@ document.addEventListener('click', function(e) {
   const modalTrigger = e.target.closest('[data-adm-modal]');
   if (modalTrigger) {
     const overlay = document.getElementById(modalTrigger.dataset.admModal);
+    if (modalTrigger.dataset.admModal === 'modal-studio-campaign') resetCampaignModal();
     if (overlay) overlay.classList.add('open');
+    return;
+  }
+  // 행 더보기 메뉴 항목
+  const rowAct = e.target.closest('[data-rowmenu-act]');
+  if (rowAct) {
+    const menu = document.getElementById('admRowMenu');
+    const row = menu?._row;
+    if (row) {
+      const badge = row.children[7]?.querySelector('.adm-badge');
+      if (rowAct.dataset.rowmenuAct === 'end' && badge) {
+        badge.className = 'adm-badge adm-hidden';
+        badge.textContent = '종료';
+      } else if (rowAct.dataset.rowmenuAct === 'delete' && badge) {
+        badge.className = 'adm-badge adm-no';
+        badge.textContent = '미반영';
+      }
+    }
+    hideRowMenu();
     return;
   }
   // 모달 닫기
@@ -1527,9 +1741,7 @@ document.addEventListener('click', function(e) {
   scRender();
 })();
 
-// ── 관리자 페이지 정렬 기능 ────────────────────────────────────────────────
-
-// 캠페인 보고서 정렬
+// 관리자 보고서 정렬 드롭다운 (기본순 = 위 진행 상황·날짜 정렬)
 (function() {
   var sel = document.getElementById('adm-report-sort');
   if (!sel) return;
@@ -1541,12 +1753,9 @@ document.addEventListener('click', function(e) {
     cards.sort(function(a, b) {
       var pctA = parseFloat(a.dataset.pct) || 0;
       var pctB = parseFloat(b.dataset.pct) || 0;
-      var stA = (a.dataset.campaignStatus || '').toLowerCase();
-      var stB = (b.dataset.campaignStatus || '').toLowerCase();
       if (val === 'pct-desc') return pctB - pctA;
       if (val === 'pct-asc')  return pctA - pctB;
-      if (val === 'status')   return stA < stB ? -1 : stA > stB ? 1 : 0;
-      return 0;
+      return compareCampaignCards(a, b);
     });
     cards.forEach(function(c) { grid.appendChild(c); });
   }

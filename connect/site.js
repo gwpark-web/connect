@@ -1,7 +1,7 @@
 try { emailjs.init('PR1yiM-fDVGYx5wCo'); } catch(e) { console.warn('EmailJS init failed', e); }
 
 // ── ROUTING ──
-const pages = ['p1','p3','p4','p-list','p-channels','p-detail','p-detail-upload','p-admin','p5','p-detail-internal','p-detail-premium'];
+const pages = ['p1','p3','p4','p-list','p-channels','p-detail','p-detail-upload','p-admin'];
 const authPages = ['p-signup','p-brochure'];
 const navMap = { p1:'nav-p1', p3:'nav-p3' };
 const ctaPages = ['p-channels'];
@@ -85,8 +85,6 @@ function goTo(id) {
   if (id === 'p-channels') { updateSortArrows(); renderChannels(); updateChSummary(); }
   if (id === 'p-list') { if (typeof updateListCardPremium === 'function') updateListCardPremium(); }
   if (id === 'p1') { setTimeout(runStatCountUp, 200); }
-  if (id === 'p5') { renderP5(); }
-  if (id === 'p-detail-premium') { renderChannels('pdpChTable'); }
 }
 
 function goToAuth(id) {
@@ -910,203 +908,6 @@ function submitCampaignReg() {
 }
 
 
-// ══════════ 관리자 내부 화면 (구 admin.js) ══════════
-// ── p5 캠페인 데이터 ──
-const P5_SVG = {
-  yt: `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>`,
-  ig: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>`,
-  tt: `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>`
-};
-const P5_PLATFORM_LABEL = { yt:'유튜브 쇼츠', ig:'인스타그램 릴스', tt:'틱톡' };
-const P5_STATUS_LABEL   = { recruiting:'모집 중', channel:'채널 선정 중', ready:'오픈 준비중', active:'진행 중', done:'완료' };
-
-const p5Filter = { client: 'ALL', product: 'ALL', platform: 'ALL' };
-
-function switchPremiumTab(tab) {
-  document.querySelectorAll('.pdp-tab').forEach((el, i) => el.classList.toggle('active', String(i+1) === String(tab)));
-  document.querySelectorAll('.pdp-pane').forEach((el, i) => el.classList.toggle('active', String(i+1) === String(tab)));
-  if (String(tab) === '2') renderChannels('pdpChTable');
-  if (String(tab) === '3') renderPdpReviewPanel();
-}
-
-// ── 프리미엄 검토 현황 ──────────────────────────────────────────────
-const PDP_REVIEW_CHANNELS = [
-  { idx:0,  emoji:'🎬', name:'궁금해소',   handle:'@궁금해소',    plat:'YT', subs:'99.7만', state:'제작 중' },
-  { idx:2,  emoji:'🌊', name:'지우멍',     handle:'@jiwumung',    plat:'YT', subs:'12.5만', state:'검토 필요' },
-  { idx:6,  emoji:'🎮', name:'겜쟁이남자', handle:'@gameman',     plat:'YT', subs:'44만',   state:'최종 확정 중' },
-  { idx:5,  emoji:'👗', name:'패피소희',   handle:'@fashionsohi', plat:'IG', subs:'18만',   state:'수정 중' },
-  { idx:9,  emoji:'📱', name:'썰전쟁',     handle:'@ssul_wars',   plat:'YT', subs:'53만',   state:'제작 중' },
-  { idx:11, emoji:'🌸', name:'뷰티일기',   handle:'@beauty_diary',plat:'IG', subs:'11.2만', state:'최종 확정 중' },
-];
-const PDP_BADGE_CLS = {
-  '최종 확정 중': 'ch-rv-badge--confirming',
-  '제작 중':      'ch-rv-badge--producing',
-  '검토 필요':    'ch-rv-badge--needcheck',
-  '수정 중':      'ch-rv-badge--revision',
-};
-const _pdpRejected = new Set();
-
-function renderPdpReviewPanel() {
-  const container = document.getElementById('pdpReviewList');
-  if (!container) return;
-  const active  = PDP_REVIEW_CHANNELS.filter(c => !_pdpRejected.has(c.idx));
-  const rejected = PDP_REVIEW_CHANNELS.filter(c => _pdpRejected.has(c.idx));
-  const cntEl = document.getElementById('pdpReviewCount');
-  if (cntEl) cntEl.textContent = `진행 중 ${active.length}개 · 반려 ${rejected.length}개`;
-
-  container.innerHTML = PDP_REVIEW_CHANNELS.map(c => {
-    const isRej = _pdpRejected.has(c.idx);
-    const zealTag = (typeof ZEAL_MEMBERS !== 'undefined' && ZEAL_MEMBERS[c.handle])
-      ? ' <span class="zeal-rv-badge">짤</span>' : '';
-    if (isRej) {
-      return `<div class="ch-rv-item pdp-rv-rejected">
-        <div class="ch-rv-left">
-          <div class="ch-thumb">${c.emoji}</div>
-          <div class="ch-rv-info">
-            <div class="ch-rv-name">${c.name}${zealTag}</div>
-            <div class="ch-rv-meta">${c.handle} · ${c.plat} · 구독자 ${c.subs}</div>
-          </div>
-        </div>
-        <span class="ch-rv-badge pdp-badge-rejected">반려됨</span>
-        <div class="ch-rv-sim">
-          <button class="ch-rv-sim-btn" data-fn="pdpUndoRejectCh" data-args="${c.idx}">되돌리기</button>
-        </div>
-      </div>`;
-    }
-    return `<div class="ch-rv-item">
-      <div class="ch-rv-left">
-        <div class="ch-thumb">${c.emoji}</div>
-        <div class="ch-rv-info">
-          <div class="ch-rv-name">${c.name}${zealTag}</div>
-          <div class="ch-rv-meta">${c.handle} · ${c.plat} · 구독자 ${c.subs}</div>
-        </div>
-      </div>
-      <span class="ch-rv-badge ${PDP_BADGE_CLS[c.state] || ''}">${c.state}</span>
-      <div class="ch-rv-sim">
-        <button class="pdp-reject-btn" data-fn="pdpRejectCh" data-args="${c.idx}">반려</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function pdpRejectCh(idx) {
-  _pdpRejected.add(Number(idx));
-  renderPdpReviewPanel();
-}
-
-function pdpUndoRejectCh(idx) {
-  _pdpRejected.delete(Number(idx));
-  renderPdpReviewPanel();
-}
-
-function setP5Filter(type, value) {
-  p5Filter[type] = value;
-  renderP5();
-}
-
-let p5Campaigns = [
-  { title:'영화 〈토이 스토리 5〉',              product:'조회수당', status:'done',    thumb:'img/toy_story5.jpg', thumbBg:'',                                           platforms:['yt'],      goalType:'조회수', goalValue:'500000', client:'월트디즈니 코리아',  assignee:'박건우', startDate:'2026-05-26', endDate:'2026-06-08', budget:'45000000', unitPrice:'90',    detailPage:'p-detail-internal' },
-  { title:'시리즈 〈다 이루어질지니〉',            product:'프리미엄', status:'channel', thumb:'',                   thumbBg:'background:linear-gradient(160deg,#1a0828,#3d1060)', platforms:['yt','ig'], goalType:'조회수', goalValue:'300000', client:'카카오엔터테인먼트', assignee:'김현묵', startDate:'2026-05-01', endDate:'2026-06-30', budget:'32000000', unitPrice:'0',     detailPage:'p-detail-premium'  },
-  { title:'EPEX — UNIVERSE 음원 바이럴 캠페인',  product:'업로드당', status:'ready',   thumb:'',                   thumbBg:'background:linear-gradient(160deg,#0a1628,#1a3060)', platforms:['yt','tt'], goalType:'영상수', goalValue:'2500',   client:'SM엔터테인먼트',      assignee:'박건우', startDate:'2026-06-15', endDate:'2026-07-15', budget:'18000000', unitPrice:'7200',  detailPage:'p-detail-internal' }
-];
-
-function renderP5() {
-  const list = document.getElementById('p5CampaignList');
-  if (!list) return;
-  const filtered = p5Campaigns.filter(c =>
-    (p5Filter.client  === 'ALL' || c.client  === p5Filter.client) &&
-    (p5Filter.product === 'ALL' || c.product === p5Filter.product) &&
-    (p5Filter.platform === 'ALL' || c.platforms.includes(p5Filter.platform))
-  );
-  if (!filtered.length) { list.innerHTML = '<div style="padding:40px;text-align:center;color:var(--gray-light);font-size:13px">조건에 맞는 캠페인이 없습니다.</div>'; return; }
-  list.innerHTML = filtered.map((c, i) => {
-    const i_orig = p5Campaigns.indexOf(c);
-    const thumbHtml = c.thumb ? `<img src="${c.thumb}" alt="${c.title}">` : '';
-    const thumbAttr = c.thumbBg ? ` style="${c.thumbBg}"` : '';
-    const badges    = c.platforms.map(p => `<span class="platform-badge ${p}">${P5_SVG[p]} ${P5_PLATFORM_LABEL[p]}</span>`).join('');
-    const goalStr   = Number(c.goalValue).toLocaleString() + (c.goalType === '조회수' ? '회' : '개');
-    const budgetFmt = Number(c.budget).toLocaleString();
-    const actionBtn = `<button class="card-btn primary" data-fn="goTo" data-args="${c.detailPage}" data-stop="1">상세 보기 →</button>`;
-    return `
-      <div class="campaign-card" data-fn="goTo" data-args="${c.detailPage}">
-        <div class="card-thumb"${thumbAttr}>${thumbHtml}</div>
-        <div class="card-left">
-          <div class="card-product-tag">${c.product}</div>
-          <div class="status-badge ${c.status}">${P5_STATUS_LABEL[c.status] || c.status}</div>
-        </div>
-        <div class="card-center">
-          <div class="card-title">${c.title}</div>
-          <div class="card-meta">
-            <div class="card-platform-badges">${badges}</div>
-            <div class="card-meta-goal">목표 <span>${goalStr}</span></div>
-          </div>
-          <div class="card-internal-row">
-            <span class="card-internal-item">클라이언트 <strong>${c.client}</strong></span>
-            <span class="card-internal-item">담당자 <strong>${c.assignee}</strong></span>
-            <span class="card-internal-item">집행 금액 <strong>${budgetFmt}원</strong></span>
-          </div>
-        </div>
-        <div class="card-right">
-          <button class="card-btn secondary" data-fn="openP5Edit" data-args="${i_orig}" data-stop="1">수정</button>
-          ${actionBtn}
-        </div>
-      </div>`;
-  }).join('');
-}
-
-let p5EditIdx = -1;
-
-function updateP5GoalUnit() {
-  const isViews = document.getElementById('p5e-goal-views')?.checked;
-  document.getElementById('p5e-goal-unit').textContent = isViews ? '회' : '개';
-  const lbl = document.getElementById('p5e-unitprice-label');
-  if (lbl) lbl.textContent = isViews ? '단가 (조회당)' : '단가 (영상당)';
-}
-
-function openP5Edit(idx) {
-  p5EditIdx = parseInt(idx);
-  const c = p5Campaigns[p5EditIdx];
-  document.getElementById('p5e-title').value    = c.title;
-  document.getElementById('p5e-product').value  = c.product;
-  document.getElementById('p5e-client').value   = c.client;
-  document.getElementById('p5e-assignee').value = c.assignee;
-  document.getElementById('p5e-goal-val').value = Number(c.goalValue).toLocaleString();
-  document.getElementById('p5e-start').value    = c.startDate;
-  document.getElementById('p5e-end').value      = c.endDate || '';
-  document.getElementById('p5e-status').value   = c.status;
-  document.getElementById('p5e-budget').value    = Number(c.budget).toLocaleString();
-  document.getElementById('p5e-unitprice').value  = Number(c.unitPrice || 0).toLocaleString();
-  document.getElementById('p5e-platform').value   = c.platforms[0] || 'yt';
-  document.getElementById('p5e-goal-views').checked = c.goalType === '조회수';
-  document.getElementById('p5e-goal-vids').checked  = c.goalType === '영상수';
-  updateP5GoalUnit();
-  document.getElementById('p5EditModal').classList.add('active');
-}
-
-function closeP5Edit() {
-  document.getElementById('p5EditModal').classList.remove('active');
-  p5EditIdx = -1;
-}
-
-function saveP5Edit() {
-  if (p5EditIdx < 0) return;
-  const c = p5Campaigns[p5EditIdx];
-  c.title     = document.getElementById('p5e-title').value.trim();
-  c.product   = document.getElementById('p5e-product').value;
-  c.client    = document.getElementById('p5e-client').value.trim();
-  c.assignee  = document.getElementById('p5e-assignee').value;
-  c.goalValue = document.getElementById('p5e-goal-val').value.replace(/,/g,'').replace(/[^0-9]/g,'');
-  c.goalType  = document.getElementById('p5e-goal-views').checked ? '조회수' : '영상수';
-  c.budget    = document.getElementById('p5e-budget').value.replace(/,/g,'').replace(/[^0-9]/g,'');
-  c.unitPrice = document.getElementById('p5e-unitprice').value.replace(/,/g,'').replace(/[^0-9]/g,'');
-  c.startDate = document.getElementById('p5e-start').value;
-  c.endDate   = document.getElementById('p5e-end').value;
-  c.status    = document.getElementById('p5e-status').value;
-  c.platforms = [document.getElementById('p5e-platform').value];
-  closeP5Edit();
-  renderP5();
-}
-
 // ── 유튜브 댓글 분석기 ──
 const YCA_YT_KEY     = 'AIzaSyCG1-LJtqq48N7713WR5bJr_hNusrS6q0g';
 const YCA_CLAUDE_KEY = '799b73c1-e79f-4e6c-a63d-5de2cfd41c71';
@@ -1303,9 +1104,7 @@ async function ycaAnalyzeComments() {
     openZealPanel, closeZealPanel, saveZealMemo,
     openAddRoundModal, closeAddRoundModal, submitAddRound,
     openCampaignRegModal, closeCampaignRegModal, submitCampaignReg, toggleCregPremium,
-    switchPremiumTab, setP5Filter, openP5Edit, closeP5Edit, saveP5Edit,
-    ycaFetchComments, ycaSortComments, ycaSwitchTab, ycaAnalyzeComments,
-    pdpRejectCh, pdpUndoRejectCh
+    ycaFetchComments, ycaSortComments, ycaSwitchTab, ycaAnalyzeComments
   };
 
   document.addEventListener('click', function(e) {
@@ -1333,13 +1132,6 @@ async function ycaAnalyzeComments() {
     if (!el.dataset.change) return;
     if (el.dataset.change === 'showBizFile') { showBizFile(el); return; }
     if (el.dataset.change === 'toggleAllAgree') { toggleAllAgree(el); return; }
-    if (el.dataset.change === 'updateP5GoalUnit') { updateP5GoalUnit(); return; }
-  });
-
-  document.addEventListener('change', function(e) {
-    const sel = e.target.closest('select[data-filter-type]');
-    if (!sel) return;
-    setP5Filter(sel.dataset.filterType, sel.value);
   });
 
   initCampaignFilter();

@@ -502,11 +502,7 @@ body.p0-active .p7-cta-sub { color: rgba(255,255,255,0.4); }
   background-size: 10px 6px; transition: border-color 0.2s;
 }
 .list-filter-select:focus { border-color: var(--orange); }
-.p5-filter-section { margin-bottom: 20px; display: flex; flex-direction: row; gap: 12px; align-items: center; flex-wrap: wrap; }
-.p5-filter-row { display: flex; align-items: center; gap: 8px; }
-.p5-filter-label { font-size: 11px; font-weight: 700; color: var(--gray-light); letter-spacing: 0.5px; white-space: nowrap; }
-.p5-filter-select { appearance: none; -webkit-appearance: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 28px 6px 10px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; color: var(--black); background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E") no-repeat right 10px center; background-size: 10px 6px; cursor: pointer; outline: none; min-width: 120px; }
-.p5-filter-select:focus { border-color: var(--orange); }
+
 .search-input { padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; outline: none; transition: border-color 0.2s; margin-left: auto; }
 .search-input:focus { border-color: var(--orange); }
 .search-input::placeholder { color: var(--gray-light); }
@@ -545,10 +541,6 @@ body.p0-active .p7-cta-sub { color: rgba(255,255,255,0.4); }
 
 /* 액션 대기 카드 강조 */
 .campaign-card.action-needed { border: 1.5px solid var(--orange); }
-.campaign-card.action-needed .status-badge.recruiting {
-  background: rgba(255,69,0,0.1); color: var(--orange);
-}
-.campaign-card.action-needed .status-badge.recruiting::before { background: var(--orange); }
 .campaign-card.action-needed::after {
   content: ''; position: absolute; top: 12px; right: 12px;
   width: 8px; height: 8px; border-radius: 50%; background: var(--orange);
@@ -556,8 +548,11 @@ body.p0-active .p7-cta-sub { color: rgba(255,255,255,0.4); }
 
 .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 13px; border-radius: 100px; font-size: 13px; font-weight: 700; white-space: nowrap; }
 .status-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; }
-.status-badge.recruiting { background: var(--status-recruiting-bg); color: var(--status-recruiting); }
-.status-badge.recruiting::before { background: var(--status-recruiting); }
+/* 채널 선정 중 = 담당자 액션 대기 → 주황.
+   카드의 .action-needed 장식 유무와 무관하게 상태 자체로 색이 정해진다
+   (수정 패널로 상태만 바꿔도 색이 어긋나지 않도록). */
+.status-badge.recruiting { background: var(--orange-pale); color: var(--orange); }
+.status-badge.recruiting::before { background: var(--orange); }
 .status-badge.open { background: var(--status-open-bg); color: var(--status-open); }
 .status-badge.open::before { background: var(--status-open); }
 .status-badge.progress { background: var(--orange-pale); color: var(--orange); }
@@ -566,8 +561,9 @@ body.p0-active .p7-cta-sub { color: rgba(255,255,255,0.4); }
 .status-badge.done::before { background: var(--status-done); }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-.status-badge.running { background: var(--orange-pale); color: var(--orange); }
-.status-badge.running::before { background: var(--orange); animation: pulse 1.5s infinite; }
+/* 진행 중 = 정상 가동, 액션 불필요 → 파랑 (주황과 구분) */
+.status-badge.running { background: var(--status-open-bg); color: var(--status-open); }
+.status-badge.running::before { background: var(--status-open); animation: pulse 1.5s infinite; }
 .status-badge.ready { background: var(--orange-pale); color: var(--orange); }
 .status-badge.ready::before { background: var(--orange); }
 .card-left { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; min-width: 96px; }
@@ -2258,20 +2254,11 @@ body.p0-active .auth-page.fullpage { background: linear-gradient(135deg, rgba(26
 .yca-stat-label { font-size:11px; color:var(--gray-light); margin-bottom:4px; }
 .yca-stat-val { font-size:22px; font-weight:600; color:var(--black); }
 .yca-tab-row { display:flex; gap:4px; margin-bottom:14px; border-bottom:1px solid var(--border); }
-.pdp-tab-nav { display:flex; gap:4px; margin:20px 0 0; border-bottom:1px solid var(--border); }
-.pdp-tab { font-size:14px; padding:10px 18px; border:none; background:transparent; color:var(--gray-light); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; font-weight:500; }
+
 .pdp-tab.active { color:var(--black); border-bottom-color:var(--orange); font-weight:700; }
-.pdp-pane { display:none; padding-top:20px; }
+
 .pdp-pane.active { display:block; }
-.pdp-status-card { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:16px; }
-.pdp-status-row { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
-.pdp-status-dot { width:10px; height:10px; border-radius:50%; background:var(--orange); animation:pulse 1.5s infinite; }
-.pdp-status-label { font-size:14px; font-weight:700; color:var(--black); }
-.pdp-goal-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-.pdp-goal-item { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 16px; }
-.pdp-goal-lbl { font-size:11px; color:var(--gray-light); font-weight:600; letter-spacing:0.4px; margin-bottom:6px; }
-.pdp-goal-val { font-size:18px; font-weight:700; color:var(--black); }
-.pdp-goal-val.orange { color:var(--orange); }
+
 .yca-tab { font-size:14px; padding:8px 16px; border:none; background:transparent; color:var(--gray-light); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; font-weight:500; }
 .yca-tab.active { color:var(--black); border-bottom-color:var(--black); }
 .yca-panel { display:none; }
@@ -2749,12 +2736,7 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
 .ch-rv-sim-inactive { font-size:11px; color:var(--border); }
 
 /* ── 프리미엄 검토 현황 ── */
-.pdp-rv-header { display:flex; align-items:center; margin-bottom:16px; }
-.pdp-rv-title { font-size:14px; font-weight:700; color:var(--gray-dark); }
-.pdp-reject-btn { font-size:11px; padding:4px 12px; border:1px solid #e0b0ad; border-radius:5px; background:var(--white); color:#c0392b; cursor:pointer; white-space:nowrap; font-family:inherit; font-weight:600; }
-.pdp-reject-btn:hover { background:#fdf2f2; }
-.pdp-badge-rejected { background:#f3f4f6 !important; color:#9ca3af !important; }
-.pdp-rv-rejected { opacity:.7; }
+
 .pdp-rv-rejected .ch-rv-name,
 .pdp-rv-rejected .ch-rv-meta { color:var(--gray-light); }
 

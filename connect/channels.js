@@ -401,7 +401,7 @@ function renderReviewPanel() {
       <div class="ch-rv-left">
         <div class="ch-thumb">${ch.emoji}</div>
         <div class="ch-rv-info">
-          <div class="ch-rv-name">${ch.name}${ZEAL_MEMBERS[ch.handle] ? ' <span class="zeal-rv-badge">짤</span>' : ''}</div>
+          <div class="ch-rv-name">${ch.name}${isAdminViewer() && ZEAL_MEMBERS[ch.handle] ? ' <span class="zeal-rv-badge">짤</span>' : ''}</div>
           <div class="ch-rv-meta">${ch.handle} · ${PLAT_LABEL[ch.platform] || ch.platform} · 구독자 ${fmtSubs(ch.subsNum)}</div>
         </div>
       </div>
@@ -490,29 +490,15 @@ function renderResultPanel() {
   container.innerHTML = `
     <div class="cd-report-row">
 
-      <div class="cd-result-card">
-        ${pct >= 100 ? '<div class="cd-result-badge">🏆 영상 목표 달성!</div>' : ''}
-        <div class="cd-result-hero">${pct}%</div>
-        <div class="cd-result-list">
-          <div class="cd-result-item">
-            <span class="cd-result-lbl">목표 영상 수</span>
-            <span class="cd-result-val">${GOAL}개</span>
-          </div>
-          <div class="cd-result-item">
-            <span class="cd-result-lbl">게시물 등록 완료</span>
-            <span class="cd-result-val cd-result-val--accent">${postedCount}개</span>
-          </div>
-          <div class="cd-result-item">
-            <span class="cd-result-lbl">달성 조회수</span>
-            <span class="cd-result-val" style="opacity:.6;font-size:12px">집계 예정</span>
-          </div>
-          <div class="cd-result-item" style="border-bottom:none">
-            <span class="cd-result-lbl">집행 금액</span>
-            <span class="cd-result-val">₩150,000,000</span>
-          </div>
+      <!-- 1열: 포스터 이미지 -->
+      <div class="cd-poster-col">
+        <div class="cd-poster-placeholder">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gray-light)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          <span>포스터 이미지</span>
         </div>
       </div>
 
+      <!-- 2열: 리포트 타임라인 -->
       <div class="cd-timeline-card">
         <div class="cd-timeline-head">리포트 타임라인 <span class="cd-timeline-period">성과 집계 예정</span></div>
         <div class="cd-tl-progress">
@@ -556,6 +542,30 @@ function renderResultPanel() {
               <div class="cd-tl-title">최종 <span class="cd-tl-pct">집계 예정</span></div>
               <div class="cd-tl-meta">완료 4주 후 기준</div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3열: 결과 카드 -->
+      <div class="cd-result-card">
+        ${pct >= 100 ? '<div class="cd-result-badge">🏆 영상 목표 달성!</div>' : ''}
+        <div class="cd-result-hero">${pct}%</div>
+        <div class="cd-result-list">
+          <div class="cd-result-item">
+            <span class="cd-result-lbl">목표 영상 수</span>
+            <span class="cd-result-val">${GOAL}개</span>
+          </div>
+          <div class="cd-result-item">
+            <span class="cd-result-lbl">게시물 등록 완료</span>
+            <span class="cd-result-val cd-result-val--accent">${postedCount}개</span>
+          </div>
+          <div class="cd-result-item">
+            <span class="cd-result-lbl">달성 조회수</span>
+            <span class="cd-result-val" style="opacity:.6;font-size:12px">집계 예정</span>
+          </div>
+          <div class="cd-result-item" style="border-bottom:none">
+            <span class="cd-result-lbl">집행 금액</span>
+            <span class="cd-result-val">₩150,000,000</span>
           </div>
         </div>
       </div>

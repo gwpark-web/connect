@@ -472,8 +472,10 @@ function renderResultPanel() {
   const campaignBadge = document.getElementById('chCampaignBadge');
   if (headerActions) headerActions.style.display = doneCount > 0 ? '' : 'none';
   if (campaignBadge) {
-    campaignBadge.textContent = doneCount > 0 ? '결과 단계' : '진행 중';
-    campaignBadge.className   = doneCount > 0 ? 'cd-badge done' : 'cd-badge running';
+    // 캠페인 상태는 광고주 카드와 동일하게 표기(채널 선정 중). 양쪽 상태값 통일.
+    // 실서비스에선 카드와 같은 캠페인 상태값을 그대로 읽어 온다.
+    campaignBadge.textContent = '채널 선정 중';
+    campaignBadge.className   = 'cd-badge running';
   }
 
   if (!doneCount) {
@@ -1206,28 +1208,26 @@ function chSetReviewStatus(val) {
   renderReviewPanel();
 }
 
-// ── p-list 프리미엄 카드 진행률 갱신 ─────────────────────────────────
+// ── 프리미엄 카드 진행률 갱신 (광고주 p-list + 관리자 p-admin 공통) ───────
 function updateListCardPremium() {
-  const progressWrap = document.getElementById('premiumCardProgress');
-  const statusHint   = document.getElementById('premiumCardHint');
-  const fillEl       = document.getElementById('premiumProgressFill');
-  const textEl       = document.getElementById('premiumProgressText');
-  if (!progressWrap || !statusHint) return;
-
   const doneCount = channels.reduce((n, _, i) =>
     n + (chState[i] === 'selected' && chReviewState[i] === '승인 완료' ? 1 : 0), 0);
-
-  progressWrap.style.display = '';
-  statusHint.style.display   = 'none';
-
   const pct     = Math.round(doneCount / GOAL * 100);
   const fillPct = Math.min(pct, 100);
-  if (fillEl) fillEl.style.width = `${fillPct}%`;
-  if (textEl) {
-    const pctCls  = pct >= 100 ? 'card-progress-pct over' : 'card-progress-pct';
-    const pctSpan = `<span class="${pctCls}">(${pct}%)</span>`;
-    textEl.innerHTML = `${doneCount} / ${GOAL}개 ${pctSpan}`;
-  }
+  const pctCls  = pct >= 100 ? 'card-progress-pct over' : 'card-progress-pct';
+  const textHtml = `${doneCount} / ${GOAL}개 <span class="${pctCls}">(${pct}%)</span>`;
+
+  // 광고주 카드(premium*)와 관리자 카드(admPremium*) 둘 다 갱신
+  [['premiumCardProgress', 'premiumCardHint', 'premiumProgressFill', 'premiumProgressText'],
+   ['admPremiumCardProgress', 'admPremiumCardHint', 'admPremiumProgressFill', 'admPremiumProgressText']]
+    .forEach(([wrapId, hintId, fillId, textId]) => {
+      const wrap = document.getElementById(wrapId), hint = document.getElementById(hintId);
+      if (!wrap || !hint) return;
+      wrap.style.display = '';
+      hint.style.display = 'none';
+      const fill = document.getElementById(fillId); if (fill) fill.style.width = `${fillPct}%`;
+      const text = document.getElementById(textId); if (text) text.innerHTML = textHtml;
+    });
 }
 
 // ── 조회수 갱신 (API / 크롤링 연동 예정) ──────────────────────────────
@@ -1263,3 +1263,6 @@ function refreshViewCounts() {
     // 연동 완료 후: renderResultPanel() 또는 개별 행 업데이트
   }, 1200);
 }
+
+// 광고주 프리미엄 카드 진행바를 로드 시점에 반영 (goTo 경로를 안 거쳐도 정확한 값)
+try { updateListCardPremium(); } catch (e) {}

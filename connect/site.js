@@ -119,7 +119,7 @@ function goTo(id) {
   bar.classList.toggle('visible', ctaPages.includes(id));
 
   if (id === 'p-channels') { updateSortArrows(); renderChannels(); updateChSummary(); }
-  if (id === 'p-list') { if (typeof updateListCardPremium === 'function') updateListCardPremium(); }
+  if (id === 'p-list' || id === 'p-admin') { if (typeof updateListCardPremium === 'function') updateListCardPremium(); }
   if (id === 'p1') { setTimeout(runStatCountUp, 200); }
 }
 

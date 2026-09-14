@@ -3912,6 +3912,22 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
   white-space: pre-wrap; word-break: break-word; margin: 0;
 }
 
+/* 보고서 등록: 캠페인 생성에서 불러오기 */
+.creg-source-field {
+  background: color-mix(in srgb, var(--orange) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--orange) 25%, transparent);
+  border-radius: 10px; padding: 12px 14px;
+}
+.creg-source-hint { display: block; font-size: 11.5px; color: var(--gray-light); margin-top: 6px; }
+
+/* 신규 캠페인 상세 — 기존 레이아웃, 데이터만 집계 전 */
+.cd-badge { display:inline-flex; align-items:center; padding:3px 10px; border-radius:100px; font-size:12px; font-weight:700; background:var(--gray-bg); color:var(--gray-light); }
+.cd-result-card--empty { background:linear-gradient(145deg,#EEF0F3 0%,#E3E6EB 100%); }
+.cd-result-card--empty .cd-result-hero, .cd-result-card--empty .cd-result-lbl, .cd-result-card--empty .cd-result-val { color:var(--gray-mid); }
+.cd-result-card--empty .cd-result-hero { color:var(--gray-light); }
+.cd-tl-empty { padding:28px 16px; text-align:center; font-size:13px; color:var(--gray-light); line-height:1.7; background:var(--gray-bg); border-radius:10px; }
+.vid-empty { padding:40px 16px; text-align:center; font-size:14px; color:var(--gray-light); }
+
 /* 채널 CID (유튜브 채널 ID) 열 — 유튜브·어드민 조회의 조인 키 */
 .ch-cid-cell { max-width: 150px; }
 .ch-cid {
@@ -4110,6 +4126,7 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
 
 /* 상단 행: 날짜 정보 + 일정 추가 버튼 */
 .sc-toprow { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.sc-toprow[hidden] { display:none !important; }  /* 달력 뷰에서 숨김 */
 .sc-today-info { display:flex; align-items:center; gap:10px; font-size:13px; color:var(--gray-mid); }
 .sc-today-sep { width:1px; height:12px; background:var(--border); }
 
@@ -4124,6 +4141,7 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
 
 /* 필터 */
 .sc-filters { display:flex; align-items:center; gap:10px; flex-wrap:nowrap; flex-shrink:0; }
+.sc-filters[hidden] { display:none !important; }  /* 달력 뷰에서 필터 숨김 (class 규칙이 hidden 을 덮지 않도록) */
 .sc-field { display:flex; align-items:center; gap:6px; }
 .sc-field > span { font-size:12px; color:var(--gray-light); white-space:nowrap; }
 .sc-field select { height:32px; padding:0 8px; border:1px solid var(--border); border-radius:7px; background:var(--white); font-size:13px; color:var(--gray-dark); cursor:pointer; }
@@ -4228,7 +4246,39 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
 .sc-icon-btn { width:30px; height:30px; border:1px solid var(--border); background:var(--white); border-radius:7px; cursor:pointer; color:var(--gray-mid); font-size:18px; line-height:1; display:grid; place-items:center; }
 .sc-icon-btn:hover { background:var(--gray-bg); color:var(--black); }
 
-.sc-cal-grid { background:var(--white); border:1px solid var(--border); border-radius:12px; display:grid; grid-template-columns:repeat(7,1fr); overflow:hidden; }
+/* 영업 목록 우선순위 배지 (상태값 + 마감 임박도 반영) */
+.sc-pri { display:inline-block; min-width:40px; padding:2px 9px; border-radius:100px; font-size:11px; font-weight:700; text-align:center; }
+.sc-pri--high   { background:#FEE2E2; color:#DC2626; }
+.sc-pri--mid    { background:var(--orange-pale); color:var(--orange); }
+.sc-pri--low    { background:var(--gray-bg); color:var(--gray-light); }
+.sc-pri--inprog { background:#DBEAFE; color:#2563EB; }
+.sc-pri--none   { background:var(--gray-bg); color:var(--gray-light); }
+
+/* 캘린더 월뷰 — 캠페인 기간 바 (주 단위 레이아웃) */
+.sc-cal-grid { background:var(--white); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+.sc-cal-dows { display:grid; grid-template-columns:repeat(7,1fr); border-bottom:1px solid var(--border); background:#FAFBFC; }
+.sc-week { border-top:1px solid #F3F4F6; }
+.sc-week:first-of-type { border-top:none; }
+.sc-week-days { display:grid; grid-template-columns:repeat(7,1fr); }
+.sc-wd { padding:6px 7px 2px; border-left:1px solid #F3F4F6; }
+.sc-wd:first-child { border-left:none; }
+.sc-wd.is-out { background:#FAFBFC; }
+.sc-wd-n { display:inline-block; font-size:12px; color:var(--gray-mid); font-variant-numeric:tabular-nums; line-height:20px; min-width:20px; text-align:center; }
+.sc-wd.sun .sc-wd-n { color:#C2413A; }
+.sc-wd.is-out .sc-wd-n { color:var(--gray-light); }
+.sc-wd.is-today .sc-wd-n { background:var(--black); color:#fff; border-radius:50%; height:20px; }
+.sc-week-bars { display:grid; grid-template-columns:repeat(7,1fr); grid-auto-rows:19px; row-gap:3px; padding:2px 0 8px; min-height:8px; }
+.sc-camp-bar { height:17px; display:flex; align-items:center; padding:0 6px; font-size:10.5px; font-weight:600; color:#fff; overflow:hidden; }
+.sc-camp-bar.is-start { border-top-left-radius:5px; border-bottom-left-radius:5px; margin-left:4px; }
+.sc-camp-bar.is-end { border-top-right-radius:5px; border-bottom-right-radius:5px; margin-right:4px; }
+.sc-camp-label { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sc-camp-progress { background:var(--orange); }
+.sc-camp-done { background:#9AA0AE; }
+.sc-camp-upcoming { background:#3B82F6; }
+.sc-cal-legend { display:flex; gap:14px; align-items:center; margin-bottom:10px; font-size:12px; color:var(--gray-mid); }
+.sc-cal-legend i { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:5px; vertical-align:-1px; }
+
+.sc-cal-grid.sc-cal-legacy { display:grid; grid-template-columns:repeat(7,1fr); }
 .sc-dow { padding:9px 0; text-align:center; font-size:12px; color:var(--gray-light); border-bottom:1px solid var(--border); background:#FAFBFC; }
 .sc-dow:first-child { color:#C2413A; }
 .sc-cell { min-height:90px; padding:7px 7px 5px; border-top:1px solid #F3F4F6; border-left:1px solid #F3F4F6; }

@@ -1389,6 +1389,16 @@
   <div class="vid-card">
     <div class="vid-card-head">
       참여 영상 <span class="vid-total-badge">2,500개</span>
+      <div class="vid-head-actions admin-only">
+        <button class="cd-btn cd-btn-excel vid-refresh-btn" data-fn="refreshViewCounts">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          조회수 갱신
+        </button>
+        <button class="cd-btn cd-btn-edit" data-fn="openReportUploadModal">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+          리포트 업로드
+        </button>
+      </div>
     </div>
     <div class="vid-stat-strip">
       <div class="vid-stat-col">
@@ -2006,6 +2016,88 @@
   <button class="btn-cta on" id="ctaBtn" data-fn="goTo" data-args="p3">캠페인 문의하기 →</button>
 </div>
 
+<!-- ════ PAGE — 신규 캠페인 상세 (기존과 동일 레이아웃, 데이터만 집계 전) ════ -->
+<!-- 실서비스에선 캠페인 id 로 각자의 리포트를 로드하는 자리. 지금은 값이 비어있다. -->
+<div class="page-wrapper" id="p-detail-empty">
+
+  <!-- 헤더 -->
+  <div class="cd-header">
+    <button class="cd-back" data-fn="goBackToList">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+    </button>
+    <div class="cd-thumb">📄</div>
+    <div class="cd-info">
+      <div class="cd-name-row">
+        <span class="cd-name">새 캠페인</span>
+        <span class="cd-badge">집계 예정</span>
+      </div>
+      <div class="cd-meta"><span style="font-size:12px;color:var(--gray-light)">캠페인이 시작되면 데이터가 집계됩니다</span></div>
+    </div>
+    <div class="cd-actions">
+      <button class="cd-btn cd-btn-tax admin-only" id="taxBtnEmpty" data-fn="openTaxModal" data-args="집계 예정|taxBtnEmpty">
+        세금계산서 요청
+      </button>
+      <button class="cd-btn cd-btn-excel">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>
+        리포트 다운로드
+      </button>
+    </div>
+  </div>
+
+  <!-- 3열 리포트 영역 -->
+  <div class="cd-report-row">
+    <div class="cd-poster-col">
+      <div class="cd-poster-placeholder">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gray-light)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        <span>포스터 이미지</span>
+      </div>
+    </div>
+
+    <div class="cd-timeline-card">
+      <div class="cd-timeline-head">
+        <span>리포트 타임라인</span>
+        <button class="cd-add-round-btn admin-only" data-fn="openAddRoundModal">+ 회차 추가</button>
+      </div>
+      <div class="cd-tl-empty">아직 집계된 회차가 없습니다.<br>캠페인이 시작되면 회차별 리포트가 쌓입니다.</div>
+      <div class="cd-tl-list"></div>
+    </div>
+
+    <div class="cd-result-card cd-result-card--empty">
+      <div class="cd-result-hero">—</div>
+      <div class="cd-result-list">
+        <div class="cd-result-item"><span class="cd-result-lbl">목표 조회수</span><span class="cd-result-val">집계 예정</span></div>
+        <div class="cd-result-item"><span class="cd-result-lbl">달성 조회수</span><span class="cd-result-val">집계 예정</span></div>
+        <div class="cd-result-item"><span class="cd-result-lbl">참여 영상</span><span class="cd-result-val">—</span></div>
+        <div class="cd-result-item"><span class="cd-result-lbl">집행 금액</span><span class="cd-result-val">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 참여 영상 -->
+  <div class="vid-card">
+    <div class="vid-card-head">
+      참여 영상
+      <div class="vid-head-actions admin-only">
+        <button class="cd-btn cd-btn-excel vid-refresh-btn" data-fn="refreshViewCounts">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          조회수 갱신
+        </button>
+        <button class="cd-btn cd-btn-edit" data-fn="openReportUploadModal">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+          리포트 업로드
+        </button>
+      </div>
+    </div>
+    <div class="vid-stat-strip">
+      <div class="vid-stat-col"><div class="vid-stat-num">—</div><div class="vid-stat-lbl">총 조회수</div></div>
+      <div class="vid-stat-col"><div class="vid-stat-num">—</div><div class="vid-stat-lbl">총 좋아요</div></div>
+      <div class="vid-stat-col"><div class="vid-stat-num">—</div><div class="vid-stat-lbl">총 댓글</div></div>
+      <div class="vid-stat-col"><div class="vid-stat-num">0</div><div class="vid-stat-lbl">참여 채널</div></div>
+    </div>
+    <div class="vid-empty">아직 참여 영상이 없습니다. 캠페인이 시작되면 여기에 표시됩니다.</div>
+  </div>
+</div>
+
 <!-- ════ PAGE — 관리자 (임시) ════ -->
 <div class="page-wrapper wide" id="p-admin">
 
@@ -2023,7 +2115,7 @@
       <button class="status-chip active" data-adm-tab="report">캠페인 보고서 <span class="chip-count">40</span></button>
       <button class="status-chip" data-adm-tab="create">캠페인 생성 <span class="chip-count">23</span></button>
       <button class="status-chip" data-adm-tab="account">계정 관리 <span class="chip-count">4</span></button>
-      <button class="status-chip" data-adm-tab="sales">영업 캘린더 <span class="chip-count" id="sc-tab-count">0</span></button>
+      <button class="status-chip" data-adm-tab="sales">캘린더 <span class="chip-count" id="sc-tab-count">0</span></button>
     </div>
     <!-- 상단 행은 4개 탭이 공유한다. 탭별로 해당하는 버튼만 노출 (site.js 탭 핸들러에서 토글) -->
     <button class="btn-new-campaign" id="adm-report-btn" data-fn="openCampaignRegModal" style="margin-left:auto">보고서 등록하기</button>
@@ -2054,7 +2146,7 @@
 
     <div class="campaign-card" data-fn="goTo" data-args="p-detail" data-campaign-type="view" data-campaign-status="done" data-pct="115"
       data-edit-title="영화 〈토이 스토리 5〉" data-edit-client="월트디즈니 코리아" data-edit-product="조회수당"
-      data-edit-status="done" data-edit-start="2026-05-26" data-edit-end="2026-06-08"
+      data-edit-status="done" data-edit-start="2026-08-15" data-edit-end="2026-09-05"
       data-edit-goal-type="조회수" data-edit-goal-value="500000" data-edit-current="524812"
       data-edit-thumb="img/toy_story5.jpg" data-edit-platforms="yt">
       <div class="card-thumb">
@@ -2082,7 +2174,7 @@
 
     <div class="campaign-card action-needed" data-fn="goTo" data-args="p-channels" data-campaign-type="connect" data-campaign-status="channel-select" data-pct="0"
       data-edit-title="시리즈 〈다 이루어질지니〉" data-edit-client="카카오엔터테인먼트" data-edit-product="프리미엄"
-      data-edit-status="channel-select" data-edit-start="2026-05-01" data-edit-end="2026-06-30"
+      data-edit-status="channel-select" data-edit-start="2026-09-10" data-edit-end="2026-10-20"
       data-edit-goal-type="조회수" data-edit-goal-value="300000" data-edit-current="0"
       data-edit-thumb="" data-edit-platforms="yt,ig">
       <div class="card-thumb" style="background:linear-gradient(160deg,#1a0828,#3d1060)">
@@ -2111,7 +2203,7 @@
 
     <div class="campaign-card" data-fn="goTo" data-args="p-detail-upload" data-campaign-type="upload" data-campaign-status="progress" data-pct="65"
       data-edit-title="EPEX — UNIVERSE 음원 바이럴 캠페인" data-edit-client="SM엔터테인먼트" data-edit-product="업로드당"
-      data-edit-status="progress" data-edit-start="2026-06-15" data-edit-end="2026-07-15"
+      data-edit-status="progress" data-edit-start="2026-08-28" data-edit-end="2026-09-22"
       data-edit-goal-type="영상" data-edit-goal-value="2500" data-edit-current="1620"
       data-edit-thumb="" data-edit-platforms="yt,tt">
       <div class="card-thumb" style="background:linear-gradient(160deg,#0a1628,#1a3060)">
@@ -2243,7 +2335,8 @@
   <!-- ── 패널 4: 영업 캘린더 ── -->
   <div class="adm-panel" id="adm-panel-sales">
 
-    <div class="sc-toprow">
+    <!-- 날짜·연락할 작품 수·갱신·일정추가 = 영업 프로스펙트용. 달력에선 숨김(기본) -->
+    <div class="sc-toprow" hidden>
       <div class="sc-today-info">
         <span id="sc-today-date"></span>
         <span class="sc-today-sep"></span>
@@ -2259,11 +2352,11 @@
     </div>
 
     <div class="sc-controls">
-      <div class="sc-seg" role="tablist">
-        <button class="sc-seg-btn is-on" data-sc-view="list">목록</button>
-        <button class="sc-seg-btn" data-sc-view="month">달력</button>
+      <div class="status-chip-bar" role="tablist">
+        <button class="status-chip active" data-sc-view="month">달력</button>
+        <button class="status-chip" data-sc-view="list">영업 목록 <span class="chip-count" id="sc-list-count">0</span></button>
       </div>
-      <div class="sc-filters">
+      <div class="sc-filters" hidden>
         <label class="sc-field">
           <span>유형</span>
           <select id="sc-fType">
@@ -2301,13 +2394,14 @@
       <span class="sc-source-note" id="sc-source-note"></span>
     </div>
 
-    <div id="sc-view-list" class="sc-view">
+    <div id="sc-view-list" class="sc-view" hidden>
       <div class="adm-card" style="margin-top:8px">
         <div class="adm-table-wrap">
           <table class="adm-table">
             <thead>
               <tr id="sc-row-head">
                 <th><button class="adm-th-sort" data-sort-key="date">개봉일</button></th>
+                <th style="text-align:center"><button class="adm-th-sort" data-sort-key="priority">우선순위</button></th>
                 <th style="text-align:center"><button class="adm-th-sort" data-sort-key="title">작품명</button></th>
                 <th><button class="adm-th-sort" data-sort-key="type">타입</button></th>
                 <th><button class="adm-th-sort" data-sort-key="genre">장르</button></th>
@@ -2329,12 +2423,18 @@
       </div>
     </div>
 
-    <div id="sc-view-month" class="sc-view" hidden>
+    <div id="sc-view-month" class="sc-view">
       <div class="sc-month-nav">
         <button class="sc-icon-btn" id="sc-prev-month">&#8249;</button>
         <h2 id="sc-month-label"></h2>
         <button class="sc-icon-btn" id="sc-next-month">&#8250;</button>
         <button class="adm-btn adm-btn-outline" id="sc-this-month" style="margin-left:8px">이번 달</button>
+      </div>
+      <div class="sc-cal-legend">
+        <span><i style="background:var(--orange)"></i>진행중</span>
+        <span><i style="background:#3B82F6"></i>예정·준비</span>
+        <span><i style="background:#9AA0AE"></i>완료</span>
+        <span style="color:var(--gray-light)">· 바 = 캠페인 기간(시작~종료)</span>
       </div>
       <div class="sc-cal-grid" id="sc-cal-grid"></div>
     </div>
@@ -2956,7 +3056,17 @@
       <button class="creg-close-btn" data-fn="closeCampaignRegModal">&#x2715;</button>
     </div>
     <form id="campaignRegForm" onsubmit="return false">
+      <input type="hidden" id="creg-source-id">
       <div class="p5-modal-grid">
+
+        <!-- 캠페인 생성에서 불러오기 — 선택하면 생성 데이터로 자동 채우고 출처를 링크한다 -->
+        <div class="p5-modal-field full creg-source-field">
+          <label class="p5-modal-label">캠페인 생성에서 불러오기</label>
+          <select class="p5-modal-select" id="creg-source">
+            <option value="">직접 입력</option>
+          </select>
+          <span class="creg-source-hint">선택하면 캠페인명·광고주·플랫폼·목표·시작일이 자동으로 채워집니다 (종료일만 입력)</span>
+        </div>
 
         <div class="p5-modal-field">
           <label class="p5-modal-label">캠페인명 *</label>

@@ -1,12 +1,12 @@
 try { emailjs.init('PR1yiM-fDVGYx5wCo'); } catch(e) { console.warn('EmailJS init failed', e); }
 
 // ── ROUTING ──
-const pages = ['p1','p3','p4','p-list','p-channels','p-detail','p-detail-upload','p-admin'];
+const pages = ['p1','p3','p4','p-list','p-channels','p-detail','p-detail-upload','p-detail-empty','p-admin'];
 const authPages = ['p-signup','p-brochure'];
 const navMap = { p1:'nav-p1', p3:'nav-p3' };
 const ctaPages = ['p-channels'];
 const p0ActivePages = ['p1','p3','p4'];
-const DETAIL_PAGES = ['p-detail', 'p-detail-upload', 'p-channels'];
+const DETAIL_PAGES = ['p-detail', 'p-detail-upload', 'p-channels', 'p-detail-empty'];
 
 // ── 캠페인 카드 정렬 (광고주 p-list · 관리자 p-admin 공통) ──────────────────
 
@@ -1011,9 +1011,86 @@ function submitAddRound() {
 }
 
 // ── 캠페인 등록 모달 ─────────────────────────────────────────────────
+// ── 보고서 등록: 캠페인 생성에서 불러오기 ─────────────────────────────
+// 캠페인 생성 표를 읽어 피커 데이터로 쓴다. 실서비스에선 이 목록이 백엔드의
+// 생성 캠페인 목록이 되고, 보고서는 선택한 캠페인의 id 를 링크로 저장한다.
+const CREATED_YEAR = 2026; // 생성 표 기간이 MM.DD 형식이라 연도 보정용 (데모 기준)
+let _createdCampaignsCache = [];
+
+// "05.26~06.25" → ["2026-05-26","2026-06-25"] (종료월 < 시작월이면 종료는 +1년)
+function parsePeriod(p) {
+  const m = String(p).match(/(\d{1,2})\.(\d{1,2})\s*~\s*(\d{1,2})\.(\d{1,2})/);
+  if (!m) return ['', ''];
+  const sm = +m[1], sd = +m[2], em = +m[3], ed = +m[4];
+  const ey = em < sm ? CREATED_YEAR + 1 : CREATED_YEAR;
+  const iso = (y, mo, d) => `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  return [iso(CREATED_YEAR, sm, sd), iso(ey, em, ed)];
+}
+
+function readCreatedCampaigns() {
+  const rows = document.querySelectorAll('#adm-sub-studio-campaign tbody tr');
+  const out = [];
+  rows.forEach((tr, idx) => {
+    const c = tr.children;
+    if (c.length < 7) return;
+    const name = (c[0].textContent || '').trim();
+    if (!name) return;
+    const platCls = c[2].querySelector('.platform-badge')?.className || '';
+    const platform = /\byt\b/.test(platCls) ? 'yt' : /\big\b/.test(platCls) ? 'ig' : /\btt\b/.test(platCls) ? 'tt' : '';
+    const [start, end] = parsePeriod((c[6].textContent || '').trim());
+    out.push({
+      idx, name,
+      brand: (c[1].getAttribute('title') || c[1].textContent || '').trim(),
+      platform,
+      type: (c[3].textContent || '').trim(),
+      goal: (c[5].textContent || '').trim(),
+      period: (c[6].textContent || '').trim(),
+      start, end,
+    });
+  });
+  return out;
+}
+
+function fillCampaignSourceSelect() {
+  const sel = document.getElementById('creg-source');
+  if (!sel) return;
+  _createdCampaignsCache = readCreatedCampaigns();
+  const platKo = { yt: '유튜브', ig: '인스타', tt: '틱톡' };
+  sel.innerHTML = '<option value="">직접 입력</option>' +
+    _createdCampaignsCache.map(c =>
+      `<option value="${c.idx}">${c.name} · ${platKo[c.platform] || '-'} · ${c.period}</option>`).join('');
+}
+
+function applyCampaignSource(idxStr) {
+  const hint = document.querySelector('.creg-source-hint');
+  const srcId = document.getElementById('creg-source-id');
+  const set = (id, v) => { const el = document.getElementById(id); if (el && v != null && v !== '') el.value = v; };
+  if (idxStr === '' || idxStr == null) {
+    if (srcId) srcId.value = '';
+    if (hint) hint.textContent = '선택하면 캠페인명·광고주·플랫폼·목표·시작일이 자동으로 채워집니다 (종료일만 입력)';
+    return;
+  }
+  const c = _createdCampaignsCache.find(x => x.idx === Number(idxStr));
+  if (!c) return;
+  set('creg-title', c.name);
+  set('creg-client', c.brand);
+  set('creg-platform', c.platform);
+  set('creg-goal-views', (c.goal || '').replace(/[^0-9,]/g, ''));
+  set('creg-start', c.start);
+  set('creg-end', c.end);   // 예비 종료 — 실제 종료일로 수정 가능
+  if (srcId) srcId.value = `${c.name}|${c.platform}|${c.start}`;
+  if (hint) hint.textContent = `✓ 「${c.name}」 연결됨 · 시작 ${c.start}(생성) — 실제 종료일을 확인/입력하세요`;
+}
+
+document.addEventListener('change', function (e) {
+  if (e.target && e.target.id === 'creg-source') applyCampaignSource(e.target.value);
+});
+
 function openCampaignRegModal() {
   document.getElementById('campaignRegForm')?.reset();
   fillAccountSelect(document.getElementById('creg-agency'), '', '선택 안함');
+  fillCampaignSourceSelect();
+  applyCampaignSource('');   // 힌트 초기화 + 링크 해제
   const toggle = document.getElementById('cregPremiumToggle');
   if (toggle) toggle.dataset.on = 'false';
   document.getElementById('campaignRegModal').classList.add('active');
@@ -1069,16 +1146,24 @@ function submitCampaignReg() {
 
   const product = isPremium ? '프리미엄' : (goalViews ? '조회수당' : '업로드당');
   const thumbBg = thumbUrl ? '' : 'background:linear-gradient(160deg,#1a1a2e,#16213e)';
-  const startFmt = startDate ? startDate.replace(/-/g, '.') : '-';
-  const endFmt   = endDate   ? endDate.replace(/-/g, '.')   : '-';
-  const goalLabel = goalViews
-    ? `목표 ${Number(goalViews).toLocaleString()} 조회수`
-    : goalVids ? `목표 ${Number(goalVids).toLocaleString()} 영상` : '';
+
+  // 신규 캠페인(모집중)은 진행률 0% + 상세보기 버튼 — 기존 카드와 동일한 구성
+  const goalNum = goalViews || goalVids;
+  const goalUnit = goalViews ? '회' : '개';
+  const progressText = goalNum
+    ? `0 / ${Number(goalNum).toLocaleString()}${goalUnit} <span class="card-progress-pct">(0%)</span>`
+    : '집계 예정';
+  // 신규 캠페인은 아직 집계 데이터가 없다 → 데모(토이스토리) 상세가 아니라 빈 상세로.
+  // 실서비스에선 캠페인 id 로 각자의 리포트를 로드하는 자리.
+  const detailTarget = 'p-detail-empty';
 
   const card = document.createElement('div');
   card.className = 'campaign-card';
   card.dataset.campaignStatus = 'recruiting';
   card.dataset.pct = '0';
+  // 카드 클릭도 상세로 (기존 정적 카드와 동일)
+  card.setAttribute('data-fn', 'goTo');
+  card.setAttribute('data-args', detailTarget);
   // 수정 사이드패널이 읽는 값들 — 없으면 등록한 카드를 편집할 수 없다
   Object.assign(card.dataset, {
     editTitle: title,
@@ -1092,6 +1177,8 @@ function submitCampaignReg() {
     editEnd: endDate,
     editThumb: thumbUrl,
     editPlatforms: platform,
+    // 캠페인 생성에서 불러온 경우 출처 링크 (name|platform|start). 캘린더 조인·추적용.
+    sourceId: document.getElementById('creg-source-id')?.value || '',
   });
   card.innerHTML = `
     <div class="card-thumb"${thumbUrl ? '' : ` style="${thumbBg}"`}>${thumbUrl
@@ -1099,21 +1186,19 @@ function submitCampaignReg() {
       : ''}<button class="card-edit-btn">수정</button></div>
     <div class="card-thumb-info">
       <div class="card-product-tag">${product}</div>
+      <div class="status-badge recruiting">모집 중</div>
     </div>
     <div class="card-body">
-      <div class="card-status-row">
-        <span class="card-status-badge status-recruiting">모집중</span>
-        <span class="card-client">${client}</span>
-      </div>
       <div class="card-title">${title}</div>
       <div class="card-platform-badges">
         ${CREG_PLAT[platform] || ''}
         ${acct ? `<span class="card-agency" title="광고주 계정">${acct}</span>` : ''}
       </div>
-      <div class="card-meta-row">
-        <span class="card-meta">${startFmt} ~ ${endFmt}</span>
-        ${goalLabel ? `<span class="card-meta">${goalLabel}</span>` : ''}
+      <div class="card-progress-wrap">
+        <div class="card-progress-track"><div class="card-progress-fill" style="width:0%"></div></div>
+        <div class="card-progress-text">${progressText}</div>
       </div>
+      <button class="card-btn primary" data-fn="goTo" data-args="${detailTarget}" data-stop="1">상세 보기 →</button>
     </div>`;
 
   const grid = document.querySelector('#adm-panel-report .adm-report-grid');
@@ -1474,7 +1559,7 @@ document.addEventListener('click', function(e) {
   var STORE_KEY = 'cs_sales_cal_v1';
   var STATUSES = ['미접촉', '접이중', '접촉완료', '진행', '무산'];
   var CLOSED = ['진행', '무산'];
-  var scView = 'list';
+  var scView = 'month';   // 달력이 기본 (영업 목록은 보조 뷰)
   var scMonth = startOfMonth(new Date());
   var scEditId = null;
   var scItems = scLoad();
@@ -1516,6 +1601,7 @@ document.addEventListener('click', function(e) {
     if (key === 'source') return (it.source || '').toLowerCase();
     if (key === 'owner') return (it.owner || '').toLowerCase();
     if (key === 'status') return STATUSES.indexOf(it.status);
+    if (key === 'priority') return { high: 0, mid: 1, low: 2, inprog: 3, none: 4 }[scPriority(it).cls];
     return '';
   }
 
@@ -1523,7 +1609,9 @@ document.addEventListener('click', function(e) {
   function scFiltered() {
     var type = (g('sc-fType') || {}).value || '';
     var filmCat = (g('sc-fFilmCat') || {}).value || '';
-    var status = (g('sc-fStatus') || {}).value || 'open';
+    // '전체'는 value="" 이므로 || 'open' 을 쓰면 안 됨 (전체가 미완료로 되돌아감)
+    var statusEl = g('sc-fStatus');
+    var status = statusEl ? statusEl.value : 'open';
     var q = ((g('sc-fQuery') || {}).value || '').trim().toLowerCase();
     var list = scItems.filter(function (it) {
       if (it.date && dday(it.date) < -7) return false;
@@ -1556,8 +1644,11 @@ document.addEventListener('click', function(e) {
     }).length;
     var ce = g('sc-today-count');
     if (ce) ce.innerHTML = due ? '연락할 작품 <b style="color:var(--orange)">' + due + '</b>건' : '연락할 작품 없음';
+    var openCnt = scItems.filter(function (it) { return CLOSED.indexOf(it.status) === -1; }).length;
     var tc = g('sc-tab-count');
-    if (tc) tc.textContent = scItems.filter(function (it) { return CLOSED.indexOf(it.status) === -1; }).length;
+    if (tc) tc.textContent = openCnt;
+    var lc = g('sc-list-count');
+    if (lc) lc.textContent = openCnt;
     var sn = g('sc-source-note');
     if (sn) sn.textContent = '전체 ' + scItems.length + '건';
   }
@@ -1591,6 +1682,18 @@ document.addEventListener('click', function(e) {
 
   var KOBIS_POPUP_BASE = 'https://www.kobis.or.kr/kobis/business/mast/mvie/searchMovieList.do?dtTp=movie&dtCd=';
 
+  // 우선순위 = 상태값 + 마감 임박도(D-day) 반영.
+  // 무산=제외, 진행=진행중, 나머지(미접촉·접이중·접촉완료)는 개봉일까지 남은 일수로.
+  function scPriority(it) {
+    if (it.status === '무산') return { label: '제외', cls: 'none' };
+    if (it.status === '진행') return { label: '진행', cls: 'inprog' };
+    var n = dday(it.date);
+    if (n === 9999 || n < 0) return { label: '낮음', cls: 'low' };
+    if (n <= 14) return { label: '높음', cls: 'high' };
+    if (n <= 30) return { label: '보통', cls: 'mid' };
+    return { label: '낮음', cls: 'low' };
+  }
+
   function rowHTML(it) {
     var n = dday(it.date);
     var urgent = n >= 0 && n <= 14 && CLOSED.indexOf(it.status) === -1;
@@ -1599,13 +1702,14 @@ document.addEventListener('click', function(e) {
       : n < 0
         ? '<span class="sc-dday is-past">공개됨</span>'
         : '<span class="sc-dday' + (urgent ? ' is-urgent' : '') + '">D-' + n + '</span>';
-    var priorityDot = it.priority === '높음' ? '🔴' : it.priority === '낮음' ? '⚪' : '';
+    var pri = scPriority(it);
     var sourceCell = it.movieCd
       ? '<a class="sc-link-kobis" href="' + KOBIS_POPUP_BASE + esc(it.movieCd) + '" target="_blank" rel="noopener">KOBIS</a>'
       : (it.source ? '<span class="sc-source-tag">' + esc(it.source) + '</span>' : '<span style="color:var(--gray-light)">—</span>');
     return '<tr class="sc-tr' + (urgent ? ' is-urgent' : '') + (CLOSED.indexOf(it.status) !== -1 ? ' is-closed' : '') + '" data-sc-id="' + it.id + '">' +
       '<td class="sc-dday-col">' + ddayStr + '<span class="sc-date">' + fmtDate(it.date) + '</span></td>' +
-      '<td class="sc-title">' + (priorityDot ? '<span class="sc-pri-dot">' + priorityDot + '</span>' : '') + esc(it.title) +
+      '<td style="text-align:center"><span class="sc-pri sc-pri--' + pri.cls + '">' + pri.label + '</span></td>' +
+      '<td class="sc-title">' + esc(it.title) +
         (it.filmCat ? '<span class="sc-filmcat">' + esc(it.filmCat) + '</span>' : '') + '</td>' +
       '<td><span class="sc-type-badge">' + esc(it.type || '—') + '</span></td>' +
       '<td class="sc-genre">' + esc(it.genre || '—') + '</td>' +
@@ -1619,32 +1723,100 @@ document.addEventListener('click', function(e) {
     '</tr>';
   }
 
+  // 캠페인 상태 → 바 색/라벨
+  var CAMP_CAL = {
+    done:             { cls: 'done',     label: '완료' },
+    progress:         { cls: 'progress', label: '진행중' },
+    'channel-select': { cls: 'upcoming', label: '준비' },
+    recruiting:       { cls: 'upcoming', label: '예정' },
+  };
+  function scIso(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+
+  // 캠페인 보고서 카드에서 캠페인을 읽는다. 시작=생성(불러오기 자동채움), 종료=보고서.
+  // 실서비스에선 이 목록이 백엔드 조인 결과가 된다.
+  function readReportCampaigns() {
+    var out = [];
+    document.querySelectorAll('.adm-report-grid .campaign-card').forEach(function (card) {
+      var d = card.dataset;
+      if (!d.editStart || !d.editEnd) return;
+      out.push({
+        name: d.editTitle || (card.querySelector('.card-title') || {}).textContent || '캠페인',
+        start: d.editStart, end: d.editEnd,
+        status: d.editStatus || d.campaignStatus || 'recruiting',
+      });
+    });
+    return out;
+  }
+
+  // 달력 = 진행 캠페인만 (프로스펙트는 영업 목록 뷰). 기간을 가로 바로 그린다.
   function scRenderMonth() {
     var y = scMonth.getFullYear(), m = scMonth.getMonth();
     var lbl = g('sc-month-label');
     if (lbl) lbl.textContent = y + '년 ' + (m + 1) + '월';
-    var startDow = new Date(y, m, 1).getDay();
-    var start = new Date(y, m, 1 - startDow);
-    var list = scFiltered();
-    var byDate = {};
-    list.forEach(function (it) { if (!byDate[it.date]) byDate[it.date] = []; byDate[it.date].push(it); });
-    var dows = ['일','월','화','수','목','금','토'];
-    var html = dows.map(function (d, i) { return '<div class="sc-dow' + (i === 0 ? ' sun' : '') + '">' + d + '</div>'; }).join('');
+
+    var gridStart = new Date(y, m, 1 - new Date(y, m, 1).getDay());
+    var gridEnd = new Date(gridStart); gridEnd.setDate(gridStart.getDate() + 41);
+    var gsISO = scIso(gridStart), geISO = scIso(gridEnd);
     var tISO = today0().toISOString().slice(0, 10);
-    for (var i = 0; i < 42; i++) {
-      var cur = new Date(start); cur.setDate(start.getDate() + i);
-      var iso = cur.getFullYear() + '-' + pad(cur.getMonth() + 1) + '-' + pad(cur.getDate());
-      var out = cur.getMonth() !== m;
-      var hits = byDate[iso] || [];
-      var chips = hits.slice(0, 3).map(function (it) {
-        var n = dday(it.date);
-        var urg = n >= 0 && n <= 14 && CLOSED.indexOf(it.status) === -1;
-        return '<button class="sc-cal-chip sc-st-' + it.status + (urg ? ' is-urgent' : '') + '" data-sc-id="' + it.id + '">' + esc(it.title) + '</button>';
-      }).join('');
-      var more = hits.length > 3 ? '<div class="sc-cell-more">외 ' + (hits.length - 3) + '건</div>' : '';
-      html += '<div class="sc-cell' + (out ? ' is-out' : '') + (iso === tISO ? ' is-today' : '') + '">' +
-        '<span class="sc-cell-n">' + cur.getDate() + '</span>' + chips + more + '</div>';
+
+    var camps = readReportCampaigns().filter(function (c) {
+      return c.end >= gsISO && c.start <= geISO;   // 이 달 그리드에 걸치는 것만
+    });
+
+    var dows = ['일', '월', '화', '수', '목', '금', '토'];
+    var html = '<div class="sc-cal-dows">' +
+      dows.map(function (d, i) { return '<div class="sc-dow' + (i === 0 ? ' sun' : '') + '">' + d + '</div>'; }).join('') + '</div>';
+
+    function colOf(weekStart, iso) {
+      return Math.round((new Date(iso + 'T00:00:00') - weekStart) / 86400000);
     }
+
+    var labeled = {};   // 캠페인별 라벨은 화면상 첫 세그먼트에 한 번만
+    for (var w = 0; w < 6; w++) {
+      var weekStart = new Date(gridStart); weekStart.setDate(gridStart.getDate() + w * 7);
+      var weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate() + 6);
+      var wsISO = scIso(weekStart), weISO = scIso(weekEnd);
+
+      var days = '';
+      for (var i = 0; i < 7; i++) {
+        var cur = new Date(weekStart); cur.setDate(weekStart.getDate() + i);
+        var iso = scIso(cur);
+        days += '<div class="sc-wd' + (cur.getMonth() !== m ? ' is-out' : '') +
+          (iso === tISO ? ' is-today' : '') + (cur.getDay() === 0 ? ' sun' : '') +
+          '"><span class="sc-wd-n">' + cur.getDate() + '</span></div>';
+      }
+
+      // 이 주 세그먼트 + lane 배정(겹치면 다음 줄)
+      var segs = camps.filter(function (c) { return c.end >= wsISO && c.start <= weISO; })
+        .map(function (c) {
+          var s = c.start > wsISO ? c.start : wsISO;
+          var e = c.end < weISO ? c.end : weISO;
+          return { c: c, col1: colOf(weekStart, s) + 1, col2: colOf(weekStart, e) + 1,
+                   startsHere: c.start >= wsISO, endsHere: c.end <= weISO };
+        }).sort(function (a, b) { return a.col1 - b.col1; });
+      var laneEnd = [];
+      segs.forEach(function (seg) {
+        var lane = 0;
+        while (lane < laneEnd.length && laneEnd[lane] >= seg.col1) lane++;
+        seg.lane = lane; laneEnd[lane] = seg.col2;
+      });
+      var bars = segs.map(function (seg) {
+        var info = CAMP_CAL[seg.c.status] || CAMP_CAL.recruiting;
+        var showLabel = !labeled[seg.c.name];   // 화면 첫 세그먼트에만
+        if (showLabel) labeled[seg.c.name] = 1;
+        var cont = seg.startsHere ? '' : '‹ ';    // 앞 주에서 이어짐 표시
+        return '<div class="sc-camp-bar sc-camp-' + info.cls +
+          (seg.startsHere ? ' is-start' : '') + (seg.endsHere ? ' is-end' : '') +
+          '" style="grid-column:' + seg.col1 + ' / ' + (seg.col2 + 1) + ';grid-row:' + (seg.lane + 1) + '"' +
+          ' title="' + esc(seg.c.name) + ' · ' + info.label + ' (' + seg.c.start + '~' + seg.c.end + ')">' +
+          (showLabel ? '<span class="sc-camp-label">' + cont + esc(seg.c.name) + '</span>' : '') + '</div>';
+      }).join('');
+
+      html += '<div class="sc-week">' +
+        '<div class="sc-week-days">' + days + '</div>' +
+        '<div class="sc-week-bars">' + bars + '</div></div>';
+    }
+
     var grid = g('sc-cal-grid');
     if (grid) grid.innerHTML = html;
   }
@@ -1751,9 +1923,14 @@ document.addEventListener('click', function(e) {
     var segBtn = e.target.closest('[data-sc-view]');
     if (segBtn) {
       scView = segBtn.dataset.scView;
-      document.querySelectorAll('[data-sc-view]').forEach(function (b) { b.classList.toggle('is-on', b === segBtn); });
+      document.querySelectorAll('[data-sc-view]').forEach(function (b) { b.classList.toggle('active', b === segBtn); });
       var vl = g('sc-view-list'), vm = g('sc-view-month');
       if (vl) vl.hidden = scView !== 'list'; if (vm) vm.hidden = scView !== 'month';
+      // 필터 + 상단 정보줄(날짜·연락할 작품 수·갱신·일정추가)은 영업 목록에서만 노출
+      var flt = document.querySelector('.sc-filters');
+      if (flt) flt.hidden = scView !== 'list';
+      var top = document.querySelector('#adm-panel-sales .sc-toprow');
+      if (top) top.hidden = scView !== 'list';
       scRender(); return;
     }
     if (e.target.id === 'sc-prev-month') { scMonth = new Date(scMonth.getFullYear(), scMonth.getMonth() - 1, 1); scRenderMonth(); return; }

@@ -455,7 +455,7 @@ function openStatModal(type) {
     bodyEl.innerHTML    = _statRankHTML(_STAT_DATA.likes, v => v.toLocaleString() + '개');
   } else if (type === 'comments') {
     titleEl.textContent = '베스트 댓글';
-    subEl.textContent   = '총 310개 댓글 중 주요 반응 · 긍정 순';
+    subEl.textContent   = '주요 반응 · 좋아요 많은 순 (긍정·기대 우선)';
     bodyEl.innerHTML    = _statCmtHTML(_STAT_DATA.comments);
   }
   document.getElementById('statModal').classList.add('open');
@@ -485,15 +485,24 @@ function _statRankHTML(items, fmt) {
 
 const _STAT_TAG_COLOR = { '기대':'#ff6200', '감동':'#a040e0', '추억':'#2080d0', '음악':'#20a060', '호평':'#c05000' };
 function _statCmtHTML(items) {
+  // 채널명 → 영상 URL (조회수/좋아요 데이터에서). 실서비스에선 각 댓글이 자기 영상 URL을
+  // 갖고, 가능하면 댓글 deep-link(유튜브 &lc=<댓글ID>)까지 붙여 바로 꽂히게 한다.
+  const urlByCh = {};
+  [].concat(_STAT_DATA.views, _STAT_DATA.likes).forEach(d => { if (d.name && d.url) urlByCh[d.name] = d.url; });
+  const linkIcon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
   return '<ul class="stat-cmt-list">' + items.map(d => {
     const c = _STAT_TAG_COLOR[d.tag] || '#888';
+    const url = d.url || urlByCh[d.channel] || 'https://www.youtube.com/shorts/dQw4w9WgXcQ';
     return `<li class="stat-cmt-item">
       <div class="stat-cmt-meta">
         <span class="stat-cmt-tag" style="background:${c}1a;color:${c}">${d.tag}</span>
         <span class="stat-cmt-likes">♥ ${d.likes.toLocaleString()}</span>
       </div>
       <p class="stat-cmt-text">"${d.text}"</p>
-      <span class="stat-cmt-ch">— ${d.channel}</span>
+      <div class="stat-cmt-foot">
+        <span class="stat-cmt-ch">— ${d.channel}</span>
+        <a class="stat-cmt-link" href="${url}" target="_blank" rel="noopener" title="이 댓글이 달린 영상 보기">영상에서 보기 ${linkIcon}</a>
+      </div>
     </li>`;
   }).join('') + '</ul>';
 }

@@ -3668,6 +3668,9 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
   margin: 0 0 5px; word-break: keep-all;
 }
 .stat-cmt-ch { font-size: 11px; color: var(--gray-light); }
+.stat-cmt-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; }
+.stat-cmt-link { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: var(--orange); text-decoration: none; white-space: nowrap; }
+.stat-cmt-link:hover { text-decoration: underline; }
 
 @media (max-width: 600px) {
   .stat-rank-item, .stat-cmt-item { padding-left: 20px; padding-right: 20px; }

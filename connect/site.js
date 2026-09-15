@@ -2,7 +2,7 @@ try { emailjs.init('PR1yiM-fDVGYx5wCo'); } catch(e) { console.warn('EmailJS init
 
 // ── ROUTING ──
 const pages = ['p1','p3','p4','p-list','p-channels','p-detail','p-detail-upload','p-detail-empty','p-admin'];
-const authPages = ['p-signup','p-brochure'];
+const authPages = ['p-brochure'];
 const navMap = { p1:'nav-p1', p3:'nav-p3' };
 const ctaPages = ['p-channels'];
 const p0ActivePages = ['p1','p3','p4'];
@@ -1223,7 +1223,7 @@ function submitCampaignReg() {
     rejectCh, undoCh,
     chSortBy, chSetStatus, chSetReviewStatus, chSwitchTab,
     advanceReviewState, creatorRejectCh,
-    openReviewModal, closeReviewModal, approveReview, requestRevision, cancelRevision, submitRevision,
+    openReviewModal, closeReviewModal, approveReview, requestRevision, cancelRevision, submitRevision, saveChVideoLink,
     toggleSimPost,
     refreshViewCounts,
     closeRefreshLimitModal,
@@ -1232,7 +1232,7 @@ function submitCampaignReg() {
     p0CcToggle,
     openZealPanel, closeZealPanel, saveZealMemo,
     openAddRoundModal, closeAddRoundModal, submitAddRound, copyRoundPreview,
-    openCampaignRegModal, closeCampaignRegModal, submitCampaignReg, toggleCregPremium,
+    openCampaignRegModal, closeCampaignRegModal, submitCampaignReg, toggleCregPremium, saveAccountEdit,
   };
 
   document.addEventListener('click', function(e) {
@@ -1337,6 +1337,30 @@ function resetPopupModal() {
   const s = document.getElementById('mp-submit');
   if (t) t.textContent = '짤 팝업 생성';
   if (s) s.textContent = '생성';
+}
+
+// ── 계정 수정/삭제 ──────────────────────────────────────────────
+let _accEditRow = null;
+function openAccountEditModal(tr) {
+  if (!tr) return;
+  _accEditRow = tr;
+  const nameEl = document.getElementById('acc-eName');
+  const pwEl = document.getElementById('acc-ePw');
+  if (nameEl) nameEl.value = (tr.children[0]?.textContent || '').trim();
+  if (pwEl) pwEl.value = '';
+  document.getElementById('modal-account-edit')?.classList.add('open');
+}
+function saveAccountEdit() {
+  const name = (document.getElementById('acc-eName')?.value || '').trim();
+  if (!name) { alert('표시 이름을 입력해주세요.'); return; }
+  if (_accEditRow && _accEditRow.children[0]) _accEditRow.children[0].textContent = name;
+  _accEditRow = null;
+  document.getElementById('modal-account-edit')?.classList.remove('open');
+}
+function updateAccountCount() {
+  const n = document.querySelectorAll('#adm-account-body tr').length;
+  const chip = document.querySelector('[data-adm-tab="account"] .chip-count');
+  if (chip) chip.textContent = n;
 }
 
 function openCampaignModalFromRow(tr) {
@@ -1481,8 +1505,17 @@ document.addEventListener('click', function(e) {
   const rowBtn = e.target.closest('[data-adm-edit-row]');
   if (rowBtn) {
     const tr = rowBtn.closest('tr');
-    if (tr?.closest('#adm-sub-studio-popup')) openPopupModalFromRow(tr);
+    if (tr?.closest('#adm-panel-account')) openAccountEditModal(tr);
+    else if (tr?.closest('#adm-sub-studio-popup')) openPopupModalFromRow(tr);
     else openCampaignModalFromRow(tr);
+    return;
+  }
+  // 계정 삭제
+  const accDel = e.target.closest('[data-adm-acc-del]');
+  if (accDel) {
+    const tr = accDel.closest('tr');
+    const name = (tr?.children[0]?.textContent || '이 계정').trim();
+    if (confirm(`${name} 계정을 삭제할까요?`)) { tr.remove(); updateAccountCount(); }
     return;
   }
   // 캠페인 행 — 더보기 메뉴

@@ -26,7 +26,6 @@
   <div class="gnb-right">
     <span class="gnb-user-info" id="gnb-user-info" hidden>매니저 · 박건우</span>
     <button class="gnb-btn-login" data-fn="goTo" data-args="p4">Login</button>
-    <button class="gnb-btn-join" data-fn="goToAuth" data-args="p-signup" style="display:none">Join</button>
   </div>
 </nav>
 <!-- ════ PAGE 0 — 서비스 소개 ════ -->
@@ -840,6 +839,13 @@
        PANEL 1 : 검토 현황 (준비 중)
   ══════════════════════════════════════════════ -->
   <div class="ch-panel" id="chPanel1" style="display:none">
+    <!-- 캠페인 제작 영상 링크 (1개 통일) — 채널별 [영상 검토]가 이 링크를 연다 -->
+    <div class="ch-rv-linkbar admin-only">
+      <span class="ch-rv-linkbar-label">🎬 캠페인 영상 링크</span>
+      <input type="url" class="ch-rv-linkbar-input" id="chVideoLink" placeholder="https://... 제작 완료 영상 링크 (전 채널 공통 1개)">
+      <button class="ch-rv-linkbar-btn" data-fn="saveChVideoLink">저장</button>
+      <span class="ch-rv-linkbar-status" id="chVideoLinkStatus"></span>
+    </div>
     <div class="ch-chips-row" id="chReviewChipsRow">
       <button class="ch-chip ch-chip--active" data-fn="chSetReviewStatus" data-args="">전체</button>
       <button class="ch-chip" data-fn="chSetReviewStatus" data-args="최종 확정 중">최종 확정 중</button>
@@ -1389,7 +1395,7 @@
   <!-- 참여 영상 -->
   <div class="vid-card">
     <div class="vid-card-head">
-      참여 영상 <span class="vid-total-badge">2,500개</span>
+      참여 영상
       <div class="vid-head-actions admin-only">
         <button class="cd-btn cd-btn-excel vid-refresh-btn" data-fn="refreshViewCounts">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
@@ -1571,92 +1577,8 @@
         <button class="auth-forgot">비밀번호 찾기</button>
       </div>
       <button class="btn-auth" data-fn="doLogin">로그인</button>
-      <div class="auth-divider"><span>또는</span></div>
-      <div class="auth-footer">
-        계정이 없으신가요? <button data-fn="goToAuth" data-args="p-signup">회원가입</button>
-      </div>
     </div>
     <button class="adm-entry-btn" data-fn="goTo" data-args="p-admin">관리자</button>
-  </div>
-</div>
-
-<!-- ════ AUTH — 회원가입 ════ -->
-<div class="auth-page fullpage" id="p-signup">
-  <div class="auth-top">
-    <div class="auth-top-logo" data-fn="goTo" data-args="p1">CRE<em>;</em>ABLE</div>
-    <h2>지금 가입하고 첫 캠페인을<br><em>무료 상담</em>으로 시작하세요</h2>
-    <p>회원가입 후 전담 플래너의 1:1 상담을 통해 최적의 캠페인을 설계해 드립니다.</p>
-  </div>
-  <div class="auth-form-box">
-    <div class="auth-form-header">
-      <h1>회원가입</h1>
-      <p>광고주 계정을 생성하세요</p>
-    </div>
-    <div class="auth-row">
-      <div class="auth-field">
-        <label class="auth-label">회사명</label>
-        <input class="auth-input" type="text" placeholder="(주)회사명">
-      </div>
-      <div class="auth-field">
-        <label class="auth-label">담당자명</label>
-        <input class="auth-input" type="text" placeholder="홍길동">
-      </div>
-    </div>
-    <div class="auth-field">
-      <label class="auth-label">이메일</label>
-      <input class="auth-input" type="email" placeholder="example@company.com">
-    </div>
-    <div class="auth-row">
-      <div class="auth-field">
-        <label class="auth-label">연락처</label>
-        <input class="auth-input" type="tel" placeholder="010-0000-0000">
-      </div>
-      <div class="auth-field">
-        <label class="auth-label">사업자등록번호</label>
-        <input class="auth-input" type="text" placeholder="000-00-00000">
-      </div>
-    </div>
-    <div class="auth-field">
-      <label class="auth-label">사업자등록증 첨부 <span style="font-size:11px;font-weight:400;color:var(--gray-light)">(필수)</span></label>
-      <div class="auth-upload" data-fileinput="bizFile">
-        <div class="auth-upload-icon">📄</div>
-        <div class="auth-upload-text">사업자등록증을 업로드하세요</div>
-        <div class="auth-upload-sub">클릭하거나 파일을 드래그하세요 · JPG, PNG, PDF · 최대 10MB</div>
-      </div>
-      <input type="file" id="bizFile" style="display:none" accept="image/*,.pdf" data-change="showBizFile">
-      <div class="auth-upload-name" id="bizFileName"></div>
-    </div>
-    <div class="auth-row">
-      <div class="auth-field">
-        <label class="auth-label">비밀번호</label>
-        <input class="auth-input" type="password" placeholder="8자 이상">
-      </div>
-      <div class="auth-field">
-        <label class="auth-label">비밀번호 확인</label>
-        <input class="auth-input" type="password" placeholder="동일하게 입력">
-      </div>
-    </div>
-    <div class="auth-agree">
-      <label class="auth-agree-item" style="font-weight:700">
-        <input type="checkbox" id="agreeAll" data-change="toggleAllAgree"> 전체 동의
-      </label>
-      <label class="auth-agree-item">
-        <input type="checkbox" class="agree-check"> 이용약관 동의 (필수)
-        <button class="auth-agree-view">보기</button>
-      </label>
-      <label class="auth-agree-item">
-        <input type="checkbox" class="agree-check"> 개인정보 처리방침 동의 (필수)
-        <button class="auth-agree-view">보기</button>
-      </label>
-      <label class="auth-agree-item">
-        <input type="checkbox" class="agree-check"> 마케팅 수신 동의 (선택)
-        <button class="auth-agree-view">보기</button>
-      </label>
-    </div>
-    <button class="btn-auth" data-fn="doLogin">회원가입 완료</button>
-    <div class="auth-footer">
-      이미 계정이 있으신가요? <button data-fn="goTo" data-args="p4">로그인</button>
-    </div>
   </div>
 </div>
 
@@ -2317,15 +2239,16 @@
       <div class="adm-table-wrap">
         <table class="adm-table">
           <thead><tr id="adm-account-head">
-            <th><button class="adm-th-sort" data-adm-col="0">이름</button></th>
-            <th><button class="adm-th-sort" data-adm-col="1">역할</button></th>
-            <th><button class="adm-th-sort" data-adm-col="2">로그인 ID</button></th>
+            <th style="width:150px"><button class="adm-th-sort" data-adm-col="0">이름</button></th>
+            <th style="width:96px"><button class="adm-th-sort" data-adm-col="1">역할</button></th>
+            <th style="width:160px"><button class="adm-th-sort" data-adm-col="2">로그인 ID</button></th>
+            <th style="width:100%;text-align:right">관리</th>
           </tr></thead>
-          <tbody>
-            <tr><td>박건우</td><td><span class="adm-role adm-manager">매니저</span></td><td>gwpark</td></tr>
-            <tr><td>김현묵</td><td><span class="adm-role adm-manager">매니저</span></td><td>hmkim</td></tr>
-            <tr><td>투래빗</td><td><span class="adm-role adm-agency">에이전시</span></td><td>two-rabbit</td></tr>
-            <tr><td>프리엠컴퍼니</td><td><span class="adm-role adm-agency">에이전시</span></td><td>PREM</td></tr>
+          <tbody id="adm-account-body">
+            <tr><td>박건우</td><td><span class="adm-role adm-manager">매니저</span></td><td>gwpark</td><td class="adm-act-cell adm-acc-act"><button class="adm-act-icon" data-adm-edit-row title="계정 수정" aria-label="계정 수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon adm-act-icon--del" data-adm-acc-del title="계정 삭제" aria-label="계정 삭제"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></td></tr>
+            <tr><td>김현묵</td><td><span class="adm-role adm-manager">매니저</span></td><td>hmkim</td><td class="adm-act-cell adm-acc-act"><button class="adm-act-icon" data-adm-edit-row title="계정 수정" aria-label="계정 수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon adm-act-icon--del" data-adm-acc-del title="계정 삭제" aria-label="계정 삭제"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></td></tr>
+            <tr><td>투래빗</td><td><span class="adm-role adm-agency">에이전시</span></td><td>two-rabbit</td><td class="adm-act-cell adm-acc-act"><button class="adm-act-icon" data-adm-edit-row title="계정 수정" aria-label="계정 수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon adm-act-icon--del" data-adm-acc-del title="계정 삭제" aria-label="계정 삭제"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></td></tr>
+            <tr><td>프리엠컴퍼니</td><td><span class="adm-role adm-agency">에이전시</span></td><td>PREM</td><td class="adm-act-cell adm-acc-act"><button class="adm-act-icon" data-adm-edit-row title="계정 수정" aria-label="계정 수정"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="adm-act-icon adm-act-icon--del" data-adm-acc-del title="계정 삭제" aria-label="계정 삭제"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button></td></tr>
           </tbody>
         </table>
       </div>
@@ -2650,6 +2573,19 @@
       <div class="adm-modal-actions">
         <button class="adm-btn adm-btn-outline" data-adm-close>취소</button>
         <button class="btn-new-campaign" style="margin:0">등록</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모달: 계정 수정 -->
+  <div class="adm-overlay" id="modal-account-edit">
+    <div class="adm-modal" style="max-width:380px">
+      <h3 class="adm-modal-h3">계정 수정 <button class="adm-modal-x" data-adm-close>&#x2715;</button></h3>
+      <div class="adm-field"><label>표시 이름 <span style="color:var(--orange)">*</span></label><input type="text" id="acc-eName" placeholder="예: OO에이전시"></div>
+      <div class="adm-field"><label>비밀번호 <span style="font-size:11px;color:var(--gray-light);font-weight:400">(변경 시만 입력)</span></label><input type="password" id="acc-ePw" placeholder="비밀번호"></div>
+      <div class="adm-modal-actions">
+        <button class="adm-btn adm-btn-outline" data-adm-close>취소</button>
+        <button class="btn-new-campaign" style="margin:0" data-fn="saveAccountEdit">수정</button>
       </div>
     </div>
   </div>

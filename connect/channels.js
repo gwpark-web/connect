@@ -179,6 +179,10 @@ const chReviewState = {}; // '최종 확정 중'→'제작 중'→'검토 필요
 let _chChecked      = new Set();
 let _chPendingIdx   = null;
 let _chReviewIdx    = null; // 영상 검토 모달 대상 채널 인덱스
+// 캠페인 제작 영상 링크 — 채널 개별이 아니라 캠페인 1개 통일. 검토 시 이 링크를 연다.
+const CH_VIDEO_LINK_KEY = 'cs_ch_video_link';
+let _chVideoLink = '';
+try { _chVideoLink = localStorage.getItem(CH_VIDEO_LINK_KEY) || ''; } catch (e) {}
 let _chFilterStatus = '';
 let _chReviewFilter = '';
 let _chSort         = 'subs';
@@ -371,6 +375,10 @@ function renderReviewPanel() {
   if (!container) return;
 
   const isAdmin = document.body.dataset.viewerRole === 'admin';
+
+  // 캠페인 영상 링크 입력값 동기화 (편집 중이 아닐 때만)
+  const linkInput = document.getElementById('chVideoLink');
+  if (linkInput && document.activeElement !== linkInput) linkInput.value = _chVideoLink;
 
   // 상태별 카운트 집계
   const counts = { '': 0, '최종 확정 중': 0, '제작 중': 0, '검토 필요': 0, '수정 중': 0 };
@@ -904,6 +912,19 @@ function showToast(msg) {
 }
 
 // ── 영상 검토 모달 ────────────────────────────────────────────────────
+// 캠페인 영상 링크 저장 (1개 통일)
+function saveChVideoLink() {
+  const input = document.getElementById('chVideoLink');
+  if (!input) return;
+  _chVideoLink = input.value.trim();
+  try { localStorage.setItem(CH_VIDEO_LINK_KEY, _chVideoLink); } catch (e) {}
+  const status = document.getElementById('chVideoLinkStatus');
+  if (status) {
+    status.textContent = _chVideoLink ? '✓ 저장됨 · 검토 시 이 링크가 열립니다' : '링크를 비웠습니다';
+    status.className = 'ch-rv-linkbar-status' + (_chVideoLink ? ' is-saved' : '');
+  }
+}
+
 function openReviewModal(idx) {
   _chReviewIdx = Number(idx);
   const ch = channels[_chReviewIdx];
@@ -915,22 +936,21 @@ function openReviewModal(idx) {
   if (nameEl) nameEl.textContent = ch.name;
   if (metaEl) metaEl.textContent = `${ch.handle} · ${PLAT_LABEL[ch.platform] || ch.platform}`;
 
-  // 영상 영역
-  const vd = CH_VIDEO[_chReviewIdx];
+  // 영상 영역 — 캠페인 제작 영상 링크(1개 통일)를 연다
   const videoBox = document.getElementById('chRvVideoBox');
   if (videoBox) {
-    if (vd && vd.url) {
+    if (_chVideoLink) {
       videoBox.innerHTML = `
         <div class="ch-rv-video-info">
-          <div class="ch-rv-video-title">${vd.title}</div>
-          <div class="ch-rv-video-dur">${vd.dur}</div>
+          <div class="ch-rv-video-title">캠페인 제작 영상</div>
+          <div class="ch-rv-video-dur">전 채널 공통 링크</div>
         </div>
-        <a class="ch-rv-video-link" href="${vd.url}" target="_blank" rel="noopener">영상 보기 →</a>`;
+        <a class="ch-rv-video-link" href="${_chVideoLink}" target="_blank" rel="noopener">영상 보기 →</a>`;
     } else {
       videoBox.innerHTML = `
         <div class="ch-rv-video-none">
           <span class="ch-rv-video-link ch-rv-video-link--disabled">영상 보기 →</span>
-          <span class="ch-rv-video-pending">영상 준비 중</span>
+          <span class="ch-rv-video-pending">검수 탭 상단에서 캠페인 영상 링크를 등록하세요</span>
         </div>`;
     }
   }

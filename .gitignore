@@ -12,3 +12,6 @@ data-zeal.json
 connect/data-zeal.json
 # 내부 어드민 API 경로를 담은 수집 도구
 connect/tools/
+
+# Pencil 디자인 원본 — 배포에 쓰이지 않는 2MB 바이너리, 로컬에만 둔다
+connect/site design.pen

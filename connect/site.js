@@ -448,7 +448,7 @@ function openStatModal(type) {
   if (type === 'views') {
     titleEl.textContent = '조회수 TOP 10 채널';
     subEl.textContent   = '참여 영상 기준 조회수 상위 채널';
-    bodyEl.innerHTML    = _statRankHTML(_STAT_DATA.views, v => v.toLocaleString() + '회');
+    bodyEl.innerHTML    = _statRankHTML(_STAT_DATA.views, v => v.toLocaleString() + '회', _campaignTotalViews());
   } else if (type === 'likes') {
     titleEl.textContent = '좋아요 TOP 10 채널';
     subEl.textContent   = '참여 영상 기준 좋아요 상위 채널';
@@ -467,8 +467,18 @@ function closeStatModal() {
   document.body.style.overflow = '';
 }
 
-function _statRankHTML(items, fmt) {
+// 지금 보고 있는 캠페인의 총 조회수 — TOP10 기여도(%) 계산 기준
+function _campaignTotalViews() {
+  const el = document.querySelector('.page-wrapper.active .vid-stat-num--accent');
+  return el ? Number(el.textContent.replace(/[^0-9]/g, '')) : 0;
+}
+
+function _statRankHTML(items, fmt, total) {
   const medals = ['🥇','🥈','🥉'];
+  const share = v => {
+    const pct = v / total * 100;
+    return (pct < 1 ? pct.toFixed(1) : Math.round(pct)) + '%';
+  };
   const linkIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
   return '<ul class="stat-rank-list">' + items.map((d, i) => `
     <li class="stat-rank-item${i < 3 ? ' stat-rank-item--top' : ''}">
@@ -479,6 +489,7 @@ function _statRankHTML(items, fmt) {
         <span class="stat-rank-subs">${d.subs} 구독</span>
       </div>
       <span class="stat-rank-val${i < 3 ? ' stat-rank-val--hi' : ''}">${fmt(d.val)}</span>
+      ${total ? `<span class="stat-rank-share">${share(d.val)}</span>` : ''}
       <a class="stat-rank-link" href="${d.url}" target="_blank" rel="noopener" title="영상 보기">${linkIcon}</a>
     </li>`).join('') + '</ul>';
 }
@@ -2205,10 +2216,24 @@ document.addEventListener('click', function(e) {
     grid.querySelectorAll('.campaign-card').forEach(function(card) {
       var title = (card.querySelector('.card-title')?.textContent || '').toLowerCase();
       var client = (card.dataset.editClient || '').toLowerCase();
-      card.hidden = q ? !(title.includes(q) || client.includes(q)) : false;
+      // hidden 속성은 .campaign-card 의 display:flex 에 밀려 먹히지 않는다
+      card.style.display = (!q || title.includes(q) || client.includes(q)) ? '' : 'none';
     });
   });
 })();
+
+// 참여 영상 행 삭제 (관리자 전용 — 버튼 열이 광고주에게는 CSS로 숨겨진다)
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('.vid-del-btn');
+  if (!btn) return;
+  var row = btn.closest('tr');
+  if (!row) return;
+  var title = (row.querySelector('.vid-table-link') || row.querySelector('td:nth-child(2)'));
+  var name = title ? title.textContent.trim().replace(/\s+/g, ' ') : '이 영상';
+  if (name.length > 40) name = name.slice(0, 40) + '…';
+  if (!confirm('"' + name + '"\n\n이 영상을 캠페인에서 삭제할까요?')) return;
+  row.remove();
+});
 
 // 정적 테이블(캠페인 생성, 계정 관리) 열 정렬
 (function() {

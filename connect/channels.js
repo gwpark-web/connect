@@ -213,6 +213,9 @@ const PLAT_ICON = {
 };
 function platBadge(p) { return PLAT_ICON[p] || `<span class="ch-plat-icon">${p}</span>`; }
 
+// 참여 영상 행 삭제 버튼 — 정적 표(site.html)와 같은 마크업을 쓴다
+const VID_DEL_BTN = `<button class="vid-del-btn" title="영상 삭제" aria-label="영상 삭제"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>`;
+
 // ── ER 바 ─────────────────────────────────────────────────────────────
 function erBar(rate) {
   const pct = Math.min(rate / 20 * 100, 100).toFixed(1);
@@ -697,6 +700,8 @@ function renderResultPanel() {
       <td style="text-align:right;font-size:12px;color:var(--gray-light)">집계 예정</td>
       ${premiumCells(i)}
       <td class="zeal-col" style="text-align:center">${zealBadgeHtml(ch)}</td>
+      <td style="text-align:center">${isPosted ? '<span class="vid-vis vid-vis--public">공개</span>' : '<span class="vid-vis vid-vis--none">-</span>'}</td>
+      <td class="vid-del-col" style="text-align:center">${VID_DEL_BTN}</td>
     </tr>`;
   }).join('');
 
@@ -872,6 +877,8 @@ function renderResultPanel() {
                 <th style="width:74px">연령대</th>
                 <th style="width:64px">성별</th>
                 <th class="zeal-col" style="text-align:center;width:52px">짤</th>
+                <th class="vid-vis-col">상태</th>
+                <th class="vid-del-col"></th>
               </tr>
             </thead>
             <tbody>${tableRows}</tbody>

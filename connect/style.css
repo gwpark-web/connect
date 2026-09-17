@@ -843,9 +843,22 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
 .vid-sort-btn { display:inline-flex; align-items:center; gap:2px; cursor:pointer; border:none; background:none; font-size:11px; color:var(--gray-light); font-weight:600; font-family:'Noto Sans KR',sans-serif; }
 .vid-sort-btn:hover { color:var(--orange); }
 .vid-avatar { width:26px; height:26px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; vertical-align:middle; }
-.vid-contrib { font-size:10px; color:var(--gray-light); white-space:nowrap; }
-.vid-contrib--hi { color:var(--orange); font-weight:600; }
 .vid-er { font-size:12px; color:var(--gray-dark); white-space:nowrap; }
+/* 영상 공개 상태 — 조회수 갱신·업로드 시점에 확인된 값 */
+.vid-vis { display:inline-block; padding:2px 8px; border-radius:20px; font-size:11px; font-weight:600; line-height:1.5; white-space:nowrap; }
+.vid-vis--public  { background:#FFDCCB; color:var(--orange); box-shadow:inset 0 0 0 1px rgba(255,69,0,.22); }
+.vid-vis--private { background:var(--status-done-bg); color:var(--gray-light); box-shadow:inset 0 0 0 1px rgba(107,114,128,.16); }
+.vid-vis--none    { background:transparent; color:var(--border); }
+.vid-del-btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:26px; height:26px; padding:0; border:1px solid var(--border); border-radius:7px;
+  background:var(--white); color:var(--gray-light); cursor:pointer; transition:all .15s;
+}
+.vid-del-btn:hover { border-color:#DC2626; color:#DC2626; background:#FEF2F2; }
+.vid-vis-col { width:74px; text-align:center; }
+.vid-del-col { width:48px; }
+/* 버튼·뱃지가 셀보다 넓어 말줄임표가 찍히지 않도록 */
+.vid-table td.vid-del-col { padding-left:4px; padding-right:4px; overflow:visible; text-overflow:clip; }
 
 /* ─ 참여 영상 확장 버튼 ─ */
 .vid-card-head { font-size:14px; font-weight:700; color:var(--black); display:flex; align-items:center; gap:8px; margin-bottom:12px; }
@@ -3689,6 +3702,12 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
 .stat-rank-subs { font-size: 11px; color: var(--gray-light); }
 .stat-rank-val  { font-size: 13px; font-weight: 700; color: var(--gray-dark); flex-shrink: 0; }
 .stat-rank-val--hi { color: var(--orange); font-size: 14px; }
+/* 캠페인 총 조회수 대비 기여도 — 표 대신 TOP10 에서만 보여준다 */
+.stat-rank-share {
+  flex-shrink: 0; min-width: 40px; text-align: right;
+  font-size: 11px; font-weight: 600; color: var(--gray-light); white-space: nowrap;
+}
+.stat-rank-item--top .stat-rank-share { color: var(--orange); }
 .stat-rank-link {
   flex-shrink: 0; display: flex; align-items: center; justify-content: center;
   width: 28px; height: 28px; border-radius: 7px;
@@ -4385,6 +4404,7 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
    관리자일 때는 규칙이 아예 적용되지 않으므로 각자의 display 값이 그대로 유지된다.
    viewerRole은 상세 페이지 진입 시 정해지므로, 미설정 상태에서도 숨겨지도록 :not() 으로 판정한다. */
 body:not([data-viewer-role="admin"]) .zeal-col,
+body:not([data-viewer-role="admin"]) .vid-del-col,
 body:not([data-viewer-role="admin"]) .admin-only { display: none; }
 
 .zeal-badge { display:inline-flex; align-items:center; padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700; line-height:1; }

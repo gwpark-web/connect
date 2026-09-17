@@ -7,6 +7,12 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/bebas-neue@5/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
 <link href="style.css" rel="stylesheet">
+<script>
+  // 이모지 세로 보정값이 폰트마다 달라 Windows(Segoe UI Emoji)만 따로 표시한다
+  if (/Win/i.test(navigator.userAgentData?.platform || navigator.platform || '')) {
+    document.documentElement.dataset.emojiFont = 'segoe';
+  }
+</script>
 </head>
 <body>
 
@@ -72,17 +78,17 @@
     </div>
 
     <div class="p0-hero-content">
-      <div class="p0-hero-eyebrow">CONNECT STUDIO</div>
-      <div class="p0-display-title">숏폼에서 브랜드의 <br><em>확산이 시작됩니다.</em></div>
-      <p class="p0-hero-en-sub">쉽고 빠르게, 효과적인 광고를 시작하세요.</p>
+      <div class="p0-hero-eyebrow">Shortform Marketing Platform</div>
+      <div class="p0-display-title">숏폼 마케팅 <br><em>커넥트 스튜디오</em></div>
+      <p class="p0-hero-en-sub">캠페인 목표를 보장해드립니다.</p>
       <div class="p0-display-btns">
         <button class="p0-btn-start" data-fn="goTo" data-args="p3">캠페인 문의하기 →</button>
       </div>
     </div>
     <div class="p0-why-stats-grid">
-      <div class="p0-why-stat"><div class="p0-why-stat-num"><em>200K</em>+</div><div class="p0-why-stat-lbl">숏폼 크리에이터</div></div>
-      <div class="p0-why-stat"><div class="p0-why-stat-num"><em>60M</em>+</div><div class="p0-why-stat-lbl">캠페인 누적 조회수</div></div>
-      <div class="p0-why-stat"><div class="p0-why-stat-num"><em>470</em>%</div><div class="p0-why-stat-lbl">재집행률</div></div>
+      <div class="p0-why-stat"><div class="p0-why-stat-num"><em>200,000</em><span class="p0-why-unit">개</span></div><div class="p0-why-stat-lbl">등록 채널수</div></div>
+      <div class="p0-why-stat"><div class="p0-why-stat-num"><em>8,000</em><span class="p0-why-unit">편</span></div><div class="p0-why-stat-lbl">배포 영상수</div></div>
+      <div class="p0-why-stat"><div class="p0-why-stat-num"><em>6,000</em><span class="p0-why-unit">만회</span></div><div class="p0-why-stat-lbl">누적 조회수</div></div>
     </div>
   </div>
 
@@ -90,8 +96,23 @@
   <div class="p0-sfm-section" id="sec-channels">
     <div class="p0-sfm-inner">
       <div class="p0-sfm-left">
-        <h2 class="p0-sfm-headline">화제를 만드는 확산력</h2>
-        <p class="p0-sfm-sub">모든 카테고리에 걸친 채널 네트워크를 갖추고 있습니다.</p>
+        <h2 class="p0-sfm-headline p0-sfm-headline--stat">21개 카테고리, <em>200,000개 채널</em></h2>
+        <p class="p0-sfm-sub">하나의 캠페인을 여러 채널에서 동시에 확산시킵니다.</p>
+        <div class="p0-sfm-plats">
+          <div class="p0-sfm-app">
+            <span class="p0-sfm-app-tile yt"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 7.5v9l7.5-4.5L9 7.5z"/></svg></span>
+            <span class="p0-sfm-app-name">YouTube</span>
+          </div>
+          <div class="p0-sfm-app">
+            <span class="p0-sfm-app-tile ig"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg></span>
+            <span class="p0-sfm-app-name">Instagram</span>
+          </div>
+          <div class="p0-sfm-app">
+            <span class="p0-sfm-app-tile tt"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg></span>
+            <span class="p0-sfm-app-name">TikTok</span>
+          </div>
+        </div>
+        <div class="p0-sfm-plats-cap">배포 가능 플랫폼</div>
       </div>
       <div class="p0-sfm-right">
         <div class="p0-ch-grid">
@@ -99,7 +120,7 @@
           <!-- 1: 영화·드라마 -->
           <div class="p0-ch-card">
             <div class="p0-ch-orb-wrap">
-              <div class="p0-ch-orb"><span class="p0-ch-emoji">🎥</span></div>
+              <div class="p0-ch-orb"><span class="p0-ch-emoji p0-ch-emoji--cam">🎥</span></div>
             </div>
             <div class="p0-ch-category">영화·드라마</div>
           </div>
@@ -161,6 +182,8 @@
           </div>
 
         </div>
+        <div class="p0-ch-grid-cap">대표 카테고리</div>
+        <div class="p0-ch-grid-note">이 외에도 게임·뷰티·패션 등 13개 카테고리에서 운영하고 있습니다</div>
       </div>
     </div>
   </div>
@@ -804,6 +827,10 @@
       <button class="ch-chip" data-fn="chSetStatus" data-args="selected">선정됨</button>
       <button class="ch-chip" data-fn="chSetStatus" data-args="rejected">반려됨</button>
       <span class="result-count" id="chResultCount" style="margin-left:auto">12개 채널</span>
+      <button class="chu-open-btn admin-only" data-fn="openChUploadModal">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+        채널 업로드
+      </button>
     </div>
 
     <!-- 벌크 선정 액션 바 -->
@@ -935,6 +962,64 @@
     <div class="ncr-footer">
       <button class="ncr-submit ncr-cancel" data-fn="closeSingleModal">취소</button>
       <button class="ncr-submit" data-fn="confirmChSelect">선정하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 채널 리스트 업로드 모달 (관리자) ── -->
+<div class="ncr-overlay" id="chUploadModal">
+  <div class="ncr-sheet ru-sheet" data-stop="1">
+    <div class="ncr-header">
+      <div>
+        <span class="ncr-title">채널 리스트 업로드</span>
+        <div class="chu-sub">CID(유튜브 채널 ID) 기준으로 조회합니다</div>
+      </div>
+      <button class="ncr-close" data-fn="closeChUploadModal">✕</button>
+    </div>
+    <div class="ncr-body">
+
+      <div class="ru-tab-row">
+        <button class="ru-tab ru-tab--active" data-fn="chUploadSwitchTab" data-args="0">개별 입력</button>
+        <button class="ru-tab" data-fn="chUploadSwitchTab" data-args="1">파일 업로드</button>
+      </div>
+
+      <!-- 개별 입력 -->
+      <div class="chu-pane" id="chuPane0">
+        <div class="ncr-field">
+          <label class="ncr-label">CID <span class="ncr-opt">(한 줄에 하나)</span></label>
+          <textarea class="ncr-input chu-textarea" id="chuCidText" rows="5" spellcheck="false" placeholder="UCnLwQwwn3Q4NaTjfEPB9Brg"></textarea>
+        </div>
+      </div>
+
+      <!-- 파일 업로드 -->
+      <div class="chu-pane" id="chuPane1" style="display:none">
+        <div class="ru-drop-zone">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+          <p class="ru-drop-label" id="chuFileLabel">CSV·TXT 파일을 클릭하여 선택</p>
+          <p class="ru-drop-hint">CID 컬럼 1개만 있으면 됩니다</p>
+          <input type="file" accept=".csv,.txt" class="ru-file-input" id="chuFileInput">
+        </div>
+      </div>
+
+      <!-- 조회 출처 안내 -->
+      <div class="ru-info-box">
+        <p class="ru-info-title">CID 기준 2개 소스를 각각 조회합니다</p>
+        <div class="chu-src">
+          <span class="chu-src-tag chu-src-tag--yt">유튜브</span>
+          <span class="chu-src-fields">채널명 · 구독자 · 평균 쇼츠 조회수(최근 5개)</span>
+        </div>
+        <div class="chu-src">
+          <span class="chu-src-tag chu-src-tag--db">기존 DB</span>
+          <span class="chu-src-fields">평균 참여율 · 카테고리 · 참여 이력 · 짤 여부</span>
+        </div>
+      </div>
+
+      <div class="chu-status" id="chuStatus" style="display:none"></div>
+
+    </div>
+    <div class="ncr-footer ru-footer">
+      <button class="cd-btn cd-btn-edit ru-footer-btn" data-fn="closeChUploadModal">취소</button>
+      <button class="cd-btn cd-btn-excel ru-footer-btn" id="chuSubmitBtn" data-fn="chUploadRun" disabled>불러오기 (0개)</button>
     </div>
   </div>
 </div>

@@ -303,6 +303,176 @@ function renderChannels() {
   }).join('');
 }
 
+// ── 채널 리스트 업로드 (관리자) ───────────────────────────────────────
+// CID(유튜브 채널 ID)만 받아 두 소스를 따로 조회해 한 행으로 합친다.
+// 소스가 서로 독립이라 DB에 이력이 없는 채널도 유튜브 값만으로 행이 만들어진다.
+const CH_CID_RE = /UC[0-9A-Za-z_-]{22}/g;
+
+let _chuCids = [];      // 조회 대기 중인 신규 CID
+let _chuDupCount = 0;   // 이미 목록에 있어 제외된 수
+
+// 85만 · 1.2억 표기 (표의 평균 조회수 칸과 같은 단위)
+function fmtKoUnit(n) {
+  n = Number(n) || 0;
+  if (n >= 100000000) return parseFloat((n / 100000000).toFixed(1)) + '억';
+  if (n >= 10000)     return parseFloat((n / 10000).toFixed(1)) + '만';
+  return String(n);
+}
+
+// CID 문자열에서 만든 고정 시드 — 같은 CID면 항상 같은 더미 값이 나온다
+function _chuSeed(cid) {
+  let h = 0;
+  for (let i = 0; i < cid.length; i++) h = (h * 31 + cid.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+/* ① 유튜브 소스 — 채널명 · 구독자 · 평균 쇼츠 조회수(최근 5개)
+   실연동 지점: YouTube Data API channels.list(id=CID) + 최근 쇼츠 5개 videos.list 평균.
+   아래는 API 연결 전까지 쓰는 CID 고정 더미. */
+async function chUploadFetchYouTube(cids) {
+  const out = {};
+  cids.forEach(cid => {
+    const s = _chuSeed(cid);
+    const subsNum = 3000 + (s % 900000);
+    const views   = Math.round(subsNum * (0.6 + (s >>> 8) % 90 / 100));
+    out[cid] = {
+      name:    '채널 ' + cid.slice(2, 8),
+      handle:  '@' + cid.slice(2, 10).toLowerCase(),
+      subsNum,
+      subs:    fmtKoUnit(subsNum),
+      views:   fmtKoUnit(views),
+    };
+  });
+  return out;
+}
+
+const CH_DB_CATS = ['엔터테인먼트', '커뮤니티·썰', '음악', '패션·뷰티', '게임·IT', '음식·요리', '운동·헬스'];
+
+/* ② 기존 DB 소스 — 평균 참여율 · 카테고리 · 참여 이력 · 짤 여부
+   실연동 지점: 백엔드에 붙일 예정 (조회 경로는 tools/ 의 수집 도구와 동일 — 로컬 전용).
+   짤 여부만 지금도 실제 회원 DB(ZEAL_MEMBERS)를 조회하고, 나머지 세 값은 CID 고정 더미.
+   이력이 없는 채널은 '삽시간' 행처럼 미분류·0 으로 남는다. */
+async function chUploadFetchDb(cids) {
+  const out = {};
+  cids.forEach(cid => {
+    const s = _chuSeed(cid);
+    const hasRecord = s % 3 !== 0;   // 더미: 실연동 시 조회 결과 유무로 대체
+    out[cid] = hasRecord
+      ? {
+          cat:    CH_DB_CATS[s % CH_DB_CATS.length],
+          rate:   Math.round((8 + (s >>> 4) % 90 / 10) * 10) / 10,
+          repeat: (s >>> 12) % 5,
+          hit:    true,
+        }
+      : { cat: '미분류', rate: 0, repeat: 0, hit: false };
+    out[cid].zeal = !!zealKey({ cid });
+  });
+  return out;
+}
+
+// ── 모달 ──
+function openChUploadModal() {
+  const ta = document.getElementById('chuCidText');
+  if (ta) ta.value = '';
+  const fi = document.getElementById('chuFileInput');
+  if (fi) fi.value = '';
+  const label = document.getElementById('chuFileLabel');
+  if (label) label.textContent = 'CSV·TXT 파일을 클릭하여 선택';
+  chUploadSwitchTab(0);
+  chUploadParse('');
+  document.getElementById('chUploadModal').classList.add('open');
+}
+
+function closeChUploadModal() {
+  document.getElementById('chUploadModal').classList.remove('open');
+}
+
+function chUploadSwitchTab(idx) {
+  const i = Number(idx);
+  document.querySelectorAll('#chUploadModal .ru-tab').forEach((btn, j) => {
+    btn.classList.toggle('ru-tab--active', j === i);
+  });
+  [0, 1].forEach(j => {
+    const pane = document.getElementById(`chuPane${j}`);
+    if (pane) pane.style.display = j === i ? '' : 'none';
+  });
+}
+
+// 붙여넣은 텍스트든 CSV든 CID 패턴만 뽑아내므로 구분자·따옴표를 안 가린다
+function chUploadParse(text) {
+  const found = String(text || '').match(CH_CID_RE) || [];
+  const have = new Set(channels.map(c => c.cid).filter(Boolean));
+  const seen = new Set();
+  _chuCids = [];
+  _chuDupCount = 0;
+  found.forEach(cid => {
+    if (seen.has(cid)) return;
+    seen.add(cid);
+    if (have.has(cid)) { _chuDupCount++; return; }
+    _chuCids.push(cid);
+  });
+
+  const btn = document.getElementById('chuSubmitBtn');
+  if (btn) {
+    btn.disabled = !_chuCids.length;
+    btn.textContent = `불러오기 (${_chuCids.length}개)`;
+  }
+  const status = document.getElementById('chuStatus');
+  if (status) {
+    if (!found.length) {
+      status.style.display = 'none';
+    } else {
+      status.style.display = '';
+      status.innerHTML = `<strong>${_chuCids.length}개</strong> 신규 CID` +
+        (_chuDupCount ? ` · 이미 등록된 <strong>${_chuDupCount}개</strong> 제외` : '');
+    }
+  }
+}
+
+async function chUploadRun() {
+  if (!_chuCids.length) return;
+  const cids = _chuCids.slice();
+  const btn = document.getElementById('chuSubmitBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '조회 중…'; }
+
+  // 두 소스는 서로 기다릴 필요가 없다
+  const [yt, db] = await Promise.all([chUploadFetchYouTube(cids), chUploadFetchDb(cids)]);
+
+  let added = 0, missing = 0, dbHit = 0;
+  cids.forEach(cid => {
+    const y = yt[cid];
+    if (!y) { missing++; return; }   // 유튜브에 없는 CID는 행을 만들지 않는다
+    const d = db[cid] || {};
+    if (d.hit) dbHit++;
+    channels.push({
+      emoji: '🎬', name: y.name, handle: y.handle, cid, cat: d.cat || '미분류',
+      platform: 'yt', subsNum: y.subsNum, subs: y.subs, views: y.views,
+      rate: d.rate || 0, repeat: d.repeat || 0,
+    });
+    chState[channels.length - 1] = 'pending';
+    added++;
+  });
+
+  renderChannels();
+  updateChSummary();
+  closeChUploadModal();
+  showToast(`${added}개 채널 추가 · DB 이력 ${dbHit}개` + (missing ? ` · 조회 실패 ${missing}개` : ''));
+}
+
+(function initChUpload() {
+  const ta = document.getElementById('chuCidText');
+  if (ta) ta.addEventListener('input', () => chUploadParse(ta.value));
+
+  const fi = document.getElementById('chuFileInput');
+  if (fi) fi.addEventListener('change', async () => {
+    const file = fi.files && fi.files[0];
+    if (!file) return;
+    const label = document.getElementById('chuFileLabel');
+    if (label) label.textContent = file.name;
+    chUploadParse(await file.text());
+  });
+})();
+
 // ── 탭 전환 ──────────────────────────────────────────────────────────
 function chSwitchTab(idx) {
   _chActiveTab = Number(idx);
@@ -543,8 +713,13 @@ function renderResultPanel() {
 
       <!-- 2열: 리포트 타임라인 -->
       <div class="cd-timeline-card">
-        <div class="cd-timeline-head"><span>리포트 타임라인</span><span class="cd-timeline-period" style="margin-right:auto;margin-left:8px">성과 집계 예정</span><button class="cd-add-round-btn admin-only" data-fn="openAddRoundModal">+ 회차 추가</button></div>
-        <div class="cd-tl-progress">
+        <div class="cd-timeline-head">
+          <span>리포트 타임라인</span>
+          <button class="cd-add-round-btn admin-only" data-fn="openAddRoundModal">+ 회차 추가</button>
+        </div>
+        <div class="cd-tl-track-row">
+          <span class="cd-timeline-period">성과 집계 예정</span>
+          <div class="cd-tl-progress">
           <div class="cd-tl-prog-track">
             <div class="cd-tl-prog-fill" style="width:${pct >= 100 ? 84 : 0}%"></div>
             <div class="cd-tl-marker" style="left:25%">
@@ -563,7 +738,8 @@ function renderResultPanel() {
               <div class="cd-tl-marker-tip">최종 · 완료 4주 후</div>
             </div>
           </div>
-        </div>
+          </div><!-- /cd-tl-progress -->
+        </div><!-- /cd-tl-track-row -->
         <div class="cd-tl-list">
           <div class="cd-tl-row">
             <div class="cd-tl-num">1</div>

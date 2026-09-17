@@ -1237,6 +1237,7 @@ function submitCampaignReg() {
     refreshViewCounts,
     closeRefreshLimitModal,
     openReportUploadModal, closeReportUploadModal, ruSwitchTab,
+    openChUploadModal, closeChUploadModal, chUploadSwitchTab, chUploadRun,
     p0RoleToggle,
     p0CcToggle,
     openZealPanel, closeZealPanel, saveZealMemo,
@@ -1295,14 +1296,17 @@ function runStatCountUp() {
     if (!em) return;
     if (!em.dataset.orig) em.dataset.orig = em.textContent.trim();
     const orig = em.dataset.orig;
-    const m = orig.match(/^(\d+)([KM]?)$/);
-    if (!m) return;
-    const target = +m[1], unit = m[2];
+    // K/M 약식(200K, 60M) 또는 콤마 포함 전체 수치(200,000 / 60,000,000) 모두 지원
+    const km = orig.match(/^(\d+)([KM])$/);
+    const target = km ? +km[1] : parseInt(orig.replace(/,/g, ''), 10);
+    const unit = km ? km[2] : '';
+    if (isNaN(target)) return;
     const dur = 1400, t0 = performance.now();
     (function tick(now) {
       const p = Math.min((now - t0) / dur, 1);
       const ease = 1 - Math.pow(1 - p, 3); // ease-out cubic
-      em.textContent = Math.round(ease * target) + unit;
+      const v = Math.round(ease * target);
+      em.textContent = km ? v + unit : v.toLocaleString();
       if (p < 1) requestAnimationFrame(tick);
     })(performance.now());
   });

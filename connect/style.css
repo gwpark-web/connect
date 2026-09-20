@@ -1501,46 +1501,6 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
 }
 .p0-products-sub { font-size: 14px; color: rgba(255,255,255,0.5); font-weight: 400; margin: 0; }
 
-.p0-products-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; max-width: 1000px; margin: 0 auto; }
-.p0-prod-card {
-  background: #fff;
-  border: 1px solid rgba(0,0,0,0.08);
-  border-radius: 16px; padding: 44px 28px 38px;
-  display: flex; flex-direction: column;
-  transition: transform 0.22s ease, box-shadow 0.22s ease;
-}
-.p0-prod-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 14px 36px rgba(0,0,0,0.12);
-}
-.p0-prod-badge {
-  display: inline-block; font-size: 10px; font-weight: 700;
-  letter-spacing: 0.08em; padding: 3px 10px;
-  border-radius: 20px; margin-bottom: 20px; align-self: flex-start;
-}
-.p0-prod-badge-orange { background: #FF4500; color: #fff; }
-.p0-prod-badge-white { background: transparent; color: #333; border: 1px solid rgba(0,0,0,0.25); }
-.p0-prod-name {
-  font-size: 20px; font-weight: 700; color: #111; margin-bottom: 20px;
-  font-family: 'Pretendard Variable', Pretendard, sans-serif; letter-spacing: -0.3px;
-}
-.p0-prod-checklist { list-style: none; padding: 0; margin: 0 0 24px; flex: 1; }
-.p0-prod-checklist li {
-  font-size: 13px; color: rgba(0,0,0,0.65); font-weight: 400;
-  padding: 11px 0; border-bottom: 1px solid rgba(0,0,0,0.07);
-  display: flex; align-items: flex-start; gap: 8px; line-height: 1.5;
-}
-.p0-prod-checklist li:first-child { border-top: 1px solid rgba(0,0,0,0.07); }
-.p0-prod-checklist li::before {
-  content: '✓'; color: #FF4500; font-size: 12px; font-weight: 700;
-  flex-shrink: 0; margin-top: 1px;
-}
-.p0-prod-recommend {
-  background: rgba(255,69,0,0.06); border-radius: 10px;
-  padding: 14px 16px; display: flex; flex-direction: column; gap: 6px;
-}
-.p0-prod-rec-title { font-size: 11px; font-weight: 700; color: rgba(0,0,0,0.75); }
-.p0-prod-rec-desc { font-size: 12px; color: rgba(0,0,0,0.5); font-weight: 400; line-height: 1.6; }
 
 .p0-products-footer {
   text-align: center; margin-top: 40px;
@@ -1593,45 +1553,53 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
 .p0-products-sub { font-size: 14px; color: rgba(255,255,255,0.5); font-weight: 400; margin: 0; }
 
 .p0-products-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; max-width: 1000px; margin: 0 auto; }
+/* 세 카드가 같은 행(뱃지·상품명·서브·체크리스트·추천)을 공유 — 한 카드 문구가 길어져도 나머지가 함께 맞춰진다 */
 .p0-prod-card {
   background: #fff;
   border: 1px solid rgba(0,0,0,0.08);
-  border-radius: 16px; padding: 44px 28px 38px;
-  display: flex; flex-direction: column;
+  border-radius: 16px; padding: 32px 28px 38px;
+  display: grid; grid-row: span 5; grid-template-rows: subgrid; row-gap: 0;
   transition: transform 0.22s ease, box-shadow 0.22s ease;
 }
 .p0-prod-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 14px 36px rgba(0,0,0,0.12);
 }
+/* 테두리 유무와 상관없이 높이를 같게 하고 글자를 상하 중앙에 둔다 */
 .p0-prod-badge {
-  display: inline-block; font-size: 10px; font-weight: 700;
-  letter-spacing: 0.08em; padding: 3px 10px;
-  border-radius: 20px; margin-bottom: 20px; align-self: flex-start;
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 24px; box-sizing: border-box; padding: 1px 10px 0;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; line-height: 1;
+  border: 1px solid transparent; border-radius: 20px;
+  margin-bottom: 18px; justify-self: start; align-self: start;
 }
 .p0-prod-badge-orange { background: #FF4500; color: #fff; }
-.p0-prod-badge-white { background: transparent; color: #333; border: 1px solid rgba(0,0,0,0.25); }
+.p0-prod-badge-white { background: #111; color: #fff; }
 .p0-prod-name {
-  font-size: 20px; font-weight: 700; color: #111; margin-bottom: 20px;
+  font-size: 20px; font-weight: 700; color: #111; margin-bottom: 6px;
   font-family: 'Pretendard Variable', Pretendard, sans-serif; letter-spacing: -0.3px;
 }
-.p0-prod-checklist { list-style: none; padding: 0; margin: 0 0 24px; flex: 1; }
+.p0-prod-sub { font-size: 13px; color: rgba(0,0,0,0.5); margin: 0 0 20px; line-height: 1.5; }
+.p0-prod-checklist { list-style: none; padding: 0; margin: 0 0 24px; }
 .p0-prod-checklist li {
-  font-size: 13px; color: rgba(0,0,0,0.65); font-weight: 400;
+  font-size: 13.5px; color: rgba(0,0,0,0.82); font-weight: 500;
   padding: 11px 0; border-bottom: 1px solid rgba(0,0,0,0.07);
-  display: flex; align-items: flex-start; gap: 8px; line-height: 1.5;
+  display: flex; align-items: flex-start; gap: 9px; line-height: 1.5;
 }
 .p0-prod-checklist li:first-child { border-top: 1px solid rgba(0,0,0,0.07); }
+/* 체크 — 섹션4 체크박스와 같은 선 모양을 주황 원 안에 */
 .p0-prod-checklist li::before {
-  content: '✓'; color: #FF4500; font-size: 12px; font-weight: 700;
-  flex-shrink: 0; margin-top: 1px;
+  content: ''; flex-shrink: 0; width: 18px; height: 18px; margin-top: 1px; border-radius: 50%;
+  background: #FF4500 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='2.5 6.2 5 8.6 9.5 3.6'/%3E%3C/svg%3E") center / 11px no-repeat;
 }
 .p0-prod-recommend {
-  background: rgba(255,69,0,0.06); border-radius: 10px;
-  padding: 14px 16px; display: flex; flex-direction: column; gap: 6px;
+  background: rgba(255,69,0,0.07); border: 1px solid rgba(255,69,0,0.16); border-radius: 10px;
+  padding: 15px 17px; display: flex; flex-direction: column; gap: 6px;
 }
-.p0-prod-rec-title { font-size: 11px; font-weight: 700; color: rgba(0,0,0,0.75); }
-.p0-prod-rec-desc { font-size: 12px; color: rgba(0,0,0,0.5); font-weight: 400; line-height: 1.6; }
+.p0-prod-rec-title { font-size: 12px; font-weight: 700; color: #FF4500; }
+.p0-prod-rec-desc { font-size: 13px; color: rgba(0,0,0,0.78); font-weight: 500; line-height: 1.55; }
+/* 한글이 단어 중간에서 끊기지 않도록 */
+.p0-prod-sub, .p0-prod-checklist li, .p0-prod-rec-desc { word-break: keep-all; }
 
 .p0-products-footer {
   text-align: center; margin-top: 40px;
@@ -1735,7 +1703,6 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
 .p0-mindmap-title { font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif; font-size: 56px; font-weight: 900; color: var(--white); letter-spacing: -2px; line-height: 1.15; }
 /* ── p0 MINDMAP (SVG) ── */
 .p0-mindmap { width: 100%; }
-.p0-mindmap-svg { display: block; width: 100%; height: auto; }
 
 /* ── P0 CAMPAIGN CARD FLOW ── */
 /* 비율: SVG viewBox 0 0 960 260 기준 260|70|300|70|260 */
@@ -1748,29 +1715,12 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
   border: 0.5px solid var(--border); background: #fff; font-family: 'Noto Sans KR', sans-serif;
 }
 .p0-cc-nav { border-bottom: 0.5px solid var(--border); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
-.p0-cc-step { font-size: 10px; font-weight: 700; color: var(--gray-light); letter-spacing: 1.5px; margin-bottom: 4px; }
 .p0-cc-title { font-size: 18px; font-weight: 700; color: var(--black); letter-spacing: -.5px; }
-.p0-cc-logo { color: var(--orange); font-size: 13px; font-weight: 500; letter-spacing: .04em; }
 .p0-cc-body { padding: 20px; }
 .p0-cc-field { margin-bottom: 14px; }
 .p0-cc-label { font-size: 10px; font-weight: 500; color: var(--gray-light); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 6px; }
 .p0-cc-input { width: 100%; padding: 9px 12px; border: 0.5px solid var(--border); border-radius: 8px; font-size: 12px; color: var(--gray-mid); background: var(--gray-bg); box-sizing: border-box; }
-.p0-cc-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-.p0-cc-tag { font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 0.5px solid var(--border); color: var(--gray-mid); background: #fff; }
-.p0-cc-tag.on { background: var(--orange-pale); border-color: var(--orange); color: var(--orange); }
 .p0-cc-open-btn { width: 100%; padding: 11px; background: var(--orange); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; margin-top: 4px; font-family: 'Noto Sans KR', sans-serif; }
-.p0-cc-ch-list { display: flex; flex-direction: column; gap: 8px; }
-.p0-cc-ch-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--gray-bg); border-radius: 8px; }
-.p0-cc-ch-name { font-size: 12px; font-weight: 500; color: var(--black); }
-.p0-cc-ch-sub { font-size: 10px; color: var(--gray-light); }
-.p0-cc-ch-val { font-size: 12px; font-weight: 600; color: var(--orange); }
-.p0-cc-big-num { text-align: center; padding: 20px 0 16px; }
-.p0-cc-bn { font-size: 64px; font-weight: 500; color: var(--orange); line-height: 1; }
-.p0-cc-bl { font-size: 12px; color: var(--gray-light); margin-top: 8px; }
-.p0-cc-stat-rows { display: flex; flex-direction: column; gap: 8px; }
-.p0-cc-stat-row { display: flex; justify-content: space-between; font-size: 12px; padding: 8px 12px; background: var(--gray-bg); border-radius: 8px; }
-.p0-cc-stat-row span:first-child { color: var(--gray-mid); }
-.p0-cc-stat-row span:last-child { font-weight: 600; color: var(--black); }
 
 /* ── P0 CARD 2 SLIDER ── */
 .p0-cc-nav-r { display: flex; align-items: center; gap: 10px; }
@@ -1782,20 +1732,6 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
 .p0-cc-slide { flex: 0 0 100%; min-width: 0; }
 
 /* Slide 2 — 채널 선정 */
-.p0-cc-sel-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 7px 12px; background: var(--gray-bg); border-radius: 8px; }
-.p0-cc-sel-label { font-size: 10px; font-weight: 700; color: var(--gray-light); letter-spacing: 1.5px; text-transform: uppercase; }
-.p0-cc-sel-count { font-size: 12px; color: var(--black); }
-.p0-cc-sel-count b { color: var(--orange); font-weight: 700; }
-.p0-cc-sel-list { display: flex; flex-direction: column; gap: 6px; }
-.p0-cc-sel-row { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--gray-bg); border-radius: 8px; }
-.p0-cc-sel-ch { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0; }
-.p0-cc-sel-emoji { font-size: 16px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: white; border-radius: 7px; flex-shrink: 0; }
-.p0-cc-sel-name { font-size: 12px; font-weight: 700; color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.p0-cc-sel-meta { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
-.p0-cc-sel-subs { font-size: 11px; color: var(--gray-mid); font-weight: 600; white-space: nowrap; }
-.p0-cc-sel-btn { width: 32px; height: 24px; border-radius: 5px; border: 1.5px solid #d8d8d8; background: white; font-size: 11px; font-weight: 700; color: #aaa; cursor: default; flex-shrink: 0; }
-.p0-cc-sel-btn.on { background: var(--orange); border-color: var(--orange); color: white; }
-.p0-cc-sel-hint { margin-top: 10px; font-size: 10px; color: var(--gray-light); text-align: center; letter-spacing: 0.3px; }
 
 /* ── P0 CARD 2 SLIDER ── */
 .p0-cc-nav-r { display: flex; align-items: center; gap: 10px; }
@@ -1807,20 +1743,6 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
 .p0-cc-slide { flex: 0 0 100%; min-width: 0; }
 
 /* Slide 2 — 채널 선정 */
-.p0-cc-sel-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 7px 12px; background: var(--gray-bg); border-radius: 8px; }
-.p0-cc-sel-label { font-size: 10px; font-weight: 700; color: var(--gray-light); letter-spacing: 1.5px; text-transform: uppercase; }
-.p0-cc-sel-count { font-size: 12px; color: var(--black); }
-.p0-cc-sel-count b { color: var(--orange); font-weight: 700; }
-.p0-cc-sel-list { display: flex; flex-direction: column; gap: 6px; }
-.p0-cc-sel-row { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--gray-bg); border-radius: 8px; }
-.p0-cc-sel-ch { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0; }
-.p0-cc-sel-emoji { font-size: 16px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: white; border-radius: 7px; flex-shrink: 0; }
-.p0-cc-sel-name { font-size: 12px; font-weight: 700; color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.p0-cc-sel-handle { font-size: 10px; color: var(--gray-light); }
-.p0-cc-sel-rate { font-size: 11px; font-weight: 700; color: var(--orange); min-width: 36px; text-align: right; flex-shrink: 0; }
-.p0-cc-sel-btn { width: 32px; height: 24px; border-radius: 5px; border: 1.5px solid #d8d8d8; background: white; font-size: 11px; font-weight: 700; color: #aaa; cursor: default; flex-shrink: 0; }
-.p0-cc-sel-btn.on { background: var(--orange); border-color: var(--orange); color: white; }
-.p0-cc-sel-hint { margin-top: 10px; font-size: 10px; color: var(--gray-light); text-align: center; letter-spacing: 0.3px; }
 
 /* ── P0 CARD 2 SLIDER ── */
 .p0-cc-nav-r { display: flex; align-items: center; gap: 10px; }
@@ -1832,20 +1754,6 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
 .p0-cc-slide { flex: 0 0 100%; min-width: 0; }
 
 /* Slide 2 — 채널 선정 */
-.p0-cc-sel-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 7px 12px; background: var(--gray-bg); border-radius: 8px; }
-.p0-cc-sel-label { font-size: 10px; font-weight: 700; color: var(--gray-light); letter-spacing: 1.5px; text-transform: uppercase; }
-.p0-cc-sel-count { font-size: 12px; color: var(--black); }
-.p0-cc-sel-count b { color: var(--orange); font-weight: 700; }
-.p0-cc-sel-list { display: flex; flex-direction: column; gap: 6px; }
-.p0-cc-sel-row { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--gray-bg); border-radius: 8px; }
-.p0-cc-sel-ch { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0; }
-.p0-cc-sel-emoji { font-size: 16px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: white; border-radius: 7px; flex-shrink: 0; }
-.p0-cc-sel-name { font-size: 12px; font-weight: 700; color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.p0-cc-sel-meta { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
-.p0-cc-sel-subs { font-size: 11px; color: var(--gray-mid); font-weight: 600; white-space: nowrap; }
-.p0-cc-sel-btn { width: 32px; height: 24px; border-radius: 5px; border: 1.5px solid #d8d8d8; background: white; font-size: 11px; font-weight: 700; color: #aaa; cursor: default; flex-shrink: 0; }
-.p0-cc-sel-btn.on { background: var(--orange); border-color: var(--orange); color: white; }
-.p0-cc-sel-hint { margin-top: 10px; font-size: 10px; color: var(--gray-light); text-align: center; letter-spacing: 0.3px; }
 
 /* ── P0 CAMPAIGN CARD FLOW ── */
 /* 비율: SVG viewBox 0 0 960 260 기준 260|70|300|70|260 */
@@ -1858,29 +1766,12 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
   border: 0.5px solid var(--border); background: #fff; font-family: 'Noto Sans KR', sans-serif;
 }
 .p0-cc-nav { border-bottom: 0.5px solid var(--border); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
-.p0-cc-step { font-size: 10px; font-weight: 700; color: var(--gray-light); letter-spacing: 1.5px; margin-bottom: 4px; }
 .p0-cc-title { font-size: 18px; font-weight: 700; color: var(--black); letter-spacing: -.5px; }
-.p0-cc-logo { color: var(--orange); font-size: 13px; font-weight: 500; letter-spacing: .04em; }
 .p0-cc-body { padding: 20px; }
 .p0-cc-field { margin-bottom: 14px; }
 .p0-cc-label { font-size: 10px; font-weight: 500; color: var(--gray-light); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 6px; }
 .p0-cc-input { width: 100%; padding: 9px 12px; border: 0.5px solid var(--border); border-radius: 8px; font-size: 12px; color: var(--gray-mid); background: var(--gray-bg); box-sizing: border-box; }
-.p0-cc-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-.p0-cc-tag { font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 0.5px solid var(--border); color: var(--gray-mid); background: #fff; }
-.p0-cc-tag.on { background: var(--orange-pale); border-color: var(--orange); color: var(--orange); }
 .p0-cc-open-btn { width: 100%; padding: 11px; background: var(--orange); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; margin-top: 4px; font-family: 'Noto Sans KR', sans-serif; }
-.p0-cc-ch-list { display: flex; flex-direction: column; gap: 8px; }
-.p0-cc-ch-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--gray-bg); border-radius: 8px; }
-.p0-cc-ch-name { font-size: 12px; font-weight: 500; color: var(--black); }
-.p0-cc-ch-sub { font-size: 10px; color: var(--gray-light); }
-.p0-cc-ch-val { font-size: 12px; font-weight: 600; color: var(--orange); }
-.p0-cc-big-num { text-align: center; padding: 20px 0 16px; }
-.p0-cc-bn { font-size: 64px; font-weight: 500; color: var(--orange); line-height: 1; }
-.p0-cc-bl { font-size: 12px; color: var(--gray-light); margin-top: 8px; }
-.p0-cc-stat-rows { display: flex; flex-direction: column; gap: 8px; }
-.p0-cc-stat-row { display: flex; justify-content: space-between; font-size: 12px; padding: 8px 12px; background: var(--gray-bg); border-radius: 8px; }
-.p0-cc-stat-row span:first-child { color: var(--gray-mid); }
-.p0-cc-stat-row span:last-child { font-weight: 600; color: var(--black); }
 
 /* ── P0 FEATURE SECTION ── */
 .p0-feature-section { margin: 0; }
@@ -3231,6 +3122,49 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
   overflow: hidden;
 }
 
+/* ══ 섹션7 마지막 화면 — 화면 한 장에 CTA 와 푸터를 함께 ══
+   남는 세로 공간을 위 2 : 아래 3 으로 나눠 CTA 를 가운데보다 조금 위에 둔다 */
+.p0-cta {
+  box-sizing: border-box; min-height: 100vh; padding: 64px 40px 0;
+  display: grid; grid-template-rows: 2fr auto 3fr auto; grid-template-columns: minmax(0, 1fr); justify-items: center;
+  justify-content: stretch; align-items: stretch;  /* 예전 flex 규칙의 flex-start/center 가 그리드 열 폭을 줄이지 않게 */
+}
+#p1 { padding-bottom: 0; }  /* 푸터 아래로 빈 여백(.page-wrapper 100px)이 남지 않게 */
+.p0-cta-body { grid-row: 2; display: flex; flex-direction: column; align-items: center; }
+.p0-cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.p0-cta h2, .p0-cta p { word-break: keep-all; }  /* 모바일에서 '확 / 산'처럼 단어 중간에서 끊기지 않게 */
+
+/* 푸터 — 섹션 좌우 패딩 밖까지 채우는 검정 띠 */
+.p0-footer {
+  grid-row: 4; justify-self: stretch; margin: 0 -40px;
+  background: #000; color: #fff; padding: 40px 40px 34px; text-align: left; font-family: 'Noto Sans KR', sans-serif;
+}
+.p0-footer-inner { max-width: 1200px; margin: 0 auto; }
+.p0-footer-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding-bottom: 22px; margin-bottom: 22px; border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.p0-footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: #fff; }
+.p0-footer-logo span { color: var(--orange); }
+.p0-footer-links { display: flex; gap: 24px; }
+.p0-footer-links button {
+  background: none; border: 0; padding: 0; cursor: pointer; font-family: inherit;
+  font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.85); transition: color .15s;
+}
+.p0-footer-links button:hover { color: #fff; }
+.p0-footer-info { display: flex; flex-wrap: wrap; gap: 14px 56px; }
+.p0-footer-group { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; margin: 0; font-size: 12.5px; line-height: 1.7; }
+.p0-footer-group dt { font-weight: 700; color: #fff; margin-right: 4px; }
+.p0-footer-group dd { margin: 0; color: rgba(255,255,255,0.62); }
+.p0-footer-group b { font-weight: 400; }
+/* 아직 확인되지 않은 회사 정보 — 채우면 클래스를 지운다 */
+.p0-footer-todo { color: rgba(255,170,120,0.9); border-bottom: 1px dashed rgba(255,170,120,0.7); }
+.p0-footer-copy { margin-top: 20px; font-size: 11.5px; color: rgba(255,255,255,0.4); }
+@media (max-width: 768px) {
+  .p0-footer-top { flex-direction: column; align-items: flex-start; }
+  .p0-footer-links { flex-wrap: wrap; gap: 10px 18px; }
+}
+
 /* ══ 섹션3 갤러리 재구성: 브랜드 로고 마키 ══ */
 
 /* 섹션: 좌우 패딩 제거 → 마키 full-bleed, 타이틀은 header에서 직접 처리
@@ -3244,6 +3178,13 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
   align-items: center;
   gap: 48px;
 }
+
+/* 하단 CTA — 섹션이 flex column(gap:48px)이라 별도 margin 없이 붙는다 */
+.p0-gallery-footer {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  padding: 0 40px; text-align: center;
+}
+.p0-gallery-note { font-size: 12px; color: rgba(255,255,255,0.38); font-weight: 400; margin: 0; letter-spacing: 0.02em; }
 
 /* 상단 타이틀 블록 */
 .p0-gallery-header {
@@ -3403,6 +3344,8 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
   line-height: 1.3;
 }
 .p0-sfm-headline--stat em { color: #FF4500; }
+/* 섹션6 헤드라인 앞부분 주황 강조 — 섹션2 헤드라인과 같은 방식 */
+.p0-role-headline em { font-style: normal; color: #FF4500; }
 
 .p0-sfm-plats-cap,
 .p0-ch-grid-cap {
@@ -3461,10 +3404,120 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
    ══════════════════════════════════════════════════════════════════ */
 .p0-cc-nav   { padding: 10px 16px; }
 .p0-cc-body  { padding: 14px 16px; }
-.p0-cc-big-num { padding: 12px 0 10px; }
 .p0-cc-field { margin-bottom: 10px; }
-.p0-cc-ch-list { gap: 6px; }
-.p0-cc-stat-rows { gap: 6px; }
+
+/* ── 섹션4: 역할(브랜드·커넥트·확산)과 화면 카드를 한 열로 통합 ── */
+.p0-cc-col {
+  display: flex; flex-direction: column; gap: 12px; padding: 10px;
+  box-sizing: border-box; border-radius: 22px;
+  background: rgba(255,255,255,0.07); border: 1.5px solid rgba(255,255,255,0.18);
+  container-type: inline-size;  /* 헤더 글씨를 열 폭에 맞춰 줄인다 (옛 SVG 처럼) */
+}
+.p0-cc-col--core { background: #ff6200; border-color: #ff6200; }
+/* 열 테두리·여백만큼 카드가 좁아져 태그가 줄바꿈되므로, 화살표 칸(70→50)을 줄여 열에 폭을 돌려준다.
+   비율 합: 272×2 + 316 + 50×2 = 960 */
+.p0-cc-flow .p0-cc-sm    { flex-basis: calc(272 / 960 * 100%); }
+.p0-cc-flow .p0-cc-lg    { flex-basis: calc(316 / 960 * 100%); }
+.p0-cc-flow .p0-cc-arrow { flex-basis: calc(50 / 960 * 100%); }
+/* 헤더 높이를 맞춰 세 카드의 윗선을, flex:1 로 아랫선을 맞춘다 */
+.p0-cc-col .p0-cc-card { flex: 1; }
+.p0-cc-role {
+  min-height: 116px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; text-align: center; font-family: 'Noto Sans KR', sans-serif;
+}
+.p0-cc-role-icon { display: block; margin-bottom: 4px; }
+.p0-cc-role-plats { display: flex; gap: 10px; margin-bottom: 4px; }  /* 타일 모양은 섹션2 .p0-sfm-app-tile 그대로 */
+.p0-cc-role-title { font-size: clamp(15px, 9cqw, 22px); font-weight: 700; color: #fff; line-height: 1.2; }
+.p0-cc-role-sub { font-size: 12px; color: rgba(255,255,255,0.45); }
+.p0-cc-col--core .p0-cc-role-title {
+  font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', sans-serif;
+  font-size: clamp(18px, 11cqw, 32px); font-weight: 900; letter-spacing: -1px; line-height: 1.1;
+}
+.p0-cc-col--core .p0-cc-role-sub { color: rgba(255,255,255,0.8); font-size: 13px; }
+
+/* 서브카피 — 섹션2·3 서브와 같은 크기·굵기·색 */
+.p0-mindmap-sub { font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.58); line-height: 1.7; margin: 14px 0 0; }
+
+/* 브랜드 카드 — 「새 캠페인 요청」 모달의 희망 상품 축소판, 세로 3단 (선택 상태도 모달과 동일) */
+.p0-cc-prods { display: flex; flex-direction: column; gap: 5px; }
+.p0-cc-prod {
+  padding: 8px 10px; border-radius: 7px; border: 1px solid var(--border); background: #fff;
+  font-size: 11px; font-weight: 700; color: var(--black); line-height: 1.3;
+}
+.p0-cc-flow[data-mode="std"] .p0-cc-prod[data-cc-sel="std"],
+.p0-cc-flow[data-mode="pre"] .p0-cc-prod[data-cc-sel="pre"] { border-color: var(--orange); color: var(--orange); background: rgba(255,69,0,0.05); }
+
+/* 조회수·업로드 / 프리미엄 토글 — p0CcToggle 이 .p0-cc-flow[data-mode] 를 바꾸면 세 카드 내용이 함께 전환된다 */
+.p0-cc-flow[data-mode="std"] [data-cc="pre"],
+.p0-cc-flow[data-mode="pre"] [data-cc="std"] { display: none; }
+
+/* 확산 카드 — 상세 페이지 결과 카드(배지·달성률·비교 행) + 참여 영상 통계 타일을 흰 배경으로 합친 축소판 */
+.p0-cc-res-badge { font-size: 11px; font-weight: 700; color: var(--orange); text-align: center; }
+.p0-cc-res-hero {
+  font-family: 'Bebas Neue', sans-serif; font-size: 60px; line-height: 1; letter-spacing: 1px;
+  color: var(--orange); margin: 6px 0 10px; text-align: center;
+}
+.p0-cc-res-rows { border-top: 1px solid var(--border); margin-bottom: 12px; }
+.p0-cc-res-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 11px;
+}
+.p0-cc-res-row span:first-child { color: var(--gray-mid); }
+.p0-cc-res-row span:last-child { font-size: 12px; font-weight: 700; color: var(--black); }
+.p0-cc-res-row--hi span:last-child { color: var(--orange); }
+/* 기간은 값이 길어 12px 로는 항목명과 겹쳐 두 줄이 된다 */
+.p0-cc-res-row--period span:last-child { font-size: 11px; letter-spacing: -0.2px; white-space: nowrap; }
+.p0-cc-res-stats { display: flex; border: 1px solid var(--border); border-radius: 9px; }
+.p0-cc-res-stat {
+  flex: 1; min-width: 0; padding: 9px 2px; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.p0-cc-res-stat + .p0-cc-res-stat { border-left: 1px solid var(--border); }
+.p0-cc-res-stat svg { width: 13px; height: 13px; color: #FF7744; margin-bottom: 2px; }
+.p0-cc-res-stat b { font-size: 13px; font-weight: 800; color: var(--black); line-height: 1.2; }
+.p0-cc-res-stat > span { font-size: 9.5px; color: var(--gray-light); white-space: nowrap; }
+
+/* 업로드 현황 카드 — 두 화면(조회수·업로드 / 프리미엄) 모두 회색 둥근 행에 열을 담는 같은 형태 */
+/* 행이 5개라 카드가 남으므로, 세로 flex 로 이어 5개 행이 남는 높이를 고르게 나눠 갖게 한다 */
+#p0CcCard2 { display: flex; flex-direction: column; }
+#p0CcCard2 .p0-cc-slider-wrap { flex: 1; display: flex; }
+#p0CcCard2 .p0-cc-slider-track { flex: 1; min-width: 0; }  /* 없으면 트랙이 두 슬라이드 내용 폭만큼 넓어져 열이 잘린다 */
+#p0CcCard2 .p0-cc-slide { display: flex; flex-direction: column; }
+#p0CcCard2 .p0-cc-slide > .p0-cc-body { flex: 1; display: flex; flex-direction: column; }
+.p0-cc-ch-table { flex: 1; display: flex; flex-direction: column; gap: 6px; font-size: 11px; }
+.p0-cc-ch-tr { flex: 1; }
+.p0-cc-ch-head,
+.p0-cc-ch-tr { display: grid; column-gap: 4px; align-items: center; padding: 0 6px; }
+/* 플랫폼 · 채널명 · 카테고리 · 구독자 · 업로드 · 링크 */
+.p0-cc-ch-table--up  :is(.p0-cc-ch-head, .p0-cc-ch-tr) { grid-template-columns: 28px minmax(0, 1fr) 52px 30px 30px 22px; }
+/* 플랫폼 · 채널명 · 카테고리 · 구독자 · 선정(선정/반려 버튼 또는 ✓ 선정됨) */
+.p0-cc-ch-table--sel :is(.p0-cc-ch-head, .p0-cc-ch-tr) { grid-template-columns: 28px minmax(0, 1fr) 52px 28px 60px; }
+.p0-cc-ch-head { font-size: 9.5px; font-weight: 600; color: var(--gray-light); }
+.p0-cc-ch-head span:nth-child(n+4) { text-align: center; }
+.p0-cc-ch-tr .p-dot { justify-self: start; }
+.p0-cc-ch-tr { padding-top: 9px; padding-bottom: 9px; background: var(--gray-bg); border-radius: 8px; }
+.p0-cc-ch-name { font-size: 11.5px; font-weight: 600; color: var(--black); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p0-cc-ch-cat { font-size: 10px; color: var(--gray-mid); white-space: nowrap; }
+.p0-cc-ch-subs { font-size: 10.5px; color: var(--gray-dark); text-align: center; }
+.p0-cc-ch-up {
+  justify-self: center; width: 14px; height: 14px; box-sizing: border-box;
+  border: 1.5px solid var(--border); border-radius: 4px; background: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.p0-cc-ch-up.on { background: var(--orange); border-color: var(--orange); color: #fff; }
+.p0-cc-ch-up svg { width: 10px; height: 10px; }
+.p0-cc-ch-link { justify-self: center; display: inline-flex; color: var(--orange); cursor: pointer; }
+.p0-cc-ch-link svg { width: 13px; height: 13px; }
+/* 관리자 채널 선정 화면(.ch-action-select / -reject / -done) 축소판 */
+.p0-cc-ch-acts { justify-self: center; display: inline-flex; gap: 3px; }
+.p0-cc-ch-act {
+  padding: 3px; border-radius: 4px; border: 1.2px solid; background: #fff;
+  font-size: 9px; font-weight: 700; line-height: 1.2; white-space: nowrap;
+}
+.p0-cc-ch-act--sel { color: var(--orange); border-color: var(--orange); }
+.p0-cc-ch-act--rej { color: var(--gray-light); border-color: var(--border); }
+.p0-cc-ch-done { justify-self: center; font-size: 10px; font-weight: 700; color: var(--orange); white-space: nowrap; }
+.p0-cc-ch-note { margin-top: 10px; font-size: 10px; color: var(--gray-light); text-align: center; letter-spacing: 0.3px; }
 
 /* ══ 섹션6 역할분담 개편 (통합·단일 규칙) ════════════════════════ */
 
@@ -3479,6 +3532,7 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
 }
 .p0rt-btn.active { background: #ff6200; border-color: #ff6200; color: #fff; }
 .p0rt-btn:not(.active):hover { border-color: rgba(255,255,255,0.45); color: rgba(255,255,255,0.85); }
+.p0rt-btns--sm { margin: 28px 0 0; }
 .p0rt-btns--sm .p0rt-btn { padding: 8px 22px; font-size: 11px; }
 
 /* ── 그리드: flex 한 줄, 가운데 정렬 ── */

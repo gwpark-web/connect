@@ -48,14 +48,18 @@ let campaignReturnPage = 'p-list';
 
 function goBackToList() { goTo(campaignReturnPage); }
 
+// 상태 칩 · 유형 선택 · 캠페인명 검색을 한꺼번에 적용 (하나만 바꿔도 나머지 조건이 유지되도록)
 function filterCampaigns() {
   const typeVal = document.getElementById('campaignTypeFilter')?.value || 'all';
   const activeChip = document.querySelector('#p-list .status-chip.active');
   const statusVal = activeChip ? activeChip.dataset.status : 'all';
+  const query = (document.getElementById('campaignSearch')?.value || '').trim().toLowerCase();
   document.querySelectorAll('#p-list .campaign-card').forEach(card => {
     const typeMatch = typeVal === 'all' || card.dataset.campaignType === typeVal;
     const statusMatch = statusVal === 'all' || card.dataset.campaignStatus === statusVal;
-    card.style.display = (typeMatch && statusMatch) ? '' : 'none';
+    const title = (card.querySelector('.card-title')?.textContent || '').toLowerCase();
+    const queryMatch = !query || title.includes(query);
+    card.style.display = (typeMatch && statusMatch && queryMatch) ? '' : 'none';
   });
 }
 
@@ -83,6 +87,8 @@ function updateChipCounts() {
 function initCampaignFilter() {
   const typeSel = document.getElementById('campaignTypeFilter');
   if (typeSel) typeSel.addEventListener('change', filterCampaigns);
+  const search = document.getElementById('campaignSearch');
+  if (search) search.addEventListener('input', filterCampaigns);
 
   document.querySelectorAll('#p-list .status-chip').forEach(chip => {
     chip.addEventListener('click', function(e) {
@@ -572,7 +578,7 @@ const processSteps = {
     ]},
     { label: 'STEP. 03', brand: false, title: '실시간 관리',  emoji: '📈', items: [
       /* 항목 1 */ '조회수 집계',
-      /* 항목 2 */ '검수·수정 반영',
+      /* 항목 2 */ '가이드 준수 확인',
       /* 항목 3 */ '목표 도달 시 자동 종료',
     ]},
     { label: 'BRAND',    brand: true,  title: '리포트 확인',  emoji: '📊', items: [
@@ -604,7 +610,7 @@ const processSteps = {
     ]},
     { label: 'STEP. 04', brand: false, title: '실시간 관리',    emoji: '📈', items: [
       /* 항목 1 */ '성과 집계',
-      /* 항목 2 */ '검수·수정 반영',
+      /* 항목 2 */ '가이드 준수 확인',
       /* 항목 3 */ '업로드 완료 시 종료',
     ]},
     { label: 'BRAND',    brand: true,  title: '리포트 확인',    emoji: '📊', items: [
@@ -689,6 +695,9 @@ function p0CcToggle(mode) {
   );
   const track = document.querySelector('#p0CcCard2 .p0-cc-slider-track');
   if (track) track.style.transform = `translateX(-${mode === 'pre' ? 100 : 0}%)`;
+  // 캠페인 오픈·확산 결과 카드도 같은 모드 내용으로 바뀐다 (CSS 가 data-mode 로 전환)
+  const flow = document.querySelector('#sec-structure .p0-cc-flow');
+  if (flow) flow.dataset.mode = mode;
 }
 
 // ── 캠페인 카드 수정 패널 ─────────────────────────────────────────────

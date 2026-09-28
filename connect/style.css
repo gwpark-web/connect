@@ -142,19 +142,6 @@ body.p0-active .gnb-btn-login:hover { border-color: var(--white); background: rg
 .btn-secondary { padding: 11px 24px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; background: var(--white); color: var(--gray-dark); font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s; }
 .btn-secondary:hover { border-color: var(--gray-dark); }
 
-/* ── CTA BAR ── */
-.cta-bar {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-  background: var(--white); border-top: 1px solid var(--border);
-  padding: 14px 40px; display: none; align-items: center; justify-content: space-between;
-}
-.cta-bar.visible { display: flex; }
-.cta-info { font-size: 14px; color: var(--gray-mid); }
-.cta-info strong { color: var(--black); }
-.cta-info .orange { color: var(--orange); }
-.btn-cta { background: var(--orange); color: var(--white); padding: 12px 36px; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s; opacity: 0.35; pointer-events: none; }
-.btn-cta.on { opacity: 1; pointer-events: all; }
-.btn-cta.on:hover { background: var(--orange-light); }
 
 /* ════ PAGE 0 — 서비스 소개 ════ */
 .p0-hero {
@@ -955,10 +942,6 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
   font-size: 13px; color: var(--gray-mid); cursor: pointer;
 }
 .auth-remember input { accent-color: var(--orange); }
-.auth-forgot {
-  font-size: 13px; color: var(--orange); background: none; border: none;
-  cursor: pointer; font-family: 'Noto Sans KR', sans-serif; font-weight: 600;
-}
 .btn-auth {
   width: 100%; padding: 14px; background: var(--orange); color: var(--white);
   border: none; border-radius: 8px; font-size: 15px; font-weight: 700;

@@ -4,7 +4,6 @@ try { emailjs.init('PR1yiM-fDVGYx5wCo'); } catch(e) { console.warn('EmailJS init
 const pages = ['p1','p3','p4','p-list','p-channels','p-detail','p-detail-upload','p-detail-empty','p-admin'];
 const authPages = ['p-brochure'];
 const navMap = { p1:'nav-p1', p3:'nav-p3' };
-const ctaPages = ['p-channels'];
 const p0ActivePages = ['p1','p3','p4'];
 const DETAIL_PAGES = ['p-detail', 'p-detail-upload', 'p-channels', 'p-detail-empty'];
 
@@ -121,9 +120,6 @@ function goTo(id) {
   window.scrollTo(0,0);
   document.getElementById('p1').scrollTop = 0;
 
-  const bar = document.getElementById('ctaBar');
-  bar.classList.toggle('visible', ctaPages.includes(id));
-
   if (id === 'p-channels') { updateSortArrows(); renderChannels(); updateChSummary(); }
   if (id === 'p-list' || id === 'p-admin') { if (typeof updateListCardPremium === 'function') updateListCardPremium(); }
   if (id === 'p1') { setTimeout(runStatCountUp, 200); }
@@ -134,7 +130,6 @@ function goToAuth(id) {
   pages.forEach(p => document.getElementById(p).classList.remove('active'));
   document.body.classList.toggle('p0-active', id === 'p-brochure');
   document.getElementById(id).classList.add('active');
-  document.getElementById('ctaBar').classList.remove('visible');
 }
 
 function doLogin() {

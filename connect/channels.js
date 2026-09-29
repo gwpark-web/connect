@@ -910,10 +910,10 @@ function renderResultPanel() {
             <thead>
               <tr>
                 <th class="vid-cb-th"><input type="checkbox" class="vid-select-all" aria-label="전체선택"></th>
-                <th style="min-width:140px">채널</th>
+                <th style="width:140px">채널</th>
                 <th style="width:150px">CID</th>
                 <th style="text-align:center;width:50px">플랫폼</th>
-                <th style="text-align:center;min-width:160px">게시물 (관리자 등록)</th>
+                <th style="text-align:center;width:160px">게시물 (관리자 등록)</th>
                 <th style="text-align:right;width:72px">조회수</th>
                 <th style="text-align:right;width:72px">좋아요</th>
                 <th style="text-align:right;width:72px">댓글</th>

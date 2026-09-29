@@ -865,18 +865,13 @@
       <button class="ncr-close" data-fn="closeReviewModal">✕</button>
     </div>
     <div class="ncr-body">
-      <div class="ch-rv-video-box" id="chRvVideoBox"></div>
       <div class="ch-rv-hist-box" id="chRvHistBox" style="display:none"></div>
-      <div class="ch-rv-revision-box" id="chRvRevisionBox" style="display:none">
+      <div class="ch-rv-revision-box" id="chRvRevisionBox">
         <textarea class="ch-rv-textarea" id="chRvRevisionText" placeholder="수정 사유를 구체적으로 입력해 주세요..." rows="4"></textarea>
       </div>
     </div>
-    <div class="ncr-footer" id="chRvFooterNormal">
-      <button class="ncr-submit ncr-cancel" data-fn="requestRevision">수정 요청</button>
-      <button class="ncr-submit" data-fn="approveReview">승인</button>
-    </div>
-    <div class="ncr-footer" id="chRvFooterRevision" style="display:none">
-      <button class="ncr-submit ncr-cancel" data-fn="cancelRevision">취소</button>
+    <div class="ncr-footer" id="chRvFooterRevision">
+      <button class="ncr-submit ncr-cancel" data-fn="closeReviewModal">취소</button>
       <button class="ncr-submit" id="chRvFooterSubmit" data-fn="submitRevision" disabled>수정 요청 보내기</button>
     </div>
   </div>
@@ -2851,6 +2846,21 @@
 <script src="emailjs.min.js"></script>
 <script src="channels.js"></script>
 <!-- ── 짤 회원 사이드패널 ── -->
+<!-- ── 수정 요청 로그 (관리자) ── -->
+<div class="sc-sheet" id="chRevSheet" hidden>
+  <div class="sc-sheet-scrim" data-fn="closeRevLogPanel"></div>
+  <div class="sc-sheet-panel">
+    <div class="sc-sheet-head">
+      <h2>수정 요청 로그</h2>
+      <button class="adm-modal-x" data-fn="closeRevLogPanel">&#x2715;</button>
+    </div>
+    <div class="sc-sheet-body">
+      <div class="ch-revlog-meta" id="chRevLogMeta"></div>
+      <div class="ch-revlog-list" id="chRevLogList"></div>
+    </div>
+  </div>
+</div>
+
 <div class="sc-sheet" id="zealSheet" hidden>
   <div class="sc-sheet-scrim" data-fn="closeZealPanel"></div>
   <div class="sc-sheet-panel">

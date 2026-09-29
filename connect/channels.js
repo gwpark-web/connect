@@ -13,6 +13,16 @@ const channels = [
   { emoji:'🌸', name:'뷰티일기',   handle:'@beauty_diary', cid:'',   cat:'패션·뷰티',   platform:'ig', subsNum:112000,  subs:'11.2만', views:'14만',  rate:12.9, repeat:2 },
   { emoji:'🎵', name:'뮤직박스',   handle:'@musicbox_kr', cid:'',    cat:'음악',         platform:'yt', subsNum:83000,   subs:'8.3만',  views:'11만',  rate:9.4,  repeat:0 },
   { emoji:'🎯', name:'삽시간',     handle:'@asaptime',      cid:'UCnLwQwwn3Q4NaTjfEPB9Brg', cat:'미분류',       platform:'yt', subsNum:274,     subs:'274',    views:'87.2만', rate:0,    repeat:0 },
+  { emoji:'🎞', name:'씬스틸러',   handle:'@scenestealer', cid:'',    cat:'영화·드라마', platform:'yt', subsNum:610000,  subs:'61만',   views:'78만',  rate:13.8, repeat:2 },
+  { emoji:'📼', name:'옛날예능',   handle:'@oldvariety', cid:'',       cat:'방송·예능',   platform:'yt', subsNum:380000,  subs:'38만',   views:'47만',  rate:11.6, repeat:0 },
+  { emoji:'🤣', name:'빵터짐',     handle:'@bbangteo', cid:'',         cat:'유머·이슈',   platform:'tt', subsNum:220000,  subs:'22만',   views:'29만',  rate:15.4, repeat:1 },
+  { emoji:'🧠', name:'지식한입',   handle:'@knowbite', cid:'',         cat:'지식·정보',   platform:'yt', subsNum:470000,  subs:'47만',   views:'52만',  rate:12.2, repeat:3 },
+  { emoji:'🎸', name:'인디사운드', handle:'@indisound', cid:'',        cat:'음악',         platform:'ig', subsNum:150000,  subs:'15만',   views:'19만',  rate:10.8, repeat:0 },
+  { emoji:'🍜', name:'한끼요리',   handle:'@onemeal', cid:'',          cat:'음식·요리',   platform:'yt', subsNum:330000,  subs:'33만',   views:'41만',  rate:14.7, repeat:1 },
+  { emoji:'🐶', name:'멍냥일기',   handle:'@mungnyang', cid:'',        cat:'동물',         platform:'ig', subsNum:740000,  subs:'74만',   views:'88만',  rate:16.8, repeat:2 },
+  { emoji:'⚽', name:'풋살왕',     handle:'@futsalking', cid:'',       cat:'운동·헬스',   platform:'yt', subsNum:190000,  subs:'19만',   views:'24만',  rate:9.6,  repeat:0 },
+  { emoji:'💄', name:'데일리뷰티', handle:'@dailybeauty', cid:'',      cat:'패션·뷰티',   platform:'ig', subsNum:290000,  subs:'29만',   views:'35만',  rate:12.5, repeat:1 },
+  { emoji:'🎧', name:'플리마스터', handle:'@plimaster', cid:'',        cat:'음악',         platform:'tt', subsNum:110000,  subs:'11만',   views:'16만',  rate:13.1, repeat:0 },
 ];
 
 const GOAL = 30;
@@ -164,6 +174,19 @@ const chRevisions = {
     { round: 1, ts: '2025-07-10 11:15', text: '제품 클로즈업 씬이 누락되었습니다. 편집본에 추가 부탁드립니다.' },
     { round: 2, ts: '2025-07-12 16:48', text: '브랜드 멘션 타이밍이 영상 초반으로 당겨져야 합니다. 1분 이내 언급 부탁드려요.' },
   ],
+  16: [
+    { round: 1, ts: '2025-07-16 09:40', text: '자막 글씨가 작아 모바일에서 읽기 어렵습니다. 크기를 키워주세요.' },
+  ],
+  20: [
+    { round: 1, ts: '2025-07-17 13:05', text: '경기 장면에 사용된 배경음악이 저작권 확인이 필요합니다. 교체 부탁드립니다.' },
+  ],
+  21: [
+    { round: 1, ts: '2025-07-17 15:22', text: '제품 사용 장면이 너무 짧습니다. 최소 5초 이상 노출해 주세요.' },
+    { round: 2, ts: '2025-07-18 10:05', text: '컷 전환이 빨라 제품명이 보이지 않습니다. 해당 구간 속도를 낮춰주세요.' },
+  ],
+  22: [
+    { round: 1, ts: '2025-07-18 16:50', text: '영상 마지막 브랜드 로고가 누락되었습니다. 아웃트로에 추가해 주세요.' },
+  ],
 };
 
 // ── 상태 ─────────────────────────────────────────────────────────────
@@ -173,8 +196,12 @@ channels.forEach((_, i) => { chState[i] = 'pending'; });
 const chReviewState = {}; // '최종 확정 중'→'제작 중'→'검토 필요'→[수정시]'수정 중'→'검토 필요'→[승인]'업로드 대기'→'업로드 완료'
 
 // ── 데모 초기 상태 (탭2·탭3 바로 확인 가능하도록 일부 시딩) ─────────────
+// 검토 현황(탭2)의 다섯 상태를 모두 볼 수 있도록 상태별로 채널을 배분한다
 [0, 2, 5, 6, 9, 11, 12].forEach(i => { chState[i] = 'selected'; chReviewState[i] = '승인 완료'; });
 [1, 3, 4, 7].forEach(i => { chState[i] = 'selected'; chReviewState[i] = '제작 중'; });
+[13, 14, 15].forEach(i => { chState[i] = 'selected'; chReviewState[i] = '최종 확정 중'; });
+[16, 17, 18, 19].forEach(i => { chState[i] = 'selected'; chReviewState[i] = '검토 필요'; });
+[20, 21, 22].forEach(i => { chState[i] = 'selected'; chReviewState[i] = '수정 중'; });
 
 let _chChecked      = new Set();
 let _chPendingIdx   = null;
@@ -602,13 +629,30 @@ function renderReviewPanel() {
   container.innerHTML = items.map(({ ch, i }) => {
     const rs = chReviewState[i] || '최종 확정 중';
     const badgeCls = REVIEW_BADGE_CLS[rs] || '';
-    const SIM_BTN = {
-      '최종 확정 중': `<button class="ch-rv-sim-btn" data-fn="advanceReviewState" data-args="${i}">관리자 확정 →</button><button class="ch-rv-sim-btn ch-rv-sim-btn--reject" data-fn="creatorRejectCh" data-args="${i}">크리에이터 거절</button>`,
-      '제작 중':      `<button class="ch-rv-sim-btn" data-fn="advanceReviewState" data-args="${i}">검토 요청 →</button><button class="ch-rv-sim-btn ch-rv-sim-btn--reject" data-fn="creatorRejectCh" data-args="${i}">반려</button>`,
-      '검토 필요':    `<button class="ch-rv-review-btn" data-fn="openReviewModal" data-args="${i}">영상 검토</button>`,
-      '수정 중':      `<button class="ch-rv-sim-btn" data-fn="advanceReviewState" data-args="${i}">재제작 완료 →</button>`,
+    // 관리자 = 진행을 움직이는 버튼, 광고주 = 영상 검토(승인·수정 요청)
+    // 거절·철회는 모두 1단계의 '반려됨'으로 되돌린다
+    const WITHDRAW = `<button class="ch-rv-sim-btn ch-rv-sim-btn--reject" data-fn="creatorRejectCh" data-args="${i}">철회</button>`;
+    const ADMIN_BTN = {
+      '최종 확정 중': `<button class="ch-rv-sim-btn" data-fn="advanceReviewState" data-args="${i}">확정 →</button><button class="ch-rv-sim-btn ch-rv-sim-btn--reject" data-fn="creatorRejectCh" data-args="${i}">크리에이터 거절</button>`,
+      '제작 중':      `<button class="ch-rv-sim-btn" data-fn="advanceReviewState" data-args="${i}">검토 요청 →</button>${WITHDRAW}`,
+      '검토 필요':    WITHDRAW,
+      '수정 중':      `<button class="ch-rv-sim-btn" data-fn="advanceReviewState" data-args="${i}">재제작 완료 →</button>${WITHDRAW}`,
     };
-    const simBtns = SIM_BTN[rs] || `<span class="ch-rv-sim-inactive">진행 중</span>`;
+    const revs = chRevisions[i] || [];
+    const unchecked = revs.filter(r => !_revChecked.has(`${i}-${r.round}`)).length;
+    // 영상은 채널별이 아니라 캠페인 공통 드라이브 링크 1개를 그대로 연다
+    const VIEW_BTN = _chVideoLink
+      ? `<a class="ch-rv-view-btn" href="${_chVideoLink}" target="_blank" rel="noopener">영상 보기 →</a>`
+      : `<span class="ch-rv-view-btn ch-rv-view-btn--off" title="관리자가 캠페인 영상 링크를 등록해야 합니다">영상 보기 →</span>`;
+    // 수정 중이어도 수정 요청을 다시 보낼 수 있어야 한다
+    const BRAND_BTN = {
+      '검토 필요': `${VIEW_BTN}<button class="ch-rv-sim-btn" data-fn="openRevisionModal" data-args="${i}">수정 요청</button><button class="ch-rv-review-btn" data-fn="approveReview" data-args="${i}">승인</button>`,
+      '수정 중':   `${VIEW_BTN}<button class="ch-rv-sim-btn" data-fn="openRevisionModal" data-args="${i}">수정 요청</button><button class="ch-rv-review-btn" data-fn="approveReview" data-args="${i}">승인</button>`,
+    };
+    const LOG_BTN = revs.length
+      ? `<button class="ch-rv-log-btn" data-fn="openRevLogPanel" data-args="${i}">수정 요청 ${revs.length}건${unchecked ? `<span class="ch-rv-log-dot"></span>` : ''}</button>`
+      : '';
+    const simBtns = ADMIN_BTN[rs] || `<span class="ch-rv-sim-inactive">진행 중</span>`;
     return `<div class="ch-rv-item">
       <div class="ch-rv-left">
         <div class="ch-thumb">${ch.emoji}</div>
@@ -618,7 +662,9 @@ function renderReviewPanel() {
         </div>
       </div>
       <span class="ch-rv-badge ${badgeCls}">${rs}</span>
-      ${isAdmin ? `<div class="ch-rv-sim"><span class="ch-rv-sim-label">시뮬</span>${simBtns}</div>` : ''}
+      ${isAdmin
+        ? `<div class="ch-rv-sim">${LOG_BTN}<span class="ch-rv-sim-label">시뮬</span>${simBtns}</div>`
+        : (BRAND_BTN[rs] ? `<div class="ch-rv-sim">${BRAND_BTN[rs]}</div>` : '')}
     </div>`;
   }).join('');
 }
@@ -1108,76 +1154,44 @@ function saveChVideoLink() {
   }
 }
 
-function openReviewModal(idx) {
+// 수정 요청 팝업 — 영상은 행의 [영상 보기]로 빠졌으므로 이력 + 입력란만 보여준다
+function openRevisionModal(idx) {
   _chReviewIdx = Number(idx);
   const ch = channels[_chReviewIdx];
   if (!ch) return;
 
-  // 헤더
   const nameEl = document.getElementById('chRvModalName');
   const metaEl = document.getElementById('chRvModalMeta');
-  if (nameEl) nameEl.textContent = ch.name;
+  if (nameEl) nameEl.textContent = `${ch.name} 수정 요청`;
   if (metaEl) metaEl.textContent = `${ch.handle} · ${PLAT_LABEL[ch.platform] || ch.platform}`;
 
-  // 영상 영역 — 캠페인 제작 영상 링크(1개 통일)를 연다
-  const videoBox = document.getElementById('chRvVideoBox');
-  if (videoBox) {
-    if (_chVideoLink) {
-      videoBox.innerHTML = `
-        <div class="ch-rv-video-info">
-          <div class="ch-rv-video-title">캠페인 제작 영상</div>
-          <div class="ch-rv-video-dur">전 채널 공통 링크</div>
-        </div>
-        <a class="ch-rv-video-link" href="${_chVideoLink}" target="_blank" rel="noopener">영상 보기 →</a>`;
-    } else {
-      videoBox.innerHTML = `
-        <div class="ch-rv-video-none">
-          <span class="ch-rv-video-link ch-rv-video-link--disabled">영상 보기 →</span>
-          <span class="ch-rv-video-pending">검수 탭 상단에서 캠페인 영상 링크를 등록하세요</span>
-        </div>`;
-    }
-  }
+  _renderRevisionHistory(_chReviewIdx);
 
-  // 수정 요청 히스토리
+  const ta = document.getElementById('chRvRevisionText');
+  if (ta) { ta.value = ''; ta.addEventListener('input', _onRevisionInput); }
+  const btn = document.getElementById('chRvFooterSubmit');
+  if (btn) btn.disabled = true;
+  document.getElementById('chReviewModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (ta) ta.focus();
+}
+
+function _renderRevisionHistory(i) {
   const histBox = document.getElementById('chRvHistBox');
-  if (histBox) {
-    const revs = chRevisions[_chReviewIdx];
-    if (revs && revs.length) {
-      histBox.style.display = '';
-      histBox.innerHTML = `<div class="ch-rv-hist-title">수정 요청 내역</div>` +
-        revs.map(r => `<div class="ch-rv-hist-item">
-          <div class="ch-rv-hist-meta">
-            <span class="ch-rv-hist-round">${r.round}차 요청</span>
-            <span class="ch-rv-hist-ts">${r.ts}</span>
-          </div>
-          <div class="ch-rv-hist-text">${r.text}</div>
-        </div>`).join('');
-    } else {
-      histBox.style.display = 'none';
-    }
-  }
-
-  // 수정 요청 입력 영역 초기화
-  const revBox  = document.getElementById('chRvRevisionBox');
-  const ta      = document.getElementById('chRvRevisionText');
-  if (revBox) revBox.style.display = 'none';
-  if (ta)    { ta.value = ''; ta.addEventListener('input', _onRevisionInput); }
-  _setRevisionFooter(false);
-
-  const modal = document.getElementById('chReviewModal');
-  if (modal) { modal.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  if (!histBox) return;
+  const list = chRevisions[i] || [];
+  if (!list.length) { histBox.style.display = 'none'; histBox.innerHTML = ''; return; }
+  histBox.style.display = '';
+  histBox.innerHTML = `<div class="ch-rv-hist-title">수정 요청 내역</div>` + list.map(r => `
+    <div class="ch-rv-hist-item">
+      <div class="ch-rv-hist-meta"><span class="ch-rv-hist-round">${r.round}차 요청</span><span class="ch-rv-hist-ts">${r.ts}</span></div>
+      <div class="ch-rv-hist-text">${r.text}</div>
+    </div>`).join('');
 }
 
 function _onRevisionInput() {
   const btn = document.getElementById('chRvFooterSubmit');
   if (btn) btn.disabled = !this.value.trim();
-}
-
-function _setRevisionFooter(revMode) {
-  const normal   = document.getElementById('chRvFooterNormal');
-  const revision = document.getElementById('chRvFooterRevision');
-  if (normal)   normal.style.display   = revMode ? 'none' : '';
-  if (revision) revision.style.display = revMode ? ''     : 'none';
 }
 
 function closeReviewModal() {
@@ -1188,31 +1202,13 @@ function closeReviewModal() {
   _chReviewIdx = null;
 }
 
-function approveReview() {
-  if (_chReviewIdx === null) return;
-  chReviewState[_chReviewIdx] = '승인 완료';
+function approveReview(idx) {
+  const i = idx !== undefined ? Number(idx) : _chReviewIdx;
+  if (i === null || i === undefined) return;
+  chReviewState[i] = '승인 완료';
   closeReviewModal();
   updateChSummary();
   showToast('승인되었습니다');
-}
-
-function requestRevision() {
-  const box = document.getElementById('chRvRevisionBox');
-  if (!box) return;
-  box.style.display = '';
-  _setRevisionFooter(true);
-  const ta = document.getElementById('chRvRevisionText');
-  if (ta) ta.focus();
-}
-
-function cancelRevision() {
-  const box = document.getElementById('chRvRevisionBox');
-  if (box) box.style.display = 'none';
-  const ta = document.getElementById('chRvRevisionText');
-  if (ta) ta.value = '';
-  const btn = document.getElementById('chRvFooterSubmit');
-  if (btn) btn.disabled = true;
-  _setRevisionFooter(false);
 }
 
 function submitRevision() {
@@ -1229,6 +1225,55 @@ function submitRevision() {
   closeReviewModal();
   updateChSummary();
   showToast('수정 요청이 전달되었습니다');
+}
+
+// ── 수정 요청 로그 (관리자) ──────────────────────────────────────────
+// 확인 처리한 요청은 '<채널>-<회차>' 로 기억한다. TODO: 서버 저장으로 대체
+const _revChecked = new Set();
+let _revLogIdx = null;
+
+function openRevLogPanel(idx) {
+  if (!isAdminViewer()) return;
+  _revLogIdx = Number(idx);
+  const ch = channels[_revLogIdx];
+  if (!ch) return;
+  const meta = document.getElementById('chRevLogMeta');
+  if (meta) meta.textContent = `${ch.name} · ${ch.handle}`;
+  _renderRevLog();
+  document.getElementById('chRevSheet').removeAttribute('hidden');
+}
+
+function closeRevLogPanel() {
+  const el = document.getElementById('chRevSheet');
+  if (el) el.setAttribute('hidden', '');
+}
+
+function toggleRevCheck(idx, round) {
+  const key = `${idx}-${round}`;
+  if (_revChecked.has(key)) _revChecked.delete(key);
+  else _revChecked.add(key);
+  _renderRevLog();
+  renderReviewPanel();
+}
+
+function _renderRevLog() {
+  const list = document.getElementById('chRevLogList');
+  if (!list || _revLogIdx === null) return;
+  const revs = chRevisions[_revLogIdx] || [];
+  if (!revs.length) { list.innerHTML = `<div class="ch-revlog-empty">수정 요청 내역이 없습니다.</div>`; return; }
+  list.innerHTML = revs.slice().reverse().map(r => {
+    const key = `${_revLogIdx}-${r.round}`;
+    const on = _revChecked.has(key);
+    return `<div class="ch-revlog-item${on ? ' is-checked' : ''}">
+      <div class="ch-revlog-main">
+        <div class="ch-revlog-head"><span class="ch-revlog-round">${r.round}차 요청</span><span class="ch-revlog-ts">${r.ts}</span></div>
+        <div class="ch-revlog-text">${r.text}</div>
+      </div>
+      <button class="ch-revlog-check${on ? ' is-on' : ''}" data-fn="toggleRevCheck" data-args="${_revLogIdx}|${r.round}" title="확인 처리">
+        <span class="ch-revlog-box">${on ? '✓' : ''}</span><span>확인</span>
+      </button>
+    </div>`;
+  }).join('');
 }
 
 // ── 게시물 등록 시뮬레이션 토글 ─────────────────────────────────────────

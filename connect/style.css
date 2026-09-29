@@ -2597,6 +2597,36 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
 .ch-rv-review-btn { font-size:11px; padding:5px 12px; border-radius:5px; border:1.5px solid var(--orange); background:var(--orange-pale); color:var(--orange); font-weight:700; cursor:pointer; white-space:nowrap; font-family:inherit; }
 .ch-rv-review-btn:hover { background:var(--orange); color:#fff; }
 
+/* 영상 보기 (드라이브 링크 바로 열기) */
+.ch-rv-view-btn { font-size:11px; padding:5px 11px; border-radius:5px; border:1px solid var(--gray-dark); background:var(--white); color:var(--gray-dark); font-weight:600; white-space:nowrap; text-decoration:none; font-family:inherit; cursor:pointer; }
+.ch-rv-view-btn:hover { background:var(--gray-dark); color:#fff; }
+.ch-rv-view-btn--off { border-color:var(--border); color:var(--border); cursor:not-allowed; }
+.ch-rv-view-btn--off:hover { background:var(--white); color:var(--border); }
+
+/* 관리자 — 수정 요청 로그 진입 버튼 */
+.ch-rv-log-btn { position:relative; font-size:11px; padding:4px 10px; border:1px solid var(--border); border-radius:5px; background:var(--white); color:var(--gray-dark); cursor:pointer; white-space:nowrap; font-family:inherit; }
+.ch-rv-log-btn:hover { background:var(--gray-bg); }
+.ch-rv-log-dot { position:absolute; top:-3px; right:-3px; width:7px; height:7px; border-radius:50%; background:var(--orange); }
+
+/* 수정 요청 로그 패널 */
+.ch-revlog-meta { font-size:12px; color:var(--gray-light); margin-bottom:14px; }
+.ch-revlog-list { display:flex; flex-direction:column; gap:10px; }
+.ch-revlog-empty { font-size:13px; color:var(--gray-light); padding:20px 0; text-align:center; }
+.ch-revlog-item { display:flex; align-items:flex-start; gap:12px; padding:12px 14px; border:1px solid var(--border); border-radius:8px; background:var(--white); }
+.ch-revlog-item.is-checked { background:var(--gray-bg); border-color:#e8e8e8; }
+.ch-revlog-item.is-checked .ch-revlog-text { color:var(--gray-light); }
+.ch-revlog-main { flex:1; min-width:0; }
+.ch-revlog-head { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
+.ch-revlog-round { font-size:11px; font-weight:700; color:var(--orange); }
+.ch-revlog-item.is-checked .ch-revlog-round { color:var(--gray-light); }
+.ch-revlog-ts { font-size:11px; color:var(--gray-light); }
+.ch-revlog-text { font-size:13px; color:var(--gray-dark); line-height:1.55; word-break:break-word; }
+.ch-revlog-check { display:flex; align-items:center; gap:5px; flex-shrink:0; padding:4px 8px 4px 5px; border:1px solid var(--border); border-radius:6px; background:var(--white); font-size:11px; color:var(--gray-light); font-family:inherit; cursor:pointer; }
+.ch-revlog-check:hover { border-color:var(--gray-dark); color:var(--gray-dark); }
+.ch-revlog-box { display:flex; align-items:center; justify-content:center; width:15px; height:15px; border:1.5px solid var(--border); border-radius:4px; font-size:10px; line-height:1; color:transparent; }
+.ch-revlog-check.is-on { border-color:var(--orange); background:var(--orange-pale); color:var(--orange); font-weight:700; }
+.ch-revlog-check.is-on .ch-revlog-box { border-color:var(--orange); background:var(--orange); color:#fff; }
+
 /* ── 영상 검토 모달 내부 ── */
 .ch-rv-video-box { background:var(--gray-bg); border-radius:10px; padding:16px; margin-bottom:4px; }
 .ch-rv-video-info { margin-bottom:12px; }

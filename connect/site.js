@@ -774,6 +774,33 @@ function p0ChInit() {
 }
 p0ChInit();
 
+/* [SEC-CASES] 집행 사례 마키 카드 — 브랜드 추가/삭제/순서 변경은 이 배열만 수정하면 된다 */
+const p0CaseLogos = [
+  { file: 'img/cases/golddust.jpg',     name: 'Gold Dust Entertainment' },
+  { file: 'img/cases/nexon.jpg',        name: 'Nexon' },
+  { file: 'img/cases/munhakdongne.jpg', name: '문학동네' },
+  { file: 'img/cases/pixar.jpg',        name: 'Pixar Animation Studios' },
+  { file: 'img/cases/wb.jpg',           name: 'Warner Bros.' },
+  { file: 'img/cases/lotte.jpg',        name: 'Lotte Entertainment' },
+  { file: 'img/cases/mindmark.jpg',     name: 'Mindmark' },
+  { file: 'img/cases/plusm.jpg',        name: 'Plus M' },
+  { file: 'img/cases/jtbc.jpg',         name: 'JTBC' },
+  { file: 'img/cases/naver.jpg',        name: 'Naver' },
+  { file: 'img/cases/disneyplus.jpg',   name: 'Disney+' },
+];
+
+function p0CaseRender() {
+  const track = document.querySelector('.p0-gallery-section .p0-marquee-track');
+  if (!track) return;
+  const card = (logo, hidden) =>
+    `<div class="p0-s3-card"><img class="p0-s3-media" src="${logo.file}" alt="${logo.name}" loading="lazy"${hidden ? ' aria-hidden="true"' : ''}></div>`;
+  // 무한 루프를 위해 원본 세트 뒤에 동일한 세트를 한 번 더 복제
+  track.innerHTML =
+    p0CaseLogos.map(l => card(l, false)).join('') +
+    p0CaseLogos.map(l => card(l, true)).join('');
+}
+p0CaseRender();
+
 /* [SEC-STRUCTURE] 구조 섹션 CC 토글 */
 function p0CcToggle(mode) {
   document.querySelectorAll('#p0CcToggle .p0rt-btn').forEach(b =>

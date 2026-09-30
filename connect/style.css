@@ -2762,7 +2762,8 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
   position: relative; overflow: hidden;
   background:
     linear-gradient(to bottom, var(--landing-dark-3) 0%, var(--landing-dark-3) 6%, transparent 14%),
-    linear-gradient(to bottom, var(--landing-dark-3) 0%, #3a1508 55%, #2a1005 100%);
+    linear-gradient(to bottom, transparent 0%, rgba(46,46,46,0.55) 45%, rgba(46,46,46,0.55) 55%, transparent 100%),
+    linear-gradient(to bottom, var(--landing-dark-1) 0%, var(--landing-dark-1) 62%, #160804 78%, var(--landing-dark-3) 93%, var(--landing-dark-3) 100%);
 }
 
 /* S2·S3·S4·S5·S6·CTA border-top 없음 — 글로우 데칼코마니로 경계 연결 */

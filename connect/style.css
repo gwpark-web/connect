@@ -2714,321 +2714,56 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
 .p0-gallery-caption,
 .p0-gallery-footer  { padding-left: 40px; padding-right: 40px; }
 
-/* ══ P0 섹션 배경 — 섹션 내부 자기완결 그라데이션 ══════════════════════
-   홀수 섹션: 검정(var(--landing-dark-1))으로 시작·끝, 내부에서 오렌지 차오름
-   짝수 섹션: 검정 유지 → 경계에서 검정끼리 만나 칼선 원천 제거
-   ══════════════════════════════════════════════════════════════════ */
+/* ══ P0 섹션 배경 — 글로우: 차콜 세로 그라디언트(중앙→상하), 정적 ══ */
 
-/* ===== [SEC-MAIN] 메인 ===== */
-/* S1 히어로 */
 .p0-display-hero {
+  position: relative; overflow: hidden;
   background:
-    radial-gradient(ellipse 105% 48% at 0% 55%, rgba(255,80,0,0.62) 0%, rgba(200,48,0,0.26) 40%, transparent 66%),
-    radial-gradient(ellipse 80% 58% at 100% 0%,  rgba(220,58,0,0.48) 0%, rgba(155,32,0,0.16) 42%, transparent 66%),
-    radial-gradient(ellipse 52% 34% at 50% 48%,  rgba(255,110,0,0.09) 0%, transparent 62%),
-    linear-gradient(to bottom,
-      var(--landing-dark-1)  0%,
-      var(--landing-dark-1)  7%,
-      var(--landing-dark-2) 24%,
-      #3a1508 50%,
-      var(--landing-dark-2) 74%,
-      var(--landing-dark-1) 88%,
-      var(--landing-dark-1) 100%);
-  overflow: hidden;
+    linear-gradient(to bottom, transparent 0%, rgba(46,46,46,0.34) 45%, rgba(46,46,46,0.34) 55%, transparent 100%),
+    linear-gradient(to bottom, var(--landing-dark-1) 0%, var(--landing-dark-1) 7%, var(--landing-dark-2) 24%, #3a1508 50%, var(--landing-dark-2) 74%, var(--landing-dark-1) 88%, var(--landing-dark-1) 100%);
 }
 
-/* 브리딩 글로우 — 좌측·우상단 */
-.p0-display-hero::before {
-  content: '';
-  position: absolute; inset: 0;
-  pointer-events: none; z-index: 0;
-  background:
-    radial-gradient(ellipse 90% 42% at 0% 52%, rgba(255,85,0,0.52) 0%, rgba(200,48,0,0.22) 42%, transparent 68%),
-    radial-gradient(ellipse 65% 52% at 100% 0%, rgba(220,60,0,0.42) 0%, rgba(155,32,0,0.14) 44%, transparent 68%);
-  animation: hero-breathe 7s ease-in-out infinite;
-}
-@keyframes hero-breathe {
-  0%   { opacity: 0.55; }
-  40%  { opacity: 1.00; }
-  70%  { opacity: 0.30; }
-  100% { opacity: 0.55; }
-}
-
-/* 우하단 데칼코마니 글로우 — 원 중심이 칼선 정중앙 */
-.p0-display-hero::after {
-  content: '';
-  position: absolute;
-  width: 700px; height: 700px;
-  left: calc(88% - 350px);  /* 중심 x = 88% */
-  bottom: -350px;            /* 중심 y = 히어로 하단 경계 정중앙 */
-  border-radius: 50%;
-  pointer-events: none; z-index: 1;
-  background: radial-gradient(circle at 50% 50%,
-    rgba(255,85,0,0.75) 0%,
-    rgba(210,52,0,0.32) 38%,
-    rgba(150,28,0,0.10) 62%,
-    transparent 78%);
-  animation: br-breathe 9s ease-in-out infinite;
-  animation-delay: -4s;
-}
-@keyframes br-breathe {
-  0%   { opacity: 0.55; }
-  42%  { opacity: 1.00; }
-  70%  { opacity: 0.28; }
-  100% { opacity: 0.55; }
-}
-
-/* ===== [SEC-CHANNELS] 채널 네트워크 ===== */
-/* S2 채널 네트워크 */
 .p0-sfm-section {
-  position: relative; overflow: hidden;  /* ::before 클립용 */
+  position: relative; overflow: hidden;
   background:
-    radial-gradient(ellipse 72% 28% at 18% 34%, rgba(255,80,0,0.09) 0%, transparent 66%),
-    linear-gradient(to bottom,
-      var(--landing-dark-1)  0%,
-      var(--landing-dark-1) 62%,
-      #160804 78%,
-      var(--landing-dark-3) 93%,
-      var(--landing-dark-3) 100%);
-}
-/* 우상단 데칼코마니 — 히어로 ::after와 완전 동일한 원, 상단 반원만 노출 */
-.p0-sfm-section::before {
-  content: '';
-  position: absolute;
-  width: 700px; height: 700px;
-  left: calc(88% - 350px);  /* 중심 x = 88% — 히어로와 동일 */
-  top: -350px;               /* 중심 y = S2 상단 경계 정중앙 */
-  border-radius: 50%;
-  pointer-events: none; z-index: 1;
-  background: radial-gradient(circle at 50% 50%,
-    rgba(255,85,0,0.75) 0%,
-    rgba(210,52,0,0.32) 38%,
-    rgba(150,28,0,0.10) 62%,
-    transparent 78%);
-  animation: br-breathe 9s ease-in-out infinite;
-  animation-delay: -4s;  /* 히어로와 완전 동기 */
+    linear-gradient(to bottom, transparent 0%, rgba(46,46,46,0.34) 45%, rgba(46,46,46,0.34) 55%, transparent 100%),
+    linear-gradient(to bottom, var(--landing-dark-1) 0%, var(--landing-dark-1) 62%, #160804 78%, var(--landing-dark-3) 93%, var(--landing-dark-3) 100%);
 }
 
-/* S2 좌하단 — S3 좌상단과 데칼코마니 */
-.p0-sfm-section::after {
-  content: '';
-  position: absolute;
-  left: 0; right: 0; bottom: 0; height: 100vh;
-  pointer-events: none; z-index: 1;
-  background: radial-gradient(ellipse 105% 48% at 0% 100%,
-    rgba(255,80,0,0.68) 0%,
-    rgba(200,48,0,0.30) 40%,
-    transparent 66%);
-  animation: bl-breathe 11s ease-in-out infinite;
-  animation-delay: -6s;
-}
-@keyframes bl-breathe {
-  0%   { opacity: 0.52; }
-  44%  { opacity: 1.00; }
-  72%  { opacity: 0.26; }
-  100% { opacity: 0.52; }
-}
-
-/* ===== [SEC-CASES] 집행 사례 ===== */
-/* S3 갤러리 — 배경은 어두운 베이스만, 글로우는 ::before 데칼코마니로 */
 .p0-gallery-section {
   position: relative; overflow: hidden;
   background:
-    linear-gradient(to bottom,
-      var(--landing-dark-3)  0%,
-      var(--landing-dark-2) 28%,
-      var(--landing-dark-1) 55%,
-      var(--landing-dark-1) 100%);
-}
-/* S3 좌상단 데칼코마니 — S2 ::after와 완전 동일·동기 */
-.p0-gallery-section::before {
-  content: '';
-  position: absolute;
-  left: 0; right: 0; top: 0; height: 100vh;
-  pointer-events: none; z-index: 1;
-  background: radial-gradient(ellipse 105% 48% at 0% 0%,
-    rgba(255,80,0,0.68) 0%,
-    rgba(200,48,0,0.30) 40%,
-    transparent 66%);
-  animation: bl-breathe 11s ease-in-out infinite;
-  animation-delay: -6s;
-}
-/* S3 우하단 — S4 우상단과 데칼코마니 (고정 밝기) */
-.p0-gallery-section::after {
-  content: '';
-  position: absolute;
-  left: 0; right: 0; bottom: 0; height: 100vh;
-  pointer-events: none; z-index: 1;
-  opacity: 0.72;
-  background: radial-gradient(ellipse 105% 48% at 100% 100%,
-    rgba(255,80,0,0.68) 0%,
-    rgba(200,48,0,0.30) 40%,
-    transparent 66%);
-}
-@keyframes br2-breathe {
-  0%   { opacity: 0.52; }
-  42%  { opacity: 1.00; }
-  70%  { opacity: 0.26; }
-  100% { opacity: 0.52; }
+    linear-gradient(to bottom, transparent 0%, rgba(46,46,46,0.34) 45%, rgba(46,46,46,0.34) 55%, transparent 100%),
+    linear-gradient(to bottom, var(--landing-dark-3) 0%, var(--landing-dark-2) 28%, var(--landing-dark-1) 55%, var(--landing-dark-1) 100%);
 }
 
-/* ===== [SEC-STRUCTURE] 구조 ===== */
-/* S4 확산 마인드맵 */
 .p0-mindmap-section {
   position: relative; overflow: hidden;
   background:
-    /* 중앙 얇은 글로우 */
-    radial-gradient(ellipse 62% 10% at 50% 50%, rgba(255,80,0,0.21) 0%, transparent 65%),
-    linear-gradient(to bottom,
-      var(--landing-dark-1)  0%,
-      var(--landing-dark-1) 62%,
-      #160804 78%,
-      var(--landing-dark-3) 93%,
-      var(--landing-dark-3) 100%);
-}
-/* S4 우상단 데칼코마니 — S3 ::after와 완전 동일 (고정 밝기) */
-.p0-mindmap-section::before {
-  content: '';
-  position: absolute;
-  left: 0; right: 0; top: 0; height: 100vh;
-  pointer-events: none; z-index: 1;
-  opacity: 0.72;
-  background: radial-gradient(ellipse 105% 48% at 100% 0%,
-    rgba(255,80,0,0.68) 0%,
-    rgba(200,48,0,0.30) 40%,
-    transparent 66%);
-}
-/* S4 좌하단 — S5 좌상단과 데칼코마니 (고정 밝기) */
-.p0-mindmap-section::after {
-  content: '';
-  position: absolute;
-  left: 0; right: 0; bottom: 0; height: 100vh;
-  pointer-events: none; z-index: 1;
-  opacity: 0.72;
-  background: radial-gradient(ellipse 105% 48% at 0% 100%,
-    rgba(255,80,0,0.68) 0%,
-    rgba(200,48,0,0.30) 40%,
-    transparent 66%);
+    linear-gradient(to bottom, transparent 0%, rgba(46,46,46,0.34) 45%, rgba(46,46,46,0.34) 55%, transparent 100%),
+    linear-gradient(to bottom, var(--landing-dark-1) 0%, var(--landing-dark-1) 62%, #160804 78%, var(--landing-dark-3) 93%, var(--landing-dark-3) 100%);
 }
 
-/* ===== [SEC-PRODUCTS] 상품 ===== */
-/* S5 상품/보장 */
 .p0-products-section {
   position: relative; overflow: hidden;
   background:
-    linear-gradient(to bottom,
-      var(--landing-dark-3)  0%,
-      #3a1508 44%,
-      var(--landing-dark-2) 73%,
-      var(--landing-dark-1) 87%,
-      var(--landing-dark-1) 100%);
-}
-/* S5 좌상단 데칼코마니 — S4 ::after와 완전 동일 (고정 밝기) */
-.p0-products-section::before {
-  content: '';
-  position: absolute;
-  left: 0; right: 0; top: 0; height: 100vh;
-  pointer-events: none; z-index: 1;
-  opacity: 0.72;
-  background: radial-gradient(ellipse 105% 48% at 0% 0%,
-    rgba(255,80,0,0.68) 0%,
-    rgba(200,48,0,0.30) 40%,
-    transparent 66%);
-}
-/* S5 우하단 — S6 우상단과 데칼코마니 */
-.p0-products-section::after {
-  content: '';
-  position: absolute;
-  left: 0; right: 0; bottom: 0; height: 100vh;
-  pointer-events: none; z-index: 1;
-  will-change: opacity;
-  background: radial-gradient(ellipse 105% 48% at 100% 100%,
-    rgba(255,80,0,0.68) 0%,
-    rgba(200,48,0,0.30) 40%,
-    transparent 66%);
-  animation: br3-breathe 9s ease-in-out infinite;
-  animation-delay: -3s;
-}
-@keyframes br3-breathe {
-  0%   { opacity: 0.52; }
-  42%  { opacity: 1.00; }
-  70%  { opacity: 0.26; }
-  100% { opacity: 0.52; }
+    linear-gradient(to bottom, transparent 0%, rgba(46,46,46,0.34) 45%, rgba(46,46,46,0.34) 55%, transparent 100%),
+    linear-gradient(to bottom, var(--landing-dark-3) 0%, #3a1508 44%, var(--landing-dark-2) 73%, var(--landing-dark-1) 87%, var(--landing-dark-1) 100%);
 }
 
-/* ===== [SEC-PROCESS] 프로세스 ===== */
-/* S6 역할분담 */
 .p0-role-section {
   position: relative; overflow: hidden;
   background:
-    radial-gradient(ellipse 58% 24% at 14% 44%, rgba(255,80,0,0.08) 0%, transparent 66%),
-    linear-gradient(to bottom,
-      var(--landing-dark-1)  0%,
-      var(--landing-dark-1) 62%,
-      #160804 78%,
-      var(--landing-dark-3) 93%,
-      var(--landing-dark-3) 100%);
-}
-/* S6 우상단 데칼코마니 — S5 ::after와 완전 동일·동기 */
-.p0-role-section::before {
-  content: '';
-  position: absolute;
-  left: 0; right: 0; top: 0; height: 100vh;
-  pointer-events: none; z-index: 1;
-  will-change: opacity;
-  background: radial-gradient(ellipse 105% 48% at 100% 0%,
-    rgba(255,80,0,0.68) 0%,
-    rgba(200,48,0,0.30) 40%,
-    transparent 66%);
-  animation: br3-breathe 9s ease-in-out infinite;
-  animation-delay: -3s;
+    linear-gradient(to bottom, transparent 0%, rgba(46,46,46,0.34) 45%, rgba(46,46,46,0.34) 55%, transparent 100%),
+    linear-gradient(to bottom, var(--landing-dark-1) 0%, var(--landing-dark-1) 62%, #160804 78%, var(--landing-dark-3) 93%, var(--landing-dark-3) 100%);
 }
 
-/* S6 우하단 — CTA 우상단과 데칼코마니 */
-.p0-role-section::after {
-  content: '';
-  position: absolute;
-  left: 0; right: 0; bottom: 0; height: 100vh;
-  pointer-events: none; z-index: 1;
-  background: radial-gradient(ellipse 105% 48% at 100% 100%,
-    rgba(255,80,0,0.68) 0%,
-    rgba(200,48,0,0.30) 40%,
-    transparent 66%);
-  animation: br4-breathe 11s ease-in-out infinite;
-  animation-delay: -7s;
-}
-@keyframes br4-breathe {
-  0%   { opacity: 0.50; }
-  40%  { opacity: 0.96; }
-  72%  { opacity: 0.24; }
-  100% { opacity: 0.50; }
-}
-
-/* ===== [SEC-CTA] CTA ===== */
-/* CTA */
 .p0-cta {
   position: relative; overflow: hidden;
   background:
     linear-gradient(to bottom, var(--landing-dark-3) 0%, var(--landing-dark-3) 6%, transparent 14%),
-    radial-gradient(ellipse 105% 48% at 0% 55%, rgba(255,80,0,0.88) 0%, rgba(200,48,0,0.38) 40%, transparent 66%),
-    radial-gradient(ellipse 52% 34% at 50% 48%,  rgba(255,110,0,0.13) 0%, transparent 62%),
-    linear-gradient(to bottom,
-      var(--landing-dark-3)  0%,
-      #3a1508 55%,
-      #2a1005 100%);
-}
-/* CTA 우상단 데칼코마니 — S6 ::after와 완전 동일·동기 */
-.p0-cta::before {
-  content: '';
-  position: absolute;
-  left: 0; right: 0; top: 0; height: 100vh;
-  pointer-events: none; z-index: 1;
-  background: radial-gradient(ellipse 105% 48% at 100% 0%,
-    rgba(255,80,0,0.68) 0%,
-    rgba(200,48,0,0.30) 40%,
-    transparent 66%);
-  animation: br4-breathe 11s ease-in-out infinite;
-  animation-delay: -7s;
+    linear-gradient(to bottom, transparent 0%, rgba(46,46,46,0.34) 45%, rgba(46,46,46,0.34) 55%, transparent 100%),
+    linear-gradient(to bottom, var(--landing-dark-3) 0%, #3a1508 55%, #2a1005 100%);
 }
 
 /* S2·S3·S4·S5·S6·CTA border-top 없음 — 글로우 데칼코마니로 경계 연결 */

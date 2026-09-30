@@ -775,18 +775,21 @@ function p0ChInit() {
 p0ChInit();
 
 /* [SEC-CASES] 집행 사례 마키 카드 — 브랜드 추가/삭제/순서 변경은 이 배열만 수정하면 된다 */
+/* 흰 배경 카드와 유색/어두운 배경 카드가 3칸 주기로 고르게 섞이도록 배치
+   (흰색: pixar·lotte·mindmark·plusm / 유색: 그 외) — 순서만 바꿔도 배치가 유지되도록
+   같은 계열(검정·네이비) 카드는 서로 붙지 않게 나눠 배치했다 */
 const p0CaseLogos = [
-  { file: 'img/cases/golddust.jpg',     name: 'Gold Dust Entertainment' },
-  { file: 'img/cases/nexon.jpg',        name: 'Nexon' },
-  { file: 'img/cases/munhakdongne.jpg', name: '문학동네' },
-  { file: 'img/cases/pixar.jpg',        name: 'Pixar Animation Studios' },
-  { file: 'img/cases/wb.jpg',           name: 'Warner Bros.' },
-  { file: 'img/cases/lotte.jpg',        name: 'Lotte Entertainment' },
-  { file: 'img/cases/mindmark.jpg',     name: 'Mindmark' },
-  { file: 'img/cases/plusm.jpg',        name: 'Plus M' },
-  { file: 'img/cases/jtbc.jpg',         name: 'JTBC' },
-  { file: 'img/cases/naver.jpg',        name: 'Naver' },
-  { file: 'img/cases/disneyplus.jpg',   name: 'Disney+' },
+  { file: 'img/cases/pixar.jpg',        name: 'Pixar Animation Studios' }, // 흰색
+  { file: 'img/cases/golddust.jpg',     name: 'Gold Dust Entertainment' }, // 검정
+  { file: 'img/cases/jtbc.jpg',         name: 'JTBC' },                    // 유채색 그라데이션
+  { file: 'img/cases/lotte.jpg',        name: 'Lotte Entertainment' },     // 흰색
+  { file: 'img/cases/munhakdongne.jpg', name: '문학동네' },                 // 네이비
+  { file: 'img/cases/naver.jpg',        name: 'Naver' },                   // 초록
+  { file: 'img/cases/mindmark.jpg',     name: 'Mindmark' },                // 흰색
+  { file: 'img/cases/wb.jpg',           name: 'Warner Bros.' },            // 네이비
+  { file: 'img/cases/nexon.jpg',        name: 'Nexon' },                   // 검정
+  { file: 'img/cases/plusm.jpg',        name: 'Plus M' },                  // 흰색
+  { file: 'img/cases/disneyplus.jpg',   name: 'Disney+' },                 // 짙은 틸
 ];
 
 function p0CaseRender() {

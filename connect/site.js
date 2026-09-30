@@ -683,6 +683,97 @@ function p0RoleToggle(mode) {
 
 renderProcessCards('std');
 
+/* [SEC-CHANNELS] 대표 카테고리 3폰 대각선 클러스터 (좌 Instagram → 중앙 YouTube → 우 TikTok, 카테고리가 좌→우로 순환) */
+const p0ChCategories = [
+  { emoji: '🎥', name: '영화·드라마', like: 12480, comment: 892, share: 341 },
+  { emoji: '📺', name: '방송·예능', like: 8765, comment: 543, share: 210 },
+  { emoji: '😂', name: '유머·이슈', like: 24310, comment: 1876, share: 902 },
+  { emoji: '💡', name: '지식·정보', like: 6120, comment: 398, share: 154 },
+  { emoji: '🎧', name: '음악', like: 15870, comment: 1043, share: 467 },
+  { emoji: '🍳', name: '요리', like: 9340, comment: 621, share: 288 },
+  { emoji: '🐈', name: '동물', like: 31200, comment: 2456, share: 1180 },
+  { emoji: '🏀', name: '스포츠', like: 11045, comment: 734, share: 305 },
+];
+let _p0ChIndex = 0;
+let _p0ChBoosts = [0, 0, 0, 0, 0, 0, 0, 0];
+
+function p0ChFmt(n) {
+  if (n >= 10000) return (n / 10000).toFixed(1) + '만';
+  return n.toLocaleString();
+}
+
+function p0ChRender() {
+  const phone = document.getElementById('p0ChPhone');
+  if (!phone) return;
+  const total = p0ChCategories.length;
+  const i = ((_p0ChIndex % total) + total) % total;
+  const leftIdx = i;
+  const centerIdx = (i - 1 + total) % total;
+  const rightIdx = (i - 2 + total) % total;
+  const left = p0ChCategories[leftIdx];
+  const center = p0ChCategories[centerIdx];
+  const right = p0ChCategories[rightIdx];
+  const boost = _p0ChBoosts[centerIdx] || 0;
+
+  document.getElementById('p0ChLeftEmoji').textContent = left.emoji;
+  document.getElementById('p0ChLeftAvatar').textContent = left.emoji;
+  document.getElementById('p0ChLeftName').textContent = left.name;
+
+  document.getElementById('p0ChRightEmoji').textContent = right.emoji;
+  document.getElementById('p0ChRightAvatar').textContent = right.emoji;
+  document.getElementById('p0ChRightName').textContent = right.name;
+
+  document.getElementById('p0ChEmoji').textContent = center.emoji;
+  document.getElementById('p0ChCapAvatar').textContent = center.emoji;
+  document.getElementById('p0ChCapName').textContent = center.name;
+  document.getElementById('p0ChLikeCount').textContent = p0ChFmt(center.like + boost);
+  document.getElementById('p0ChCommentCount').textContent = p0ChFmt(center.comment + Math.floor(boost / 4));
+  document.getElementById('p0ChShareCount').textContent = p0ChFmt(center.share + Math.floor(boost / 6));
+
+  document.querySelectorAll('#p0ChProgress > span > i').forEach((el, idx) => {
+    if (idx < centerIdx) { el.style.width = '100%'; el.style.background = 'rgba(255,255,255,0.85)'; }
+    else if (idx === centerIdx) { el.style.width = '100%'; el.style.background = '#FF0000'; }
+    else { el.style.width = '0%'; el.style.background = 'transparent'; }
+  });
+}
+
+function p0ChGoTo(index) {
+  const total = p0ChCategories.length;
+  _p0ChIndex = ((index % total) + total) % total;
+  p0ChRender();
+}
+function p0ChSlideNext() { p0ChGoTo(_p0ChIndex + 1); }
+function p0ChSlidePrev() { p0ChGoTo(_p0ChIndex - 1); }
+
+function p0ChFitStage() {
+  const outer = document.getElementById('p0ChStageOuter');
+  const stage = document.getElementById('p0ChStage');
+  if (!outer || !stage) return;
+  const naturalW = 460, naturalH = 560;
+  const scale = Math.min(1, outer.clientWidth / naturalW);
+  stage.style.transform = 'scale(' + scale + ')';
+  outer.style.height = (naturalH * scale) + 'px';
+}
+
+function p0ChInit() {
+  const outer = document.getElementById('p0ChStageOuter');
+  if (!document.getElementById('p0ChPhone') || !outer) return;
+  p0ChRender();
+  p0ChFitStage();
+  window.addEventListener('resize', p0ChFitStage);
+  if (window.ResizeObserver) {
+    new ResizeObserver(p0ChFitStage).observe(outer);
+  }
+  setInterval(p0ChSlideNext, 1500);
+  setInterval(() => {
+    const total = p0ChCategories.length;
+    const centerIdx = ((_p0ChIndex - 1 + total) % total + total) % total;
+    _p0ChBoosts[centerIdx] = (_p0ChBoosts[centerIdx] || 0) + Math.floor(Math.random() * 5) + 1;
+    p0ChRender();
+  }, 500);
+}
+p0ChInit();
+
 /* [SEC-STRUCTURE] 구조 섹션 CC 토글 */
 function p0CcToggle(mode) {
   document.querySelectorAll('#p0CcToggle .p0rt-btn').forEach(b =>
@@ -1256,6 +1347,7 @@ function submitCampaignReg() {
     openChUploadModal, closeChUploadModal, chUploadSwitchTab, chUploadRun,
     p0RoleToggle,
     p0CcToggle,
+    p0ChSlidePrev, p0ChSlideNext,
     openZealPanel, closeZealPanel, saveZealMemo,
     openAddRoundModal, closeAddRoundModal, submitAddRound, copyRoundPreview,
     openCampaignRegModal, closeCampaignRegModal, submitCampaignReg, toggleCregPremium, saveAccountEdit,

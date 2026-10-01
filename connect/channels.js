@@ -990,7 +990,7 @@ function hexA(hex, alpha) {
 // 연령대·성별은 고정 순서를 유지해야 하므로 정렬은 호출부 책임, 여기서는 그리기만 한다
 // 세그먼트가 2개 이상일 때만 끝을 둥글린다 — 1개(100%)일 땐 이음매가 생겨 보기 흉해진다
 function donutSVG(segments, size, stroke) {
-  size = size || 116; stroke = stroke || 20;
+  size = size || 148; stroke = stroke || 26;
   const cx = size / 2, r = (size - stroke) / 2;
   const circumf = 2 * Math.PI * r;
   const rounded = segments.length > 1;

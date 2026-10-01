@@ -13,6 +13,29 @@
 body { font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif; background: #F9F9F7; color: var(--black); overflow-x: hidden; }
 body.p0-active {
   background: var(--landing-dark-1);
+  /* 랜딩(섹션1~7) 전용 sRGB 보정 — 디자인은 Display P3(맥북/아이폰)에서 확인했지만
+     HEX 색상은 항상 sRGB로 해석되므로, 일반 sRGB 모니터(삼성 S34J 등)에서는
+     채도가 이미 한계치인 원색 톤이 패널 품질 차이로 더 흐리게 보인다.
+     여기서는 명도를 살짝 낮추고(50%→46%) 색상도 레드 쪽으로 미세하게 틀어
+     (16°→12°) 저가 패널에서도 "탁해 보이는" 느낌을 줄인 진한 버전을 기본값으로 쓴다. */
+  --orange: #EB2F00;
+  --orange-light: #FF5A1F;
+}
+
+/* Display P3 지원 "화면"(최신 맥북·아이폰 등)에서는 sRGB가 표현 못 하는
+   원래 디자인한 화려한 톤을 그대로 재현한다.
+   ⚠ @supports (color: color(display-p3 1 0 0))는 "브라우저가 이 문법을
+   해석할 수 있는가"만 확인한다 — 최신 Chrome/Edge는 일반 sRGB 모니터에
+   연결되어 있어도 이 조건을 통과하므로, 그걸로 게이트를 걸면 삼성 S34J 같은
+   화면에서도 위의 sRGB 보정값 대신 이 블록이 적용돼 버려 의도가 깨진다.
+   실제 연결된 디스플레이의 색 영역을 보는 미디어 쿼리 color-gamut으로
+   게이트를 걸어야 "P3 화면에서만" 켜진다. 구문을 이해 못 하는 구형 브라우저는
+   선언을 무시하고 위 sRGB 값을 그대로 쓰므로 별도 @supports 중첩은 불필요하다. */
+@media (color-gamut: p3) {
+  body.p0-active {
+    --orange: color(display-p3 1 0.271 0);
+    --orange-light: color(display-p3 1 0.420 0.208);
+  }
 }
 
 /* ── P0 GRADIENT BG (비활성 — 섹션별 독립 배경으로 대체) ── */

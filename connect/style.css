@@ -4487,6 +4487,27 @@ body[data-viewer-role="admin"] span.admin-only { display: inline !important; }
 .vid-head-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 .vid-refresh-btn:disabled { opacity: .5; cursor: not-allowed !important; }
 
+/* 갱신 대상 플랫폼 선택 — 복수 플랫폼 캠페인에서만 노출(단일 플랫폼이면 JS가 숨김) */
+.vid-plat-select {
+  appearance: none; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 9px center;
+  padding: 7px 26px 7px 11px; font-size: 12px; font-weight: 600; color: var(--gray-dark);
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  cursor: pointer;
+}
+
+/* ── 참여 영상 플랫폼 필터 — 플랫폼이 복수인 캠페인에서만 렌더(없으면 칩 자체가 안 만들어짐) ── */
+.vid-plat-filter { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 14px; }
+.vid-plat-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 12px 6px 10px; border-radius: 100px; border: 1px solid var(--border);
+  background: var(--white); color: var(--gray-mid); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+}
+.vid-plat-chip:hover { border-color: var(--orange); color: var(--orange); }
+.vid-plat-chip.active { background: var(--orange); color: #fff; border-color: var(--orange); }
+
 /* ── 리포트 업로드 / 갱신 제한 모달 ─────────────────────────────────── */
 .ru-sheet { max-width: 640px; }
 

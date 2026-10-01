@@ -528,8 +528,37 @@ function closeRefreshLimitModal() {
   document.getElementById('refreshLimitModal').classList.remove('open');
 }
 
+// 현재 활성 페이지의 플랫폼 목록 — 리포트 업로드/조회수 갱신에서
+// "이 캠페인이 복수 플랫폼인가"를 판단하는 공통 기준.
+// p-channels(프리미엄)는 channels[].platform이 실데이터이고, p-detail·
+// p-detail-upload는 정적 헤더의 .cd-meta .platform-badge로 판단한다.
+function getActivePagePlatforms() {
+  const activeId = pages.find(p => document.getElementById(p)?.classList.contains('active'));
+  if (activeId === 'p-channels') {
+    return [...new Set(channels.map(c => c.platform))];
+  }
+  const wrap = activeId && document.getElementById(activeId);
+  if (!wrap) return [];
+  const plats = new Set();
+  wrap.querySelectorAll('.cd-meta .platform-badge').forEach(b => {
+    ['yt', 'ig', 'tt'].forEach(p => { if (b.classList.contains(p)) plats.add(p); });
+  });
+  return [...plats];
+}
+
 // ── 리포트 업로드 모달 ──
 function openReportUploadModal() {
+  const plats = getActivePagePlatforms();
+  const field = document.getElementById('ruPlatformField');
+  const select = document.getElementById('ruPlatformSelect');
+  if (field && select) {
+    if (plats.length > 1) {
+      select.innerHTML = plats.map(p => `<option value="${p}">${PLAT_NAME_KO[p] || p}</option>`).join('');
+      field.style.display = '';
+    } else {
+      field.style.display = 'none';
+    }
+  }
   document.getElementById('reportUploadModal').classList.add('open');
 }
 function closeReportUploadModal() {
@@ -1371,6 +1400,7 @@ function submitCampaignReg() {
     openRevisionModal, closeReviewModal, approveReview, submitRevision, saveChVideoLink,
     openRevLogPanel, closeRevLogPanel, toggleRevCheck,
     toggleSimPost,
+    pmSetPlatformFilter,
     refreshViewCounts,
     closeRefreshLimitModal,
     openReportUploadModal, closeReportUploadModal, ruSwitchTab,
@@ -1408,6 +1438,22 @@ function submitCampaignReg() {
     if (!el.dataset.change) return;
     if (el.dataset.change === 'showBizFile') { showBizFile(el); return; }
     if (el.dataset.change === 'toggleAllAgree') { toggleAllAgree(el); return; }
+  });
+
+  // 참여 영상 표 플랫폼 필터 (정적 표: p-detail·p-detail-upload).
+  // 프리미엄(p-channels)은 데이터를 다시 그려야 해서 channels.js의
+  // pmSetPlatformFilter(→ data-fn 경로)를 따로 쓰고, 여기선 다루지 않는다.
+  document.addEventListener('click', function(e) {
+    const chip = e.target.closest('.vid-plat-filter [data-vid-plat]');
+    if (!chip) return;
+    const bar = chip.closest('.vid-plat-filter');
+    const card = chip.closest('.vid-card');
+    if (!bar || !card) return;
+    bar.querySelectorAll('[data-vid-plat]').forEach(b => b.classList.toggle('active', b === chip));
+    const want = chip.dataset.vidPlat;
+    card.querySelectorAll('.vid-table-wrap tbody tr[data-platform]').forEach(tr => {
+      tr.style.display = (want === 'all' || tr.dataset.platform === want) ? '' : 'none';
+    });
   });
 
   initCampaignFilter();

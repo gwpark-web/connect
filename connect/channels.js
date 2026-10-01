@@ -239,6 +239,16 @@ const PLAT_ICON = {
   </span>`,
 };
 function platBadge(p) { return PLAT_ICON[p] || `<span class="ch-plat-icon">${p}</span>`; }
+const PLAT_NAME_KO = { yt: '유튜브', ig: '인스타그램', tt: '틱톡' };
+
+// ── 참여 영상 / 프리미엄 지표 플랫폼 필터 ───────────────────────────────
+// 플랫폼이 1개뿐인 캠페인에서는 칩 자체를 만들지 않는다(renderResultPanel 참고)
+let _pmPlatformFilter = 'all';   // 'all' | 'yt' | 'ig' | 'tt'
+let _pmActiveSubTab   = 'videos'; // 'videos' | 'metrics' — 필터를 바꿔도 보던 탭 유지
+function pmSetPlatformFilter(p) {
+  _pmPlatformFilter = p;
+  renderResultPanel();
+}
 
 // 참여 영상 행 삭제 버튼 — 정적 표(site.html)와 같은 마크업을 쓴다
 const VID_DEL_BTN = `<button class="vid-del-btn" title="영상 삭제" aria-label="영상 삭제"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>`;
@@ -684,6 +694,25 @@ function renderResultPanel() {
   const postedCount = doneItems.filter(({ i }) => _simPosted.has(i)).length;
   const pct = GOAL > 0 ? Math.round(postedCount / GOAL * 100) : 0;
 
+  // 플랫폼이 복수인 캠페인에서만 필터 칩을 보여준다. 상단 완료/집계 통계는
+  // 캠페인 전체 기준을 유지하고, 테이블 행 + 프리미엄 지표만 필터를 반영한다.
+  const donePlatforms = [...new Set(doneItems.map(({ i }) => channels[i].platform))];
+  if (_pmPlatformFilter !== 'all' && !donePlatforms.includes(_pmPlatformFilter)) _pmPlatformFilter = 'all';
+  const filteredItems = _pmPlatformFilter === 'all'
+    ? doneItems
+    : doneItems.filter(({ i }) => channels[i].platform === _pmPlatformFilter);
+  const platFilterHtml = donePlatforms.length > 1 ? `
+    <div class="vid-plat-filter" role="tablist" aria-label="플랫폼 필터">
+      <button class="vid-plat-chip${_pmPlatformFilter === 'all' ? ' active' : ''}" data-fn="pmSetPlatformFilter" data-args="all">전체</button>
+      ${donePlatforms.map(p => `<button class="vid-plat-chip${_pmPlatformFilter === p ? ' active' : ''}" data-fn="pmSetPlatformFilter" data-args="${p}">${platBadge(p)}${PLAT_NAME_KO[p] || p}</button>`).join('')}
+    </div>` : '';
+  // 조회수 갱신 대상 선택 — 복수 플랫폼일 때만 노출
+  const refreshSelectHtml = donePlatforms.length > 1 ? `
+    <select class="vid-plat-select" id="pmRefreshPlat" aria-label="갱신 대상 플랫폼">
+      <option value="all">전체 플랫폼</option>
+      ${donePlatforms.map(p => `<option value="${p}">${PLAT_NAME_KO[p] || p}</option>`).join('')}
+    </select>` : '';
+
   // 탭3 카드 카운트 + 뱃지 갱신
   const hero3 = document.getElementById('chTabHero3Sel');
   if (hero3) hero3.textContent = postedCount;
@@ -714,7 +743,7 @@ function renderResultPanel() {
     return;
   }
 
-  const tableRows = doneItems.map(({ ch, i }) => {
+  const tableRows = filteredItems.map(({ ch, i }) => {
     const post = CH_POST[i];
     const isPosted = _simPosted.has(i);
     const postCell = isPosted
@@ -727,7 +756,7 @@ function renderResultPanel() {
            ${isAdmin ? `<button class="ch-sim-btn ch-sim-btn--off" data-fn="toggleSimPost" data-args="${i}">+ 등록</button>` : ''}
          </div>`;
     const vidUrl = (post?.url && post.url !== '#') ? post.url : '';
-    return `<tr>
+    return `<tr data-platform="${ch.platform}">
       <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="${encodeURIComponent(ch.handle)}" data-url="${vidUrl}"></td>
       <td>
         <div style="display:flex;align-items:center;gap:8px">
@@ -861,6 +890,7 @@ function renderResultPanel() {
       <div class="vid-card-head">
         참여 영상
         ${isAdmin ? `<div class="vid-head-actions">
+          ${refreshSelectHtml}
           <button class="cd-btn cd-btn-excel vid-refresh-btn" data-fn="refreshViewCounts"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>조회수 갱신</button>
           <button class="cd-btn cd-btn-edit" data-fn="openReportUploadModal"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>리포트 업로드</button>
         </div>` : ''}
@@ -899,12 +929,13 @@ function renderResultPanel() {
         <span class="ch-sim-notice-icon">🔧</span>
         게시물 등록은 관리자가 설정합니다 · 아래 [+ 등록] 버튼은 표시 시뮬레이션용입니다
       </div>` : ''}
+      ${platFilterHtml}
       <div class="pm-tabs">
-        <button class="pm-tab active" data-pm-tab="videos">참여 영상</button>
-        <button class="pm-tab" data-pm-tab="metrics">프리미엄 지표</button>
+        <button class="pm-tab${_pmActiveSubTab === 'videos' ? ' active' : ''}" data-pm-tab="videos">참여 영상</button>
+        <button class="pm-tab${_pmActiveSubTab === 'metrics' ? ' active' : ''}" data-pm-tab="metrics">프리미엄 지표</button>
       </div>
 
-      <div class="pm-pane active" id="pmPaneVideos">
+      <div class="pm-pane${_pmActiveSubTab === 'videos' ? ' active' : ''}" id="pmPaneVideos">
         <div class="vid-table-wrap">
           <table class="vid-table" data-vid-mode="premium">
             <thead>
@@ -932,7 +963,7 @@ function renderResultPanel() {
         </div>
       </div>
 
-      <div class="pm-pane" id="pmPaneMetrics">${renderPremiumMetrics(doneItems)}</div>
+      <div class="pm-pane${_pmActiveSubTab === 'metrics' ? ' active' : ''}" id="pmPaneMetrics">${renderPremiumMetrics(filteredItems)}</div>
     </div>`;
 }
 
@@ -942,6 +973,7 @@ document.addEventListener('click', function(e) {
   if (!tab) return;
   const card = tab.closest('.vid-card');
   if (!card) return;
+  _pmActiveSubTab = tab.dataset.pmTab; // 플랫폼 필터로 재렌더링해도 보던 탭이 유지되도록 기억
   card.querySelectorAll('[data-pm-tab]').forEach(b => b.classList.toggle('active', b === tab));
   const want = tab.dataset.pmTab === 'metrics' ? 'pmPaneMetrics' : 'pmPaneVideos';
   card.querySelectorAll('.pm-pane').forEach(p => p.classList.toggle('active', p.id === want));
@@ -1162,9 +1194,9 @@ function renderPremiumMetrics(doneItems) {
     </div>
 
     <div class="pm-section-row">
-      ${ageBarCard('주요 연령대 분포', ageSegments)}
-      ${donutCard('주요 성별 분포', genSegments)}
-      ${donutCard('주요 국가 분포', ctySegments)}
+      ${ageBarCard('주요 연령대', ageSegments)}
+      ${donutCard('주요 성별', genSegments)}
+      ${donutCard('주요 국가', ctySegments)}
     </div>`;
 }
 
@@ -1543,35 +1575,45 @@ function updateListCardPremium() {
 
 // ── 조회수 갱신 (API / 크롤링 연동 예정) ──────────────────────────────
 // TODO: GET /api/result/:campaignId/views 응답으로 테이블 행 업데이트
+// 플랫폼이 복수인 캠페인에서는 옆에 .vid-plat-select가 함께 렌더링되고,
+// 선택된 플랫폼별로 "하루 1회" 제한과 갱신 동작이 독립적으로 적용된다.
 function refreshViewCounts() {
+  // 페이지 wrapper 전체가 DOM에 항상 존재하므로(비활성 페이지는 display:none)
+  // 동일 클래스 버튼이 여럿일 수 있다 — 실제로 보이는 것만 대상으로 한다.
+  const btn = [...document.querySelectorAll('.vid-refresh-btn')].find(b => b.offsetParent !== null);
+  if (!btn || btn.disabled) return;
+
+  const select = btn.closest('.vid-head-actions')?.querySelector('.vid-plat-select');
+  const platform = select ? select.value : 'all';
+  const platLabel = platform === 'all' ? '전체' : (PLAT_NAME_KO[platform] || platform);
+  const platSuffix = select ? ` · ${platLabel}` : '';
+
   const TODAY = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
-  const LAST_KEY = 'cs_refresh_last';
+  const LAST_KEY = 'cs_refresh_last_' + platform; // 플랫폼별 독립된 하루 1회 제한
 
   if (localStorage.getItem(LAST_KEY) === TODAY) {
-    // 오늘 이미 갱신 완료 → 제한 모달 표시
+    // 오늘 이미 갱신 완료(해당 플랫폼) → 제한 모달 표시
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
     const nextEl = document.getElementById('refreshNextTime');
     if (nextEl) {
-      nextEl.textContent = '다음 갱신 가능 시간: ' + tomorrow.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' }) + ' 오전 12:00';
+      nextEl.textContent = '다음 갱신 가능 시간' + platSuffix + ': ' + tomorrow.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' }) + ' 오전 12:00';
     }
     const modal = document.getElementById('refreshLimitModal');
     if (modal) modal.classList.add('open');
     return;
   }
 
-  const btn = document.querySelector('.vid-refresh-btn');
-  if (!btn || btn.disabled) return;
   const orig = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = '갱신 중…';
+  btn.innerHTML = select ? `갱신 중… (${platLabel})` : '갱신 중…';
   // 연동 전 1.2s 로딩 시뮬레이션
   setTimeout(() => {
     localStorage.setItem(LAST_KEY, TODAY);
     btn.disabled = false;
     btn.innerHTML = orig;
-    // 연동 완료 후: renderResultPanel() 또는 개별 행 업데이트
+    // 연동 완료 후: renderResultPanel() 또는 개별 행 업데이트(platform 스코프로 교체)
   }, 1200);
 }
 

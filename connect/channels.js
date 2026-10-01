@@ -974,24 +974,34 @@ const GENDER_COLOR = { F: '#DB2777', M: '#2563EB' };
 const AGE_ORDER  = ['25-34', '35-44', '45-54', '55+'];
 const AGE_COLOR  = { '25-34': '#FF4500', '35-44': '#2563EB', '45-54': '#16A34A', '55+': '#DB2777' };
 const NO_DATA_COLOR = '#94A3B8';
+const NO_DATA_LABEL = '기타';
 const COUNTRY_NAME = { KR: '대한민국', US: '미국', JP: '일본' };
 const COUNTRY_FLAG = { KR: '🇰🇷', US: '🇺🇸', JP: '🇯🇵' };
 // 국가 색 — AGE_COLOR와 동일한 검증된 3색(주황·파랑·초록)을 재사용(CVD 전체쌍 통과 조합)
 const COUNTRY_COLOR = { KR: '#FF4500', US: '#2563EB', JP: '#16A34A' };
 
+function hexA(hex, alpha) {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.substring(0, 2), 16), g = parseInt(h.substring(2, 4), 16), b = parseInt(h.substring(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 // 원형(도넛) 차트 — segments: [{ label, count, pct, color }], 그려지는 순서 = 배열 순서
 // 연령대·성별은 고정 순서를 유지해야 하므로 정렬은 호출부 책임, 여기서는 그리기만 한다
+// 세그먼트가 2개 이상일 때만 끝을 둥글린다 — 1개(100%)일 땐 이음매가 생겨 보기 흉해진다
 function donutSVG(segments, size, stroke) {
-  size = size || 104; stroke = stroke || 16;
+  size = size || 116; stroke = stroke || 20;
   const cx = size / 2, r = (size - stroke) / 2;
   const circumf = 2 * Math.PI * r;
-  const gap = segments.length > 1 ? 3 : 0; // 세그먼트 사이 여백(원주 기준 px) — 색만으로 뭉개지지 않게
+  const rounded = segments.length > 1;
+  const gap = rounded ? stroke * 0.55 : 0; // 둥근 끝 두께만큼 여백을 넉넉히 둬 겹침 방지
   let offset = 0;
-  const arcs = segments.map(seg => {
+  const arcs = segments.map((seg, i) => {
     const raw = (seg.pct / 100) * circumf;
-    const len = Math.max(raw - gap, 0);
-    const circle = `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${seg.color}"
-      stroke-width="${stroke}" stroke-dasharray="${len} ${circumf - len}" stroke-dashoffset="${-offset}"
+    const len = Math.max(raw - gap, 0.0001);
+    const circle = `<circle class="pm-arc" data-idx="${i}" cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${seg.color}"
+      stroke-width="${stroke}" stroke-linecap="${rounded ? 'round' : 'butt'}"
+      stroke-dasharray="${len} ${circumf - len}" stroke-dashoffset="${-offset}"
       transform="rotate(-90 ${cx} ${cx})"><title>${seg.label} ${seg.pct}% · ${seg.count}개</title></circle>`;
     offset += raw;
     return circle;
@@ -1003,32 +1013,61 @@ function donutSVG(segments, size, stroke) {
   </svg>`;
 }
 
-// 범례에 수치를 항상 함께 적어 색에만 의존하지 않게 한다 (도넛 공통 사용)
+// 범례에 수치를 항상 함께 적어 색에만 의존하지 않게 한다 (도넛 공통 사용). 각 항목에
+// 도넛 세그먼트와 같은 data-idx를 달아 마우스오버 시 서로 강조되도록 연결한다.
 function donutLegend(segments) {
-  return `<div class="pm-dlegend">${segments.map(s => `
-    <div class="pm-dlegend-item">
+  return `<div class="pm-dlegend">${segments.map((s, i) => `
+    <div class="pm-dlegend-item" data-idx="${i}">
       <i style="background:${s.color}"></i>
       <span class="pm-dlegend-lbl" title="${s.label}">${s.label}</span>
       <span class="pm-dlegend-pct">${s.pct}%</span>
     </div>`).join('')}</div>`;
 }
 
-// 도넛 중앙에는 비중이 가장 큰 구간을 띄운다 (그려지는 순서와 무관)
+// 도넛 중앙에는 비중이 가장 큰 구간을 그 색으로 강조해 띄운다 (그려지는 순서와 무관).
+// 전체 래퍼에 1등 구간 색의 은은한 글로우를 깔아 단조로운 링에 포인트를 준다.
 function donutCard(title, segments) {
   const top = segments.reduce((a, b) => (b.pct > a.pct ? b : a), segments[0]);
   return `
     <div class="pm-donut-card">
       <p class="pm-section-title">${title}</p>
-      <div class="pm-donut-wrap">
+      <div class="pm-donut-wrap" style="--glow:${hexA(top.color, 0.30)}">
         ${donutSVG(segments)}
         <div class="pm-donut-center">
-          <span class="pm-donut-center-pct">${top.pct}%</span>
+          <span class="pm-donut-center-pct" style="color:${top.color}">${top.pct}%</span>
           <span class="pm-donut-center-lbl" title="${top.label}">${top.label}</span>
         </div>
       </div>
       ${donutLegend(segments)}
     </div>`;
 }
+
+// 범례 ↔ 도넛 세그먼트 상호 강조 (마우스오버). 결과 패널은 매번 새로 그려지므로 위임으로 처리한다.
+function pmDonutFocus(card, idx) {
+  card.querySelectorAll('.pm-arc').forEach(c => {
+    const match = c.dataset.idx === idx;
+    c.classList.toggle('pm-arc--focus', match);
+    c.classList.toggle('pm-arc--dim', !match);
+  });
+  card.querySelectorAll('.pm-dlegend-item').forEach(it => it.classList.toggle('pm-dlegend-item--focus', it.dataset.idx === idx));
+}
+function pmDonutBlur(card) {
+  card.querySelectorAll('.pm-arc').forEach(c => c.classList.remove('pm-arc--focus', 'pm-arc--dim'));
+  card.querySelectorAll('.pm-dlegend-item').forEach(it => it.classList.remove('pm-dlegend-item--focus'));
+}
+document.addEventListener('mouseover', function(e) {
+  const target = e.target.closest('.pm-arc, .pm-dlegend-item');
+  if (!target) return;
+  const card = target.closest('.pm-donut-card');
+  if (!card) return;
+  pmDonutFocus(card, target.dataset.idx);
+});
+document.addEventListener('mouseout', function(e) {
+  const target = e.target.closest('.pm-arc, .pm-dlegend-item');
+  if (!target) return;
+  const card = target.closest('.pm-donut-card');
+  if (card) pmDonutBlur(card);
+});
 
 function fmtNum(n) { return n.toLocaleString('ko-KR'); }
 
@@ -1071,7 +1110,7 @@ function renderPremiumMetrics(doneItems) {
   rows.forEach(r => { const k = r.age || '조회 불가'; ageCount[k] = (ageCount[k] || 0) + 1; });
   const ageKeys = AGE_ORDER.filter(k => ageCount[k]).concat(ageCount['조회 불가'] ? ['조회 불가'] : []);
   const ageSegments = ageKeys.map(k => ({
-    label: k, count: ageCount[k], pct: Math.round(ageCount[k] / provided * 100),
+    label: k === '조회 불가' ? NO_DATA_LABEL : k, count: ageCount[k], pct: Math.round(ageCount[k] / provided * 100),
     color: k === '조회 불가' ? NO_DATA_COLOR : AGE_COLOR[k],
   }));
 
@@ -1080,7 +1119,7 @@ function renderPremiumMetrics(doneItems) {
   rows.forEach(r => { const k = r.gender || '조회 불가'; genCount[k] = (genCount[k] || 0) + 1; });
   const genKeys = ['F', 'M'].filter(k => genCount[k]).concat(genCount['조회 불가'] ? ['조회 불가'] : []);
   const genSegments = genKeys.map(k => ({
-    label: k === '조회 불가' ? k : (GENDER_LABEL[k] || k), count: genCount[k],
+    label: k === '조회 불가' ? NO_DATA_LABEL : (GENDER_LABEL[k] || k), count: genCount[k],
     pct: Math.round(genCount[k] / provided * 100),
     color: k === '조회 불가' ? NO_DATA_COLOR : GENDER_COLOR[k],
   }));
@@ -1090,7 +1129,7 @@ function renderPremiumMetrics(doneItems) {
   rows.forEach(r => { const k = r.country || '조회 불가'; ctyCount[k] = (ctyCount[k] || 0) + 1; });
   const ctyKeys = Object.keys(ctyCount).sort((a, b) => ctyCount[b] - ctyCount[a]);
   const ctySegments = ctyKeys.map(k => ({
-    label: k === '조회 불가' ? k : (COUNTRY_NAME[k] || k), count: ctyCount[k],
+    label: k === '조회 불가' ? NO_DATA_LABEL : (COUNTRY_NAME[k] || k), count: ctyCount[k],
     pct: Math.round(ctyCount[k] / provided * 100),
     color: k === '조회 불가' ? NO_DATA_COLOR : (COUNTRY_COLOR[k] || NO_DATA_COLOR),
   }));

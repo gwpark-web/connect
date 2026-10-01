@@ -4043,29 +4043,38 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
 .pm-section-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .pm-donut-card {
   border: 1px solid var(--border); border-radius: 14px;
-  padding: 16px 14px; text-align: center; background: var(--gray-bg);
+  padding: 18px 14px; text-align: center; background: var(--gray-bg);
 }
-.pm-donut-wrap { position: relative; width: 104px; height: 104px; margin: 0 auto; }
-.pm-donut-wrap svg circle { transition: stroke-dasharray .2s ease; }
+.pm-donut-wrap {
+  position: relative; width: 116px; height: 116px; margin: 0 auto;
+  /* 1등 구간 색의 은은한 글로우 — 단조로운 링에 포인트를 준다 */
+  background: radial-gradient(circle, var(--glow) 0%, transparent 72%);
+}
+.pm-arc { transition: opacity .15s ease, stroke-width .15s ease; }
+.pm-arc--focus { stroke-width: 23px; }
+.pm-arc--dim { opacity: .25; }
 .pm-donut-center {
   position: absolute; inset: 0; display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 1px; pointer-events: none;
 }
-.pm-donut-center-pct { font-size: 18px; font-weight: 800; color: var(--gray-dark); line-height: 1.1; }
+.pm-donut-center-pct { font-size: 21px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.1; }
 .pm-donut-center-lbl {
   font-size: 10.5px; font-weight: 600; color: var(--gray-mid);
-  max-width: 68px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
 /* 범례: 값(퍼센트)을 항상 함께 적어 색에만 의존하지 않게 한다 */
 .pm-dlegend {
   display: flex; flex-direction: column; gap: 6px;
-  margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); text-align: left;
+  margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); text-align: left;
 }
-.pm-dlegend-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--gray-mid); }
+.pm-dlegend-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--gray-mid); border-radius: 6px; padding: 2px 4px; margin: 0 -4px; cursor: default; transition: background-color .15s ease; }
 .pm-dlegend-item i { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
 .pm-dlegend-lbl { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pm-dlegend-pct { font-weight: 700; color: var(--gray-dark); flex-shrink: 0; }
+.pm-dlegend-item--focus { background: rgba(0,0,0,.05); }
+.pm-dlegend-item--focus .pm-dlegend-lbl,
+.pm-dlegend-item--focus .pm-dlegend-pct { color: var(--gray-dark); }
 
 @media (max-width: 900px) { .pm-stat-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px) { .pm-section-row { grid-template-columns: 1fr; } }

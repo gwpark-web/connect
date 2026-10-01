@@ -728,37 +728,78 @@ function handleReportCsvFile(input) {
   reader.readAsText(file, 'utf-8');
 }
 
+// 이름이 일치하는 열 데이터만 가진 채 새 행을 만들 때, 나머지 열은
+// 종류에 따라 빈 칸(체크박스·삭제·짤)·플레이스홀더 아바타·"-"로 채운다.
+function ruBuildPlaceholderCell(th, name) {
+  const td = document.createElement('td');
+  if (th.classList.contains('vid-cb-th')) {
+    td.className = 'vid-cb-td';
+    td.innerHTML = '<input type="checkbox" class="vid-row-cb">';
+  } else if (th.classList.contains('vid-del-col')) {
+    td.className = 'vid-del-col';
+    td.style.textAlign = 'center';
+    td.innerHTML = VID_DEL_BTN;
+  } else if (th.classList.contains('zeal-col')) {
+    td.className = 'zeal-col';
+    td.style.textAlign = 'center';
+    td.textContent = '-';
+  } else if (!th.textContent.trim() && !th.querySelector('.vid-sort-btn')) {
+    // 라벨 없는 빈 th = 아바타 열
+    td.innerHTML = `<span class="vid-avatar" style="background:#e8eaf0;color:#666">${(name || '?').trim().charAt(0)}</span>`;
+  } else if (th.classList.contains('vid-vis-col')) {
+    td.style.textAlign = 'center';
+    td.innerHTML = '<span class="vid-vis vid-vis--public">공개</span>';
+  } else {
+    td.textContent = '-';
+  }
+  return td;
+}
+
 function applyReportCsv() {
   if (!_ruParsedRows || !_ruParsedRows.length) return;
   const table = findVisibleVidTable();
   if (!table) { alert('반영할 참여 영상 표를 찾을 수 없습니다.'); return; }
 
+  const ths = [...table.querySelectorAll('thead th')];
   const nameCol = ruTableColIndex(table, '채널명');
   const viewsCol = ruTableColIndex(table, '조회수');
   const likesCol = ruTableColIndex(table, '좋아요');
   const commentsCol = ruTableColIndex(table, '댓글');
+  const tbody = table.querySelector('tbody');
 
   const rowsByName = new Map();
-  table.querySelectorAll('tbody tr').forEach(tr => {
+  tbody.querySelectorAll('tr').forEach(tr => {
     const nameCell = tr.children[nameCol];
     const name = (nameCell?.getAttribute('title') || nameCell?.textContent || '').trim();
     if (name) rowsByName.set(name, tr);
   });
 
-  let applied = 0, skipped = 0;
+  // CSV에 있는 채널은 전부 표에 반영한다 — 이미 있으면 갱신, 없으면 새 행 추가(건너뛰지 않음)
+  let updated = 0, added = 0;
   _ruParsedRows.forEach(r => {
-    const tr = rowsByName.get(r.name);
-    if (!tr) { skipped++; return; }
+    let tr = rowsByName.get(r.name);
+    if (!tr) {
+      tr = document.createElement('tr');
+      ths.forEach(th => tr.appendChild(ruBuildPlaceholderCell(th, r.name)));
+      if (nameCol > -1) {
+        tr.children[nameCol].textContent = r.name;
+        tr.children[nameCol].setAttribute('title', r.name);
+      }
+      tbody.appendChild(tr);
+      rowsByName.set(r.name, tr);
+      added++;
+    } else {
+      updated++;
+    }
     const tds = [...tr.children];
     if (viewsCol > -1 && r.views !== undefined && tds[viewsCol]) tds[viewsCol].textContent = (Number(r.views) || 0).toLocaleString();
     if (likesCol > -1 && r.likes !== undefined && tds[likesCol]) tds[likesCol].textContent = (Number(r.likes) || 0).toLocaleString();
     if (commentsCol > -1 && r.comments !== undefined && tds[commentsCol]) tds[commentsCol].textContent = (Number(r.comments) || 0).toLocaleString();
-    applied++;
   });
 
   closeReportUploadModal();
   alert(
-    `${applied}개 반영 완료` + (skipped ? `, ${skipped}개는 일치하는 채널명을 찾지 못해 건너뜀` : '') +
+    `${_ruParsedRows.length}개 전부 반영 완료 (기존 채널 갱신 ${updated}개, 신규 채널 추가 ${added}개)` +
     '\n(검토용 반영이라 새로고침하면 초기화됩니다 — 저장하려면 백엔드 연동 필요)'
   );
 }

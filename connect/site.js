@@ -163,12 +163,19 @@ function submitBrochure() {
     .filter(id => document.getElementById(id)?.checked)
     .map(getLabelText).join(', ') || '(선택 없음)';
 
+  // EmailJS는 send()에 넘긴 키 이름이 템플릿 안의 {{변수}}와 "똑같아야" 내용이 채워진다.
+  // 템플릿 쪽 변수명을 모르는 상태라 자주 쓰이는 이름(subject/body, message, from_name,
+  // reply_to)을 전부 같이 보낸다 — 템플릿이 쓰지 않는 키는 그냥 무시되니 더 보낸다고 문제되지 않는다.
+  const brochureBody =
+    `회사명 / 브랜드명 : ${company}\n` +
+    `이메일            : ${email}\n` +
+    `카테고리          : ${cats}`;
   emailjs.send(EJS_SVC, EJS_TPL, {
     subject: `[커넥트 스튜디오] 상품소개서 요청 - ${company}`,
-    body:
-      `회사명 / 브랜드명 : ${company}\n` +
-      `이메일            : ${email}\n` +
-      `카테고리          : ${cats}`
+    body: brochureBody,
+    message: brochureBody,
+    from_name: company,
+    reply_to: email,
   }).then(() => {
     alert('요청이 접수되었습니다.\n입력하신 이메일로 소개서를 발송해드립니다.');
     goTo('p1');
@@ -194,17 +201,24 @@ function submitInquiry() {
   const budget = getLabelText(document.querySelector('[name="iq-budget"]:checked')?.id) || '(선택 없음)';
   const timing = getLabelText(document.querySelector('[name="iq-timing"]:checked')?.id) || '(선택 없음)';
 
+  // EmailJS는 send()에 넘긴 키 이름이 템플릿 안의 {{변수}}와 "똑같아야" 내용이 채워진다.
+  // 템플릿 쪽 변수명을 모르는 상태라 자주 쓰이는 이름(subject/body, message, from_name,
+  // reply_to)을 전부 같이 보낸다 — 템플릿이 쓰지 않는 키는 그냥 무시되니 더 보낸다고 문제되지 않는다.
+  const inquiryBody =
+    `회사명 / 브랜드명 : ${company}\n` +
+    `담당자명          : ${name}\n` +
+    `연락처            : ${phone}\n` +
+    `이메일            : ${email}\n\n` +
+    `광고 카테고리     : ${cats}\n` +
+    `집행 플랫폼       : ${platforms}\n` +
+    `예산 규모         : ${budget}\n` +
+    `희망 라이브 시기  : ${timing}`;
   emailjs.send(EJS_SVC, EJS_TPL, {
     subject: `[커넥트 스튜디오] 캠페인 문의 - ${company}`,
-    body:
-      `회사명 / 브랜드명 : ${company}\n` +
-      `담당자명          : ${name}\n` +
-      `연락처            : ${phone}\n` +
-      `이메일            : ${email}\n\n` +
-      `광고 카테고리     : ${cats}\n` +
-      `집행 플랫폼       : ${platforms}\n` +
-      `예산 규모         : ${budget}\n` +
-      `희망 라이브 시기  : ${timing}`
+    body: inquiryBody,
+    message: inquiryBody,
+    from_name: company,
+    reply_to: email,
   }).then(() => {
     alert('문의가 접수되었습니다.\n영업일 기준 1일 내 담당자가 연락드립니다.');
     goTo('p1');

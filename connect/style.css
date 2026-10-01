@@ -4039,9 +4039,9 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
 
 .pm-section-title { font-size: 12px; font-weight: 700; color: var(--gray-mid); margin-bottom: 12px; }
 
-/* 연령대·성별·국가 분포 — 도넛 차트 3개를 한 행에 균등 배치 */
+/* 연령대·성별·국가 분포 — 막대 1개 + 도넛 2개를 한 행에 균등 배치 */
 .pm-section-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.pm-donut-card {
+.pm-chart-card {
   border: 1px solid var(--border); border-radius: 14px;
   padding: 18px 14px; text-align: center; background: var(--gray-bg);
 }
@@ -4075,6 +4075,19 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
 .pm-dlegend-item--focus { background: rgba(0,0,0,.05); }
 .pm-dlegend-item--focus .pm-dlegend-lbl,
 .pm-dlegend-item--focus .pm-dlegend-pct { color: var(--gray-dark); }
+
+/* 연령대 분포 — 좌측 라벨 · 가로 막대 · 우측 퍼센트 한 줄씩 (순서가 있는 값이라 도넛보다 더 바로 읽힌다) */
+.pm-chart-card--bars { text-align: left; display: flex; flex-direction: column; }
+.pm-chart-card--bars .pm-section-title { text-align: center; }
+.pm-hbar-list { display: flex; flex-direction: column; gap: 10px; margin: auto 0; }
+.pm-hbar-row { display: flex; align-items: center; gap: 10px; }
+.pm-hbar-lbl {
+  width: 52px; flex-shrink: 0; font-size: 11.5px; font-weight: 600; color: var(--gray-mid);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.pm-hbar-track { flex: 1; height: 10px; background: var(--border); border-radius: 100px; overflow: hidden; }
+.pm-hbar-fill { height: 100%; border-radius: 100px; transition: width .2s ease; }
+.pm-hbar-val { width: 38px; flex-shrink: 0; text-align: right; font-size: 11.5px; font-weight: 700; color: var(--gray-dark); }
 
 @media (max-width: 900px) { .pm-stat-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px) { .pm-section-row { grid-template-columns: 1fr; } }

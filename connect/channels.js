@@ -1029,7 +1029,7 @@ function donutLegend(segments) {
 function donutCard(title, segments) {
   const top = segments.reduce((a, b) => (b.pct > a.pct ? b : a), segments[0]);
   return `
-    <div class="pm-donut-card">
+    <div class="pm-chart-card">
       <p class="pm-section-title">${title}</p>
       <div class="pm-donut-wrap" style="--glow:${hexA(top.color, 0.30)}">
         ${donutSVG(segments)}
@@ -1039,6 +1039,25 @@ function donutCard(title, segments) {
         </div>
       </div>
       ${donutLegend(segments)}
+    </div>`;
+}
+
+// 연령대는 구간이 순서를 가진 값(어릴수록/많을수록)이라 좌측 가로 막대가 더 바로 읽힌다 —
+// 라벨(좌) · 막대(가운데, 폭 = 비중) · 퍼센트(우) 한 줄에 한 구간씩.
+function ageBarCard(title, segments) {
+  // 막대 길이는 비중(%)을 그대로 쓴다 — 전체 대비 몫이므로 상대 스케일링 없이 그려야 왜곡이 없다.
+  const rows = segments.map(s => `
+    <div class="pm-hbar-row">
+      <span class="pm-hbar-lbl" title="${s.label}">${s.label}</span>
+      <div class="pm-hbar-track">
+        <div class="pm-hbar-fill" style="width:${s.pct}%;background:${s.color}"></div>
+      </div>
+      <span class="pm-hbar-val">${s.pct}%</span>
+    </div>`).join('');
+  return `
+    <div class="pm-chart-card pm-chart-card--bars">
+      <p class="pm-section-title">${title}</p>
+      <div class="pm-hbar-list">${rows}</div>
     </div>`;
 }
 
@@ -1058,14 +1077,14 @@ function pmDonutBlur(card) {
 document.addEventListener('mouseover', function(e) {
   const target = e.target.closest('.pm-arc, .pm-dlegend-item');
   if (!target) return;
-  const card = target.closest('.pm-donut-card');
+  const card = target.closest('.pm-chart-card');
   if (!card) return;
   pmDonutFocus(card, target.dataset.idx);
 });
 document.addEventListener('mouseout', function(e) {
   const target = e.target.closest('.pm-arc, .pm-dlegend-item');
   if (!target) return;
-  const card = target.closest('.pm-donut-card');
+  const card = target.closest('.pm-chart-card');
   if (card) pmDonutBlur(card);
 });
 
@@ -1143,7 +1162,7 @@ function renderPremiumMetrics(doneItems) {
     </div>
 
     <div class="pm-section-row">
-      ${donutCard('주요 연령대 분포', ageSegments)}
+      ${ageBarCard('주요 연령대 분포', ageSegments)}
       ${donutCard('주요 성별 분포', genSegments)}
       ${donutCard('주요 국가 분포', ctySegments)}
     </div>`;

@@ -4037,48 +4037,38 @@ th .th-sub { font-weight:400; color:var(--gray-light); font-size:10px; }
 .pm-stat--d .pm-stat-lbl, .pm-stat--d .pm-stat-sub { color: #BE185D; }
 .pm-stat--d .pm-stat-num { color: #DB2777; }
 
-.pm-section { margin-bottom: 22px; }
-.pm-section:last-child { margin-bottom: 0; }
 .pm-section-title { font-size: 12px; font-weight: 700; color: var(--gray-mid); margin-bottom: 12px; }
 
-/* 막대: 값 라벨을 항상 붙여 색에만 의존하지 않게 한다 */
-.pm-bar-row { display: flex; gap: 6px; align-items: flex-end; height: 104px; }
-.pm-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px; }
-.pm-bar-val { font-size: 11.5px; font-weight: 700; color: var(--gray-dark); }
-.pm-bar { width: 100%; border-radius: 4px 4px 0 0; }
-.pm-bar-lbl-row { display: flex; gap: 6px; margin-top: 5px; }
-.pm-bar-lbl {
-  flex: 1; text-align: center; font-size: 11px; color: var(--gray-light);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+/* 연령대·성별·국가 분포 — 도넛 차트 3개를 한 행에 균등 배치 */
+.pm-section-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.pm-donut-card {
+  border: 1px solid var(--border); border-radius: 14px;
+  padding: 16px 14px; text-align: center; background: var(--gray-bg);
 }
-.pm-legend {
-  display: flex; flex-wrap: wrap; gap: 4px 14px;
-  margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);
+.pm-donut-wrap { position: relative; width: 104px; height: 104px; margin: 0 auto; }
+.pm-donut-wrap svg circle { transition: stroke-dasharray .2s ease; }
+.pm-donut-center {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1px; pointer-events: none;
 }
-.pm-legend-item { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--gray-mid); }
-.pm-legend-item i { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.pm-donut-center-pct { font-size: 18px; font-weight: 800; color: var(--gray-dark); line-height: 1.1; }
+.pm-donut-center-lbl {
+  font-size: 10.5px; font-weight: 600; color: var(--gray-mid);
+  max-width: 68px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 
-.pm-cty-hero {
-  background: linear-gradient(140deg, var(--orange-pale), #FFF7F2);
-  border: 1px solid rgba(255,69,0,.16); border-radius: 14px;
-  padding: 18px; text-align: center; margin-bottom: 14px;
+/* 범례: 값(퍼센트)을 항상 함께 적어 색에만 의존하지 않게 한다 */
+.pm-dlegend {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); text-align: left;
 }
-.pm-cty-hero-flag { font-size: 30px; line-height: 1; margin-bottom: 4px; }
-.pm-cty-hero-pct { font-size: 30px; font-weight: 800; color: var(--orange); line-height: 1.1; }
-.pm-cty-hero-name { font-size: 13px; font-weight: 700; color: #C43A00; margin-top: 2px; }
-.pm-cty-hero-sub { font-size: 11px; color: var(--gray-mid); margin-top: 3px; }
-.pm-cty-row { display: flex; align-items: center; gap: 9px; margin-bottom: 9px; }
-.pm-cty-row:last-child { margin-bottom: 0; }
-.pm-cty-flag { font-size: 17px; line-height: 1; flex-shrink: 0; }
-.pm-cty-body { flex: 1; min-width: 0; }
-.pm-cty-top { display: flex; justify-content: space-between; font-size: 11.5px; margin-bottom: 3px; }
-.pm-cty-name { font-weight: 600; color: var(--gray-dark); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pm-cty-pct { font-weight: 700; margin-left: 6px; flex-shrink: 0; }
-.pm-cty-track { height: 7px; background: var(--gray-bg); border-radius: 100px; overflow: hidden; }
-.pm-cty-fill { height: 100%; border-radius: 100px; }
-.pm-cty-cnt { font-size: 11px; color: var(--gray-light); flex-shrink: 0; width: 34px; text-align: right; }
+.pm-dlegend-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--gray-mid); }
+.pm-dlegend-item i { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.pm-dlegend-lbl { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pm-dlegend-pct { font-weight: 700; color: var(--gray-dark); flex-shrink: 0; }
 
 @media (max-width: 900px) { .pm-stat-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .pm-section-row { grid-template-columns: 1fr; } }
 
 /* ── 캠페인 행 관리 버튼 ── */
 .adm-act-cell { white-space: nowrap; }

@@ -976,6 +976,59 @@ const AGE_COLOR  = { '25-34': '#FF4500', '35-44': '#2563EB', '45-54': '#16A34A',
 const NO_DATA_COLOR = '#94A3B8';
 const COUNTRY_NAME = { KR: '대한민국', US: '미국', JP: '일본' };
 const COUNTRY_FLAG = { KR: '🇰🇷', US: '🇺🇸', JP: '🇯🇵' };
+// 국가 색 — AGE_COLOR와 동일한 검증된 3색(주황·파랑·초록)을 재사용(CVD 전체쌍 통과 조합)
+const COUNTRY_COLOR = { KR: '#FF4500', US: '#2563EB', JP: '#16A34A' };
+
+// 원형(도넛) 차트 — segments: [{ label, count, pct, color }], 그려지는 순서 = 배열 순서
+// 연령대·성별은 고정 순서를 유지해야 하므로 정렬은 호출부 책임, 여기서는 그리기만 한다
+function donutSVG(segments, size, stroke) {
+  size = size || 104; stroke = stroke || 16;
+  const cx = size / 2, r = (size - stroke) / 2;
+  const circumf = 2 * Math.PI * r;
+  const gap = segments.length > 1 ? 3 : 0; // 세그먼트 사이 여백(원주 기준 px) — 색만으로 뭉개지지 않게
+  let offset = 0;
+  const arcs = segments.map(seg => {
+    const raw = (seg.pct / 100) * circumf;
+    const len = Math.max(raw - gap, 0);
+    const circle = `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${seg.color}"
+      stroke-width="${stroke}" stroke-dasharray="${len} ${circumf - len}" stroke-dashoffset="${-offset}"
+      transform="rotate(-90 ${cx} ${cx})"><title>${seg.label} ${seg.pct}% · ${seg.count}개</title></circle>`;
+    offset += raw;
+    return circle;
+  }).join('');
+  const srLabel = segments.map(s => `${s.label} ${s.pct}%`).join(', ');
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="${srLabel}">
+    <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="var(--gray-bg)" stroke-width="${stroke}"/>
+    ${arcs}
+  </svg>`;
+}
+
+// 범례에 수치를 항상 함께 적어 색에만 의존하지 않게 한다 (도넛 공통 사용)
+function donutLegend(segments) {
+  return `<div class="pm-dlegend">${segments.map(s => `
+    <div class="pm-dlegend-item">
+      <i style="background:${s.color}"></i>
+      <span class="pm-dlegend-lbl" title="${s.label}">${s.label}</span>
+      <span class="pm-dlegend-pct">${s.pct}%</span>
+    </div>`).join('')}</div>`;
+}
+
+// 도넛 중앙에는 비중이 가장 큰 구간을 띄운다 (그려지는 순서와 무관)
+function donutCard(title, segments) {
+  const top = segments.reduce((a, b) => (b.pct > a.pct ? b : a), segments[0]);
+  return `
+    <div class="pm-donut-card">
+      <p class="pm-section-title">${title}</p>
+      <div class="pm-donut-wrap">
+        ${donutSVG(segments)}
+        <div class="pm-donut-center">
+          <span class="pm-donut-center-pct">${top.pct}%</span>
+          <span class="pm-donut-center-lbl" title="${top.label}">${top.label}</span>
+        </div>
+      </div>
+      ${donutLegend(segments)}
+    </div>`;
+}
 
 function fmtNum(n) { return n.toLocaleString('ko-KR'); }
 
@@ -1017,59 +1070,30 @@ function renderPremiumMetrics(doneItems) {
   const ageCount = {};
   rows.forEach(r => { const k = r.age || '조회 불가'; ageCount[k] = (ageCount[k] || 0) + 1; });
   const ageKeys = AGE_ORDER.filter(k => ageCount[k]).concat(ageCount['조회 불가'] ? ['조회 불가'] : []);
-  const ageMax = Math.max(...ageKeys.map(k => ageCount[k]));
-  const agePct = k => Math.round(ageCount[k] / provided * 100);
-  const ageColor = k => (k === '조회 불가' ? NO_DATA_COLOR : AGE_COLOR[k]);
+  const ageSegments = ageKeys.map(k => ({
+    label: k, count: ageCount[k], pct: Math.round(ageCount[k] / provided * 100),
+    color: k === '조회 불가' ? NO_DATA_COLOR : AGE_COLOR[k],
+  }));
 
-  const ageBars = ageKeys.map(k => `
-    <div class="pm-bar-col">
-      <span class="pm-bar-val">${agePct(k)}%</span>
-      <div class="pm-bar" style="height:${Math.round(ageCount[k] / ageMax * 82)}px;background:${ageColor(k)}"></div>
-    </div>`).join('');
-  const ageLabels = ageKeys.map(k => `<div class="pm-bar-lbl" title="${k}">${k}</div>`).join('');
-  const ageLegend = ageKeys.map(k =>
-    `<span class="pm-legend-item"><i style="background:${ageColor(k)}"></i>${k} · ${ageCount[k]}개</span>`).join('');
-
-  // 성별 집계 — 연령대와 같은 막대 형태. 미제공은 중립색으로 맨 뒤.
+  // 성별 집계 — 연령대와 동일한 집계 방식. 미제공은 중립색으로 맨 뒤.
   const genCount = {};
   rows.forEach(r => { const k = r.gender || '조회 불가'; genCount[k] = (genCount[k] || 0) + 1; });
   const genKeys = ['F', 'M'].filter(k => genCount[k]).concat(genCount['조회 불가'] ? ['조회 불가'] : []);
-  const genMax = Math.max(...genKeys.map(k => genCount[k]));
-  const genName = k => GENDER_LABEL[k] || k;
-  const genColor = k => (k === '조회 불가' ? NO_DATA_COLOR : GENDER_COLOR[k]);
-  const genBars = genKeys.map(k => `
-    <div class="pm-bar-col">
-      <span class="pm-bar-val">${Math.round(genCount[k] / provided * 100)}%</span>
-      <div class="pm-bar" style="height:${Math.round(genCount[k] / genMax * 82)}px;background:${genColor(k)}"></div>
-    </div>`).join('');
-  const genLabels = genKeys.map(k => `<div class="pm-bar-lbl" title="${genName(k)}">${genName(k)}</div>`).join('');
-  const genLegend = genKeys.map(k =>
-    `<span class="pm-legend-item"><i style="background:${genColor(k)}"></i>${genName(k)} · ${genCount[k]}개</span>`).join('');
+  const genSegments = genKeys.map(k => ({
+    label: k === '조회 불가' ? k : (GENDER_LABEL[k] || k), count: genCount[k],
+    pct: Math.round(genCount[k] / provided * 100),
+    color: k === '조회 불가' ? NO_DATA_COLOR : GENDER_COLOR[k],
+  }));
 
-  // 국가 집계 — 최다 국가를 대표로 보여준다
+  // 국가 집계 — 최다 국가 순으로 정렬(국가는 연령대·성별과 달리 고정 순서가 없다)
   const ctyCount = {};
   rows.forEach(r => { const k = r.country || '조회 불가'; ctyCount[k] = (ctyCount[k] || 0) + 1; });
   const ctyKeys = Object.keys(ctyCount).sort((a, b) => ctyCount[b] - ctyCount[a]);
-  const topCty = ctyKeys[0];
-  const topPct = Math.round(ctyCount[topCty] / provided * 100);
-  const ctyRows = ctyKeys.map(k => {
-    const pct = Math.round(ctyCount[k] / provided * 100);
-    const isNo = k === '조회 불가';
-    return `
-      <div class="pm-cty-row">
-        <span class="pm-cty-flag">${isNo ? '🌐' : (COUNTRY_FLAG[k] || '🌐')}</span>
-        <div class="pm-cty-body">
-          <div class="pm-cty-top">
-            <span class="pm-cty-name">${isNo ? '조회 불가' : (COUNTRY_NAME[k] || k)}</span>
-            <span class="pm-cty-pct" style="color:${isNo ? NO_DATA_COLOR : 'var(--orange)'}">${pct}%</span>
-          </div>
-          <div class="pm-cty-track">
-            <div class="pm-cty-fill" style="width:${pct}%;background:${isNo ? NO_DATA_COLOR : 'var(--orange)'}"></div>
-          </div>
-        </div>
-        <span class="pm-cty-cnt">${ctyCount[k]}개</span>
-      </div>`;
-  }).join('');
+  const ctySegments = ctyKeys.map(k => ({
+    label: k === '조회 불가' ? k : (COUNTRY_NAME[k] || k), count: ctyCount[k],
+    pct: Math.round(ctyCount[k] / provided * 100),
+    color: k === '조회 불가' ? NO_DATA_COLOR : (COUNTRY_COLOR[k] || NO_DATA_COLOR),
+  }));
 
   return `
     <div class="pm-stat-grid">
@@ -1079,29 +1103,10 @@ function renderPremiumMetrics(doneItems) {
       <div class="pm-stat pm-stat--d"><p class="pm-stat-lbl">총 공유수</p><p class="pm-stat-num">${fmtNum(totalShares)}</p></div>
     </div>
 
-    <div class="pm-section">
-      <p class="pm-section-title">주요 연령대 분포</p>
-      <div class="pm-bar-row">${ageBars}</div>
-      <div class="pm-bar-lbl-row">${ageLabels}</div>
-      <div class="pm-legend">${ageLegend}</div>
-    </div>
-
-    <div class="pm-section">
-      <p class="pm-section-title">주요 성별 분포</p>
-      <div class="pm-bar-row">${genBars}</div>
-      <div class="pm-bar-lbl-row">${genLabels}</div>
-      <div class="pm-legend">${genLegend}</div>
-    </div>
-
-    <div class="pm-section">
-      <p class="pm-section-title">주요 국가 분포</p>
-      <div class="pm-cty-hero">
-        <div class="pm-cty-hero-flag">${topCty === '조회 불가' ? '🌐' : (COUNTRY_FLAG[topCty] || '🌐')}</div>
-        <p class="pm-cty-hero-pct">${topPct}%</p>
-        <p class="pm-cty-hero-name">${topCty === '조회 불가' ? '조회 불가' : (COUNTRY_NAME[topCty] || topCty)}</p>
-        <p class="pm-cty-hero-sub">${ctyCount[topCty]}개 영상${topCty === 'KR' ? ' · 국내 집중 캠페인' : ''}</p>
-      </div>
-      ${ctyRows}
+    <div class="pm-section-row">
+      ${donutCard('주요 연령대 분포', ageSegments)}
+      ${donutCard('주요 성별 분포', genSegments)}
+      ${donutCard('주요 국가 분포', ctySegments)}
     </div>`;
 }
 

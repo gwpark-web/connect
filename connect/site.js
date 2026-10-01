@@ -562,6 +562,15 @@ function getActivePagePlatforms() {
 
 // ── 리포트 업로드 모달 ──
 function openReportUploadModal() {
+  // 이전에 고른 파일·파싱 결과가 남아있지 않도록 매번 초기화
+  _ruParsedRows = null;
+  const fileInput = document.getElementById('ruFileInput');
+  if (fileInput) fileInput.value = '';
+  const dropLabel = document.getElementById('ruDropLabel');
+  if (dropLabel) dropLabel.textContent = '채널명·조회수·좋아요·댓글 CSV 파일을 클릭하여 선택';
+  const submitBtn = document.getElementById('ruSubmitBtn');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = submitBtn.innerHTML.replace(/\(\d+개\)/, '(0개)'); }
+
   const plats = getActivePagePlatforms();
   const field = document.getElementById('ruPlatformField');
   const select = document.getElementById('ruPlatformSelect');
@@ -583,6 +592,175 @@ function ruSwitchTab(idx) {
   document.querySelectorAll('#reportUploadModal .ru-tab').forEach((btn, j) => {
     btn.classList.toggle('ru-tab--active', j === i);
   });
+}
+
+// ── 리포트 다운로드 / CSV 업로드 (검토용 — 백엔드 없이 브라우저에서만 동작) ──
+// 화면에 보이는 .vid-table 하나를 대상으로 한다. 페이지 wrapper가 전부 DOM에
+// 동시 존재해 같은 클래스 테이블이 여럿일 수 있어 실제로 보이는 것만 고른다.
+function findVisibleVidTable() {
+  return [...document.querySelectorAll('.vid-table')].find(t => t.offsetParent !== null) || null;
+}
+
+function csvEscape(v) {
+  v = String(v ?? '');
+  return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+}
+
+function downloadCsv(filename, rows) {
+  const csv = rows.map(r => r.map(csvEscape).join(',')).join('\r\n');
+  // BOM을 붙여야 엑셀에서 한글이 깨지지 않는다
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// 따옴표로 감싼 콤마·줄바꿈 정도만 지원하는 단순 CSV 파서(리포트 업로드 용도로 충분)
+function parseCsv(text) {
+  const rows = []; let row = []; let field = ''; let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else inQuotes = false; }
+      else field += c;
+    } else if (c === '"') inQuotes = true;
+    else if (c === ',') { row.push(field); field = ''; }
+    else if (c === '\n' || c === '\r') {
+      if (c === '\r' && text[i + 1] === '\n') i++;
+      row.push(field); field = ''; rows.push(row); row = [];
+    } else field += c;
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows.filter(r => r.some(f => f.trim() !== ''));
+}
+
+function ruTableColIndex(table, label) {
+  const ths = [...table.querySelectorAll('thead th')];
+  return ths.findIndex(th => (th.querySelector('.vid-sort-btn')?.textContent || th.textContent || '').includes(label));
+}
+
+// ── 리포트 다운로드: 현재 보이는 표를 CSV로 저장 ──
+function downloadReport() {
+  const table = findVisibleVidTable();
+  if (!table) { alert('다운로드할 참여 영상 데이터가 없습니다.'); return; }
+
+  const SKIP_CLASSES = ['vid-cb-th', 'vid-del-col', 'zeal-col'];
+  const ths = [...table.querySelectorAll('thead th')];
+  const keepIdx = [];
+  const headers = [];
+  ths.forEach((th, i) => {
+    if (SKIP_CLASSES.some(c => th.classList.contains(c))) return;
+    const label = (th.querySelector('.vid-sort-btn')?.textContent || th.textContent || '').replace(/[↓↕↑]/g, '').trim();
+    if (!label) return; // 아바타 등 라벨 없는 열은 제외
+    keepIdx.push(i);
+    headers.push(label);
+  });
+
+  const rows = [headers];
+  table.querySelectorAll('tbody tr').forEach(tr => {
+    const tds = [...tr.children];
+    rows.push(keepIdx.map(i => {
+      const td = tds[i];
+      if (!td) return '';
+      if (td.querySelector('.ch-plat-icon--yt')) return '유튜브';
+      if (td.querySelector('.ch-plat-icon--tt')) return '틱톡';
+      if (td.querySelector('.ch-plat-icon--ig')) return '인스타그램';
+      return td.textContent.trim().replace(/\s+/g, ' ');
+    }));
+  });
+
+  const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  downloadCsv(`참여영상_리포트_${stamp}.csv`, rows);
+}
+
+function downloadSampleCsv() {
+  downloadCsv('리포트_업로드_샘플.csv', [
+    ['채널명', '조회수', '좋아요', '댓글'],
+    ['핫클립', '2850000', '12500', '390'],
+    ['뮤직트렌드', '2000000', '8800', '225'],
+  ]);
+}
+
+// ── CSV 업로드: 파일 선택 시 파싱만 해두고, [적용] 클릭 시 표에 반영 ──
+let _ruParsedRows = null;
+
+function handleReportCsvFile(input) {
+  const file = input.files && input.files[0];
+  const label = document.getElementById('ruDropLabel');
+  const btn = document.getElementById('ruSubmitBtn');
+  _ruParsedRows = null;
+  if (btn) { btn.disabled = true; btn.innerHTML = btn.innerHTML.replace(/\(\d+개\)/, '(0개)'); }
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const rows = parseCsv(String(reader.result || ''));
+    if (rows.length < 2) {
+      if (label) label.textContent = '유효한 데이터가 없습니다. 헤더 + 최소 1행이 필요합니다.';
+      return;
+    }
+    const header = rows[0].map(h => h.trim());
+    const idx = {
+      name: header.indexOf('채널명'),
+      views: header.indexOf('조회수'),
+      likes: header.indexOf('좋아요'),
+      comments: header.indexOf('댓글'),
+    };
+    if (idx.name === -1) {
+      if (label) label.textContent = '"채널명" 컬럼을 찾을 수 없습니다. 샘플 CSV 형식을 확인해주세요.';
+      return;
+    }
+    _ruParsedRows = rows.slice(1).map(r => ({
+      name: (r[idx.name] || '').trim(),
+      views: idx.views > -1 ? r[idx.views] : undefined,
+      likes: idx.likes > -1 ? r[idx.likes] : undefined,
+      comments: idx.comments > -1 ? r[idx.comments] : undefined,
+    })).filter(r => r.name);
+
+    if (label) label.textContent = `${file.name} 선택됨 (${_ruParsedRows.length}행 인식)`;
+    if (btn) {
+      btn.disabled = _ruParsedRows.length === 0;
+      btn.innerHTML = btn.innerHTML.replace(/\(\d+개\)/, `(${_ruParsedRows.length}개)`);
+    }
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+function applyReportCsv() {
+  if (!_ruParsedRows || !_ruParsedRows.length) return;
+  const table = findVisibleVidTable();
+  if (!table) { alert('반영할 참여 영상 표를 찾을 수 없습니다.'); return; }
+
+  const nameCol = ruTableColIndex(table, '채널명');
+  const viewsCol = ruTableColIndex(table, '조회수');
+  const likesCol = ruTableColIndex(table, '좋아요');
+  const commentsCol = ruTableColIndex(table, '댓글');
+
+  const rowsByName = new Map();
+  table.querySelectorAll('tbody tr').forEach(tr => {
+    const nameCell = tr.children[nameCol];
+    const name = (nameCell?.getAttribute('title') || nameCell?.textContent || '').trim();
+    if (name) rowsByName.set(name, tr);
+  });
+
+  let applied = 0, skipped = 0;
+  _ruParsedRows.forEach(r => {
+    const tr = rowsByName.get(r.name);
+    if (!tr) { skipped++; return; }
+    const tds = [...tr.children];
+    if (viewsCol > -1 && r.views !== undefined && tds[viewsCol]) tds[viewsCol].textContent = (Number(r.views) || 0).toLocaleString();
+    if (likesCol > -1 && r.likes !== undefined && tds[likesCol]) tds[likesCol].textContent = (Number(r.likes) || 0).toLocaleString();
+    if (commentsCol > -1 && r.comments !== undefined && tds[commentsCol]) tds[commentsCol].textContent = (Number(r.comments) || 0).toLocaleString();
+    applied++;
+  });
+
+  closeReportUploadModal();
+  alert(
+    `${applied}개 반영 완료` + (skipped ? `, ${skipped}개는 일치하는 채널명을 찾지 못해 건너뜀` : '') +
+    '\n(검토용 반영이라 새로고침하면 초기화됩니다 — 저장하려면 백엔드 연동 필요)'
+  );
 }
 
 // ── SCROLL — #p1이 스크롤 컨테이너이므로 window 대신 #p1 이벤트 감지 ──
@@ -1418,6 +1596,7 @@ function submitCampaignReg() {
     refreshViewCounts,
     closeRefreshLimitModal,
     openReportUploadModal, closeReportUploadModal, ruSwitchTab,
+    downloadReport, downloadSampleCsv, applyReportCsv,
     openChUploadModal, closeChUploadModal, chUploadSwitchTab, chUploadRun,
     p0RoleToggle,
     p0CcToggle,
@@ -1452,6 +1631,7 @@ function submitCampaignReg() {
     if (!el.dataset.change) return;
     if (el.dataset.change === 'showBizFile') { showBizFile(el); return; }
     if (el.dataset.change === 'toggleAllAgree') { toggleAllAgree(el); return; }
+    if (el.dataset.change === 'handleReportCsvFile') { handleReportCsvFile(el); return; }
   });
 
   // 참여 영상 표 플랫폼 필터 (정적 표: p-detail·p-detail-upload).

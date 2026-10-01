@@ -677,9 +677,9 @@ function downloadReport() {
 
 function downloadSampleCsv() {
   downloadCsv('리포트_업로드_샘플.csv', [
-    ['채널명', '조회수', '좋아요', '댓글'],
-    ['핫클립', '2850000', '12500', '390'],
-    ['뮤직트렌드', '2000000', '8800', '225'],
+    ['채널명', '업로드일', '구독자', '영상 제목', '영상 길이', '조회수', '좋아요', '댓글'],
+    ['핫클립', '26/05/01', '1.2M', 'EPEX - UNIVERSE M/V 반응', '43초', '2850000', '12500', '390'],
+    ['뮤직트렌드', '26/04/28', '450K', 'UNIVERSE 챌린지 따라해봄', '38초', '2000000', '8800', '225'],
   ]);
 }
 
@@ -702,22 +702,18 @@ function handleReportCsvFile(input) {
       return;
     }
     const header = rows[0].map(h => h.trim());
-    const idx = {
-      name: header.indexOf('채널명'),
-      views: header.indexOf('조회수'),
-      likes: header.indexOf('좋아요'),
-      comments: header.indexOf('댓글'),
-    };
-    if (idx.name === -1) {
+    const nameIdx = header.indexOf('채널명');
+    if (nameIdx === -1) {
       if (label) label.textContent = '"채널명" 컬럼을 찾을 수 없습니다. 샘플 CSV 형식을 확인해주세요.';
       return;
     }
-    _ruParsedRows = rows.slice(1).map(r => ({
-      name: (r[idx.name] || '').trim(),
-      views: idx.views > -1 ? r[idx.views] : undefined,
-      likes: idx.likes > -1 ? r[idx.likes] : undefined,
-      comments: idx.comments > -1 ? r[idx.comments] : undefined,
-    })).filter(r => r.name);
+    // "채널명"을 중복 판정 기준(key)으로 쓰고, 나머지는 CSV에 있는 컬럼만큼
+    // 그대로 가져간다 — 표의 어떤 컬럼이든 이름만 맞으면 반영되는 범용 구조.
+    _ruParsedRows = rows.slice(1).map(r => {
+      const row = { name: (r[nameIdx] || '').trim() };
+      header.forEach((h, i) => { if (i !== nameIdx && h) row[h] = r[i]; });
+      return row;
+    }).filter(r => r.name);
 
     if (label) label.textContent = `${file.name} 선택됨 (${_ruParsedRows.length}행 인식)`;
     if (btn) {
@@ -728,8 +724,15 @@ function handleReportCsvFile(input) {
   reader.readAsText(file, 'utf-8');
 }
 
-// 이름이 일치하는 열 데이터만 가진 채 새 행을 만들 때, 나머지 열은
-// 종류에 따라 빈 칸(체크박스·삭제·짤)·플레이스홀더 아바타·"-"로 채운다.
+// 천단위 콤마를 붙여야 하는 컬럼 — 표에 항상 완전한 숫자로 들어가는 것만 포함한다.
+// "구독자"는 기존 표가 1.2M·450K처럼 약어로 쓰고 있어 그대로 텍스트로 둔다.
+const RU_NUMERIC_COLS = new Set(['조회수', '좋아요', '댓글']);
+
+// 채널명 비교용 — 앞뒤 공백·연속 공백 차이로 매칭이 깨지지 않도록 정규화
+function ruNormalizeName(s) { return (s || '').trim().replace(/\s+/g, ' '); }
+
+// 새 행을 만들 때, CSV가 값을 주지 않는 열(체크박스·삭제·짤·상태 등)은
+// 종류에 맞는 플레이스홀더로 채워 기존 행과 같은 모양을 유지한다.
 function ruBuildPlaceholderCell(th, name) {
   const td = document.createElement('td');
   if (th.classList.contains('vid-cb-th')) {
@@ -762,22 +765,24 @@ function applyReportCsv() {
 
   const ths = [...table.querySelectorAll('thead th')];
   const nameCol = ruTableColIndex(table, '채널명');
-  const viewsCol = ruTableColIndex(table, '조회수');
-  const likesCol = ruTableColIndex(table, '좋아요');
-  const commentsCol = ruTableColIndex(table, '댓글');
   const tbody = table.querySelector('tbody');
 
+  // 채널명(정규화) 기준으로 기존 행을 찾는다 — 이게 지금 이 표에서 유일하게
+  // 실제로 존재하고 사람이 구분 가능한 식별자라 중복 판정 key로 쓴다.
   const rowsByName = new Map();
   tbody.querySelectorAll('tr').forEach(tr => {
     const nameCell = tr.children[nameCol];
-    const name = (nameCell?.getAttribute('title') || nameCell?.textContent || '').trim();
+    const name = ruNormalizeName(nameCell?.getAttribute('title') || nameCell?.textContent);
     if (name) rowsByName.set(name, tr);
   });
 
-  // CSV에 있는 채널은 전부 표에 반영한다 — 이미 있으면 갱신, 없으면 새 행 추가(건너뛰지 않음)
+  // CSV에 있는 채널은 전부 표에 반영한다 — 이미 있으면 모든 입력 컬럼을 덮어쓰고,
+  // 없으면 새 행 추가. CSV 안에서 같은 채널명이 여러 번 나와도 마지막 값으로
+  // 덮어써져 행이 중복 생성되지 않는다(먼저 만든 행을 rowsByName에 바로 등록하기 때문).
   let updated = 0, added = 0;
   _ruParsedRows.forEach(r => {
-    let tr = rowsByName.get(r.name);
+    const key = ruNormalizeName(r.name);
+    let tr = rowsByName.get(key);
     if (!tr) {
       tr = document.createElement('tr');
       ths.forEach(th => tr.appendChild(ruBuildPlaceholderCell(th, r.name)));
@@ -786,15 +791,20 @@ function applyReportCsv() {
         tr.children[nameCol].setAttribute('title', r.name);
       }
       tbody.appendChild(tr);
-      rowsByName.set(r.name, tr);
+      rowsByName.set(key, tr);
       added++;
     } else {
       updated++;
     }
     const tds = [...tr.children];
-    if (viewsCol > -1 && r.views !== undefined && tds[viewsCol]) tds[viewsCol].textContent = (Number(r.views) || 0).toLocaleString();
-    if (likesCol > -1 && r.likes !== undefined && tds[likesCol]) tds[likesCol].textContent = (Number(r.likes) || 0).toLocaleString();
-    if (commentsCol > -1 && r.comments !== undefined && tds[commentsCol]) tds[commentsCol].textContent = (Number(r.comments) || 0).toLocaleString();
+    Object.keys(r).forEach(field => {
+      if (field === 'name') return;
+      const val = r[field];
+      if (val === undefined || val === '') return;
+      const colIdx = ruTableColIndex(table, field);
+      if (colIdx === -1 || !tds[colIdx]) return;
+      tds[colIdx].textContent = RU_NUMERIC_COLS.has(field) ? (Number(val) || 0).toLocaleString() : val;
+    });
   });
 
   closeReportUploadModal();

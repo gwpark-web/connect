@@ -123,6 +123,8 @@ function goTo(id) {
   if (id === 'p-channels') { updateSortArrows(); renderChannels(); updateChSummary(); }
   if (id === 'p-list' || id === 'p-admin') { if (typeof updateListCardPremium === 'function') updateListCardPremium(); }
   if (id === 'p1') { setTimeout(runStatCountUp, 200); }
+  // 검토용 백엔드에 저장된 참여 영상 데이터가 있으면 복원(서버 미실행 시 조용히 무시)
+  if (id === 'p-detail' || id === 'p-detail-upload') { ruLoadFromServer(id); }
 }
 
 function goToAuth(id) {
@@ -758,17 +760,14 @@ function ruBuildPlaceholderCell(th, name) {
   return td;
 }
 
-function applyReportCsv() {
-  if (!_ruParsedRows || !_ruParsedRows.length) return;
-  const table = findVisibleVidTable();
-  if (!table) { alert('반영할 참여 영상 표를 찾을 수 없습니다.'); return; }
-
+// rows(배열, {name, ...필드})를 표 DOM에 upsert한다. 채널명(정규화) 기준으로
+// 기존 행을 찾아 덮어쓰고, 없으면 새 행을 만든다 — CSV 적용과 서버에서
+// 불러온 데이터 복원에 공통으로 쓰는 핵심 로직이라 분리해뒀다.
+function ruApplyRowsToTable(table, rows) {
   const ths = [...table.querySelectorAll('thead th')];
   const nameCol = ruTableColIndex(table, '채널명');
   const tbody = table.querySelector('tbody');
 
-  // 채널명(정규화) 기준으로 기존 행을 찾는다 — 이게 지금 이 표에서 유일하게
-  // 실제로 존재하고 사람이 구분 가능한 식별자라 중복 판정 key로 쓴다.
   const rowsByName = new Map();
   tbody.querySelectorAll('tr').forEach(tr => {
     const nameCell = tr.children[nameCol];
@@ -776,12 +775,10 @@ function applyReportCsv() {
     if (name) rowsByName.set(name, tr);
   });
 
-  // CSV에 있는 채널은 전부 표에 반영한다 — 이미 있으면 모든 입력 컬럼을 덮어쓰고,
-  // 없으면 새 행 추가. CSV 안에서 같은 채널명이 여러 번 나와도 마지막 값으로
-  // 덮어써져 행이 중복 생성되지 않는다(먼저 만든 행을 rowsByName에 바로 등록하기 때문).
   let updated = 0, added = 0;
-  _ruParsedRows.forEach(r => {
+  rows.forEach(r => {
     const key = ruNormalizeName(r.name);
+    if (!key) return;
     let tr = rowsByName.get(key);
     if (!tr) {
       tr = document.createElement('tr');
@@ -806,12 +803,60 @@ function applyReportCsv() {
       tds[colIdx].textContent = RU_NUMERIC_COLS.has(field) ? (Number(val) || 0).toLocaleString() : val;
     });
   });
+  return { updated, added };
+}
 
-  closeReportUploadModal();
-  alert(
-    `${_ruParsedRows.length}개 전부 반영 완료 (기존 채널 갱신 ${updated}개, 신규 채널 추가 ${added}개)` +
-    '\n(검토용 반영이라 새로고침하면 초기화됩니다 — 저장하려면 백엔드 연동 필요)'
-  );
+// ── 검토용 백엔드 연동 (로컬에서만 — node review-server/server.js로 띄운다) ──
+// 서버가 안 떠 있으면 그냥 화면에만 반영되는 기존 동작으로 조용히 넘어간다.
+const RU_API_BASE = 'http://localhost:4000';
+
+function ruCampaignKey() {
+  return pages.find(p => document.getElementById(p)?.classList.contains('active')) || 'default';
+}
+
+// 페이지 진입 시 서버에 저장된 값이 있으면 표에 복원한다(새로고침해도 유지되는지 확인용)
+function ruLoadFromServer(pageId) {
+  if (!['p-detail', 'p-detail-upload'].includes(pageId)) return;
+  fetch(`${RU_API_BASE}/api/videos?campaign=${encodeURIComponent(pageId)}`)
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (!data || !data.rows || !data.rows.length) return;
+      const table = findVisibleVidTable();
+      if (!table) return;
+      ruApplyRowsToTable(table, data.rows);
+    })
+    .catch(() => { /* 서버 미실행 — 조용히 무시, 로컬 전용 동작 유지 */ });
+}
+
+function applyReportCsv() {
+  if (!_ruParsedRows || !_ruParsedRows.length) return;
+  const table = findVisibleVidTable();
+  if (!table) { alert('반영할 참여 영상 표를 찾을 수 없습니다.'); return; }
+
+  const campaign = ruCampaignKey();
+  fetch(`${RU_API_BASE}/api/videos?campaign=${encodeURIComponent(campaign)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(_ruParsedRows),
+  })
+    .then(r => r.ok ? r.json() : Promise.reject(new Error('서버 응답 오류')))
+    .then(data => {
+      const { updated, added } = ruApplyRowsToTable(table, data.rows);
+      closeReportUploadModal();
+      alert(
+        `${data.rows.length}개 서버에 저장 완료 (갱신 ${updated}개, 신규 ${added}개)\n` +
+        '(검토용 로컬 서버 저장 — 새로고침해도 유지됩니다)'
+      );
+    })
+    .catch(() => {
+      // 서버가 없거나 실패하면 기존처럼 화면에만 반영
+      const { updated, added } = ruApplyRowsToTable(table, _ruParsedRows);
+      closeReportUploadModal();
+      alert(
+        `${_ruParsedRows.length}개 화면에만 반영 완료 (갱신 ${updated}개, 신규 ${added}개)\n` +
+        '(검토용 서버(localhost:4000)에 연결되지 않아 로컬에만 반영 — 새로고침하면 초기화됩니다)'
+      );
+    });
 }
 
 // ── SCROLL — #p1이 스크롤 컨테이너이므로 window 대신 #p1 이벤트 감지 ──

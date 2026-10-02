@@ -1123,6 +1123,36 @@ p0CaseRender();
 
 /* [SEC-STRUCTURE] 구조 섹션 CC 토글 */
 function p0CcToggle(mode) {
+/* 섹션3 마키 양끝 — 가장자리에 다가갈수록 카드가 작아지며 사라진다.
+   투명도는 건드리지 않는다(흰 카드가 배경과 섞여 탁해지지 않게). CSS의 scale 속성에
+   --edge-scale 값을 넣으며, 화면에 보일 때만 프레임마다 갱신한다. */
+(function p0CaseEdgeScale() {
+  const section = document.getElementById('sec-cases');
+  const wrap = document.querySelector('.p0-gallery-section .p0-gallery-wrap');
+  if (!section || !wrap) return;
+  const MIN = 0.55;                       // 가장 가장자리에서의 최소 크기
+  function update() {
+    const w = wrap.getBoundingClientRect();
+    if (!w.width) return;
+    const zone = Math.min(170, w.width * 0.16);   // 크기가 변하는 구간(px)
+    wrap.querySelectorAll('.p0-s3-card').forEach(card => {
+      const r = card.getBoundingClientRect();
+      const d = Math.min(r.left + r.width / 2 - w.left, w.right - (r.left + r.width / 2));
+      const t = Math.max(0, Math.min(1, d / zone));
+      const eased = t * t * (3 - 2 * t);            // smoothstep
+      card.style.setProperty('--edge-scale', (MIN + (1 - MIN) * eased).toFixed(3));
+    });
+  }
+  let raf = 0;
+  function loop() { update(); raf = requestAnimationFrame(loop); }
+  new IntersectionObserver(entries => {
+    const on = entries[0].isIntersecting;
+    if (on && !raf) loop();
+    if (!on && raf) { cancelAnimationFrame(raf); raf = 0; }
+  }).observe(section);
+  update();
+})();
+
   document.querySelectorAll('#p0CcToggle .p0rt-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.args === mode)
   );

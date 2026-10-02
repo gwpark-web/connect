@@ -3298,6 +3298,8 @@ body.p0-active #p1 {
   width: 200px;
   aspect-ratio: 9 / 16;
   height: auto;
+  /* 양끝에서 작아지는 효과(site.js p0CaseEdgeScale). transform(hover)과 별개 속성이라 서로 간섭하지 않는다 */
+  scale: var(--edge-scale, 1);
 }
 
 /* ══ 섹션4 STEP 카드 높이 축소 ══════════════════════════════════════

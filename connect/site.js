@@ -982,6 +982,8 @@ function p0RoleToggle(mode) {
     const grid = document.getElementById('p0RoleGrid');
     const card2 = grid && grid.children[2];
     if (card2) {
+      // 펼칠 때 붙은 entering/visible 이 남아 있으면 우선순위가 더 높아 접는 스타일이 먹지 않는다 → 먼저 제거
+      card2.classList.remove('p0rc-entering', 'p0rc-visible');
       card2.classList.add('p0rc-collapsing');
       _p0RoleTimer = setTimeout(() => {
         renderProcessCards(mode);
@@ -1121,8 +1123,6 @@ function p0CaseRender() {
 }
 p0CaseRender();
 
-/* [SEC-STRUCTURE] 구조 섹션 CC 토글 */
-function p0CcToggle(mode) {
 /* 섹션3 마키 양끝 — 가장자리에 다가갈수록 카드가 작아지며 사라진다.
    투명도는 건드리지 않는다(흰 카드가 배경과 섞여 탁해지지 않게). CSS의 scale 속성에
    --edge-scale 값을 넣으며, 화면에 보일 때만 프레임마다 갱신한다. */
@@ -1153,6 +1153,8 @@ function p0CcToggle(mode) {
   update();
 })();
 
+/* [SEC-STRUCTURE] 구조 섹션 CC 토글 */
+function p0CcToggle(mode) {
   document.querySelectorAll('#p0CcToggle .p0rt-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.args === mode)
   );

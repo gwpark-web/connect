@@ -4596,3 +4596,134 @@ body[data-viewer-role="admin"] span.admin-only { display: inline !important; }
 .sc-ac-name { font-size: 13px; font-weight: 700; color: var(--black); }
 .sc-ac-meta { font-size: 11px; color: var(--gray-light); }
 
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   모바일 반응형 — 랜딩 / 로그인 / 캠페인 문의하기 / 상품소개서 요청
+   · 로그인 후 화면(캠페인 목록·채널·관리자)은 대상이 아니라서 body.p0-active 로 범위를 제한한다.
+   · 기준 폭 390px. 768px 이하(태블릿 세로 포함)에서 레이아웃을 바꾸고,
+     480px 이하에서 글자·간격을 한 번 더 줄인다.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* 상품소개서 요청 입력창 — .inq-text-input 스타일이 없어 브라우저 기본 입력창으로 보이던 것을 .inq-input 과 맞춘다 */
+.inq-text-input {
+  width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 13px; font-family: inherit; outline: none; transition: border-color 0.2s; background: #fff; color: var(--black);
+}
+.inq-text-input:focus { border-color: var(--orange); }
+.inq-text-input::placeholder { color: var(--gray-light); }
+
+@media (max-width: 768px) {
+
+  /* ── 상단 메뉴: 로고 | 캠페인 문의하기 | Login 한 줄 ── */
+  body.p0-active .gnb {
+    height: 56px; padding: 0 16px; gap: 8px;
+    grid-template-columns: auto 1fr auto;
+  }
+  body.p0-active .gnb-logo { grid-column: 1; grid-row: 1; text-align: left; font-size: 20px; }
+  body.p0-active .gnb-left { grid-column: 2; grid-row: 1; justify-content: flex-end; gap: 0; }
+  body.p0-active .gnb-left #nav-p1 { display: none; }              /* 로고가 홈이라 중복 */
+  body.p0-active .gnb-left button { padding: 6px 10px; font-size: 13px; white-space: nowrap; }
+  body.p0-active .gnb-right { grid-column: 3; grid-row: 1; }
+  body.p0-active .gnb-user-info { display: none; }
+  body.p0-active .gnb-btn-login { padding: 7px 14px; font-size: 13px; white-space: nowrap; }
+  body.p0-active .gnb-left button, body.p0-active .gnb-btn-login { min-height: 38px; }   /* 터치하기 쉬운 높이 */
+
+  /* 섹션이 한 화면보다 길어지므로 스냅은 끈다(모바일에서 스크롤이 끌려가는 현상 방지) */
+  body.p0-active #p1 { height: 100vh; scroll-snap-type: none; }
+  @supports (height: 100dvh) { body.p0-active #p1 { height: 100dvh; } }
+  body.p0-active .p0-display-hero,
+  body.p0-active .p0-sfm-section,
+  body.p0-active .p0-gallery-section,
+  body.p0-active .p0-mindmap-section,
+  body.p0-active .p0-products-section,
+  body.p0-active .p0-role-section,
+  body.p0-active .p0-cta { scroll-snap-stop: normal; min-height: 0; }
+
+  /* 섹션 좌우 여백 40 → 20 */
+  body.p0-active .p0-sfm-section,
+  body.p0-active .p0-mindmap-section,
+  body.p0-active .p0-products-section,
+  body.p0-active .p0-role-section { padding-left: 20px; padding-right: 20px; padding-top: 88px; padding-bottom: 56px; }
+  body.p0-active .p0-cta { padding-left: 20px; padding-right: 20px; }
+  body.p0-active .p0-footer { margin: 40px -20px 0; padding: 28px 20px 28px; }
+
+  /* ── 히어로 ── */
+  body.p0-active .p0-display-hero { min-height: 100vh; }
+  body.p0-active .p0-display-hero { padding-left: 20px; padding-right: 20px; }
+  body.p0-active .p0-hero-content { padding: 72px 0 24px; }
+  body.p0-active .p0-hero-eyebrow { font-size: 10px; letter-spacing: 1.2px; padding: 6px 14px; margin-bottom: 20px; white-space: nowrap; }
+  body.p0-active .p0-display-title { font-size: clamp(34px, 10.4vw, 54px); line-height: 1.12; margin-bottom: 20px; word-break: keep-all; }
+  body.p0-active .p0-hero-en-sub { font-size: 17px; margin-bottom: 22px; }
+  body.p0-active .p0-why-stat { padding: 18px 4px; }
+
+  /* ── 섹션2: 카테고리·200,000개 채널 ── */
+  body.p0-active .p0-ch2-inner { width: 100%; gap: 28px; }
+  body.p0-active .p0-ch2-headline { font-size: clamp(28px, 8.6vw, 40px); line-height: 1.2; word-break: keep-all; }
+  body.p0-active .p0-ch2-sub { font-size: 14px; }
+  body.p0-active .p0-ch2-badge-row { flex-wrap: wrap; }
+  /* 3대 폰 연출(460×560)을 폭에 맞춰 축소 */
+  body.p0-active .p0-ch2-phone-col { overflow: hidden; align-items: center; }
+  body.p0-active .p0-ch2-stage-outer { flex: 0 0 auto; transform: scale(var(--ch2-s, 0.76)); transform-origin: top center; margin-bottom: calc(560px * (var(--ch2-s, 0.76) - 1)); }
+
+  /* ── 섹션3: 집행사례 ── */
+  body.p0-active .p0-gallery-section { padding-top: 88px; padding-bottom: 56px; gap: 32px; }
+  body.p0-active .p0-gallery-header { padding: 0 20px; }
+  body.p0-active .p0-gallery-title { font-size: clamp(26px, 8vw, 38px); line-height: 1.2; word-break: keep-all; }
+  body.p0-active .p0-gallery-sub { font-size: 14px; word-break: keep-all; }
+  body.p0-active .p0-gallery-section .p0-s3-card { width: 150px; }
+  body.p0-active .p0-gallery-footer { padding-left: 20px; padding-right: 20px; }
+
+  /* ── 섹션4: 구조 — 3열 가로 흐름을 세로로 쌓는다 ── */
+  body.p0-active .p0-mindmap-section { gap: 28px; }
+  body.p0-active .p0-mindmap-title { font-size: clamp(26px, 8vw, 38px); line-height: 1.2; word-break: keep-all; }
+  body.p0-active .p0-mindmap-sub { font-size: 14px; }
+  body.p0-active .p0-cc-flow { flex-direction: column; align-items: stretch; width: 100%; }
+  body.p0-active .p0-cc-flow .p0-cc-col { flex: 0 0 auto; width: 100%; }
+  body.p0-active .p0-cc-flow .p0-cc-arrow { flex: 0 0 auto; height: 36px; transform: rotate(90deg); }
+
+  /* ── 섹션5: 상품 ── */
+  body.p0-active .p0-products-headline { font-size: clamp(26px, 7.6vw, 36px); line-height: 1.25; word-break: keep-all; }
+  body.p0-active .p0-products-sub { font-size: 14px; }
+
+  /* ── 섹션6: 프로세스 — 카드를 옆으로 넘겨 본다(스냅) ── */
+  body.p0-active .p0-role-headline { font-size: clamp(26px, 7.6vw, 36px); line-height: 1.25; word-break: keep-all; }
+  body.p0-active .p0-role-sub { font-size: 14px; word-break: keep-all; }
+  body.p0-active .p0-role-section .p0-role-grid {
+    justify-content: flex-start !important;
+    overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+    max-width: none !important; width: calc(100% + 40px); margin-left: -20px; margin-right: -20px;
+    padding: 4px 20px 12px; scroll-padding: 0 20px; gap: 12px;
+  }
+  body.p0-active .p0-role-section .p0-role-grid .wp-card { scroll-snap-align: start; }
+
+  /* ── CTA ── */
+  body.p0-active .p0-cta { min-height: 0; padding-top: 88px; padding-bottom: 48px; }
+  body.p0-active .p0-cta h2 { font-size: clamp(28px, 8.6vw, 40px); line-height: 1.22; word-break: keep-all; }
+  body.p0-active .p0-cta p { font-size: 14px; margin-bottom: 28px; }
+  body.p0-active .p0-cta-btns { flex-direction: column; align-items: stretch; }
+  body.p0-active .p0-cta-btns > * { width: 100%; justify-content: center; }
+
+  /* ── 로그인 / 캠페인 문의하기 / 상품소개서 요청 ── */
+  .auth-page.fullpage { padding: 80px 16px 56px; }
+  .auth-top { margin-bottom: 28px; }
+  .auth-top h2 { font-size: 32px; }
+  .inq-header { margin-bottom: 24px; }
+  .inq-header h1 { font-size: 26px; }
+  .inq-header p { font-size: 13px; word-break: keep-all; }
+  .inq-card { padding: 28px 20px; border-radius: 18px; }
+  .inq-section { margin-bottom: 26px; }
+  .inq-inputs { grid-template-columns: 1fr; }
+  .auth-form-box { padding: 28px 22px; }
+  /* 관리자 진입 버튼: PC에서는 폼 오른쪽 바깥에 떠 있어 모바일에서는 화면 밖으로 나가므로 폼 아래 가운데로 옮긴다 */
+  .adm-entry-btn { position: static; display: block; margin: 14px auto 0; }
+}
+
+@media (max-width: 480px) {
+  body.p0-active .p0-ch2-stage-outer { --ch2-s: 0.72; }
+  body.p0-active .p0-hero-content { padding-top: 64px; }
+  body.p0-active .p0-display-btns { flex-direction: column; align-items: stretch; width: 100%; }
+}
+@media (max-width: 400px) {
+  body.p0-active .p0-ch2-stage-outer { --ch2-s: 0.66; }
+}

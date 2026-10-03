@@ -1,0 +1,21 @@
+creds.json
+creds_2.json
+chrome_profile/
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.bak
+
+# 짤 회원 실데이터 — PII(이메일·전화). 공개 저장소에 절대 올리지 않는다.
+data-zeal.json
+connect/data-zeal.json
+# 내부 어드민 API 경로를 담은 수집 도구
+connect/tools/
+
+# Pencil 디자인 원본 — 배포에 쓰이지 않는 2MB 바이너리, 로컬에만 둔다
+connect/site design.pen
+
+# 백엔드 비밀값·데이터 (키·비밀번호·고객 데이터)
+connect-server/.env
+connect-server/data/

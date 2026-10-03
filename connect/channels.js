@@ -1,0 +1,1752 @@
+// ── 채널 데이터 ──────────────────────────────────────────────────────
+const channels = [
+  { emoji:'🎬', name:'궁금해소',   handle:'@궁금해소', cid:'',       cat:'엔터테인먼트', platform:'yt', subsNum:997000,  subs:'99.7만', views:'85만',  rate:12.4, repeat:4 },
+  { emoji:'🍜', name:'평양냉면',   handle:'@pyeongyang', cid:'',     cat:'엔터테인먼트', platform:'yt', subsNum:350000,  subs:'35만',   views:'42만',  rate:9.8,  repeat:0 },
+  { emoji:'🌊', name:'지우멍',     handle:'@jiwumung', cid:'',       cat:'커뮤니티·썰', platform:'yt', subsNum:125000,  subs:'12.5만', views:'18만',  rate:14.2, repeat:2 },
+  { emoji:'😸', name:'확고냥쇼츠', handle:'@hwakgocat', cid:'',      cat:'엔터테인먼트', platform:'yt', subsNum:67000,   subs:'6.7만',  views:'9만',   rate:11.1, repeat:0 },
+  { emoji:'🎤', name:'쇼쇼짱',     handle:'@showshowjjang', cid:'',  cat:'음악',         platform:'ig', subsNum:24000,   subs:'2.4만',  views:'3.2만', rate:8.7,  repeat:1 },
+  { emoji:'👗', name:'패피소희',   handle:'@fashionsohi', cid:'',    cat:'패션·뷰티',   platform:'ig', subsNum:180000,  subs:'18만',   views:'22만',  rate:13.5, repeat:0 },
+  { emoji:'🎮', name:'겜쟁이남자', handle:'@gameman', cid:'',        cat:'게임·IT',      platform:'yt', subsNum:440000,  subs:'44만',   views:'61만',  rate:10.2, repeat:3 },
+  { emoji:'🍳', name:'요리하는곰', handle:'@cooking_bear', cid:'',   cat:'음식·요리',   platform:'yt', subsNum:270000,  subs:'27만',   views:'38만',  rate:15.1, repeat:0 },
+  { emoji:'💪', name:'헬스왕김씨', handle:'@healthking', cid:'',     cat:'운동·헬스',   platform:'ig', subsNum:91000,   subs:'9.1만',  views:'13만',  rate:11.8, repeat:1 },
+  { emoji:'📱', name:'썰전쟁',     handle:'@ssul_wars', cid:'',      cat:'커뮤니티·썰', platform:'yt', subsNum:530000,  subs:'53만',   views:'71만',  rate:16.3, repeat:0 },
+  { emoji:'🌸', name:'뷰티일기',   handle:'@beauty_diary', cid:'',   cat:'패션·뷰티',   platform:'ig', subsNum:112000,  subs:'11.2만', views:'14만',  rate:12.9, repeat:2 },
+  { emoji:'🎵', name:'뮤직박스',   handle:'@musicbox_kr', cid:'',    cat:'음악',         platform:'yt', subsNum:83000,   subs:'8.3만',  views:'11만',  rate:9.4,  repeat:0 },
+  { emoji:'🎯', name:'삽시간',     handle:'@asaptime',      cid:'UCnLwQwwn3Q4NaTjfEPB9Brg', cat:'미분류',       platform:'yt', subsNum:274,     subs:'274',    views:'87.2만', rate:0,    repeat:0 },
+  { emoji:'🎞', name:'씬스틸러',   handle:'@scenestealer', cid:'',    cat:'영화·드라마', platform:'yt', subsNum:610000,  subs:'61만',   views:'78만',  rate:13.8, repeat:2 },
+  { emoji:'📼', name:'옛날예능',   handle:'@oldvariety', cid:'',       cat:'방송·예능',   platform:'yt', subsNum:380000,  subs:'38만',   views:'47만',  rate:11.6, repeat:0 },
+  { emoji:'🤣', name:'빵터짐',     handle:'@bbangteo', cid:'',         cat:'유머·이슈',   platform:'ig', subsNum:220000,  subs:'22만',   views:'29만',  rate:15.4, repeat:1 },
+  { emoji:'🧠', name:'지식한입',   handle:'@knowbite', cid:'',         cat:'지식·정보',   platform:'yt', subsNum:470000,  subs:'47만',   views:'52만',  rate:12.2, repeat:3 },
+  { emoji:'🎸', name:'인디사운드', handle:'@indisound', cid:'',        cat:'음악',         platform:'ig', subsNum:150000,  subs:'15만',   views:'19만',  rate:10.8, repeat:0 },
+  { emoji:'🍜', name:'한끼요리',   handle:'@onemeal', cid:'',          cat:'음식·요리',   platform:'yt', subsNum:330000,  subs:'33만',   views:'41만',  rate:14.7, repeat:1 },
+  { emoji:'🐶', name:'멍냥일기',   handle:'@mungnyang', cid:'',        cat:'동물',         platform:'ig', subsNum:740000,  subs:'74만',   views:'88만',  rate:16.8, repeat:2 },
+  { emoji:'⚽', name:'풋살왕',     handle:'@futsalking', cid:'',       cat:'운동·헬스',   platform:'yt', subsNum:190000,  subs:'19만',   views:'24만',  rate:9.6,  repeat:0 },
+  { emoji:'💄', name:'데일리뷰티', handle:'@dailybeauty', cid:'',      cat:'패션·뷰티',   platform:'ig', subsNum:290000,  subs:'29만',   views:'35만',  rate:12.5, repeat:1 },
+  { emoji:'🎧', name:'플리마스터', handle:'@plimaster', cid:'',        cat:'음악',         platform:'ig', subsNum:110000,  subs:'11만',   views:'16만',  rate:13.1, repeat:0 },
+];
+
+const GOAL = 30;
+let _chActiveTab = 0;
+
+// ── 짤 회원 데이터 ──────────────────────────────────────────────────
+// 아래는 폴백용 샘플. 실데이터는 data-zeal.json 을 두면 통째로 대체된다
+// (수집 도구가 관리자 어드민에서 뽑아 만든 파일 — 저장소에는 커밋하지 않는다).
+const ZEAL_MEMBERS = {
+  '@궁금해소':    { id:'gung9@zeal.kr',     nick:'궁해소',   phone:'010-2341-5678', channels:['@궁금해소'],                 note:'VIP · 재참여 2회' },
+  '@jiwumung':    { id:'jiwu@zeal.kr',       nick:'지우멍',   phone:'010-9876-1234', channels:['@jiwumung'],                  note:'' },
+  '@gameman':     { id:'gameman@zeal.kr',    nick:'겜쟁남',   phone:'010-5555-7890', channels:['@gameman','@gameman_shorts'], note:'재참여 3회' },
+  '@ssul_wars':   { id:'ssul@zeal.kr',       nick:'썰전쟁',   phone:'010-1111-3344', channels:['@ssul_wars'],                 note:'' },
+  '@fashionsohi': { id:'sohi2@zeal.kr',      nick:'패피소희', phone:'010-7788-2211', channels:['@fashionsohi','@sohi_ig'],    note:'패션 카테고리 전문' },
+};
+
+// data-zeal.json 은 로컬(localhost) 에만 둔다. 공개 배포에는 없으므로
+// 거기서는 fetch 자체를 건너뛰어 404 콘솔 노이즈를 남기지 않는다.
+(async function loadZealMembers() {
+  // 서버가 있으면 짤 회원은 서버에서만(관리자 로그인 후 zealSyncFromServer) 받는다 — 광고주 브라우저에는 내려보내지 않는다.
+  // 서버가 없을 때만(로컬 데모) 아래 파일을 읽는다.
+  if (typeof Api !== 'undefined' && Api.enabled && await Api.ping()) return;
+  var h = location.hostname;
+  if (h !== 'localhost' && h !== '127.0.0.1') return;   // 공개 배포 → 샘플 폴백
+  try {
+    const r = await fetch('data-zeal.json', { cache: 'no-store' });
+    if (!r.ok) return;
+    const data = await r.json();
+    if (!data || typeof data !== 'object' || !Object.keys(data).length) return;
+    Object.keys(ZEAL_MEMBERS).forEach(k => delete ZEAL_MEMBERS[k]);
+    Object.assign(ZEAL_MEMBERS, data);
+    // 관리자가 이미 결과 화면을 보고 있으면 새 데이터로 다시 그린다
+    if (document.getElementById('chResultContent') && typeof renderResultPanel === 'function') {
+      try { renderResultPanel(); } catch (e) {}
+    }
+  } catch (e) { /* 폴백 유지 */ }
+})();
+
+// 짤 회원 정보를 화면 메모리·패널에서 모두 지운다(로그아웃하거나 관리자가 아닌 계정으로 바뀔 때)
+function zealClear() {
+  Object.keys(ZEAL_MEMBERS).forEach(k => delete ZEAL_MEMBERS[k]);
+  ['zealPanelNick', 'zealPanelId', 'zealPanelPhone', 'zealPanelChannels', 'zealPanelNote'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = ''; });
+  const memo = document.getElementById('zealMemoHistory'); if (memo) memo.innerHTML = '';
+  const input = document.getElementById('zealMemoInput'); if (input) input.value = '';
+  try { closeZealPanel(); } catch (e) {}
+}
+
+// 서버의 짤 회원 목록(관리자만 받을 수 있다)으로 화면 데이터를 바꾼다
+async function zealSyncFromServer() {
+  if (typeof Api === 'undefined' || !Api.enabled || !Api.isAdmin()) return false;
+  const r = await Api.req('/api/zeal/members');
+  if (!r.ok || !r.data) return false;
+  Object.keys(ZEAL_MEMBERS).forEach(k => delete ZEAL_MEMBERS[k]);
+  Object.assign(ZEAL_MEMBERS, r.data.members || {});
+  if (document.getElementById('chResultContent') && typeof renderResultPanel === 'function') {
+    try { renderResultPanel(); } catch (e) {}
+  }
+  return true;
+}
+
+// 상세 페이지는 광고주·관리자가 공유하므로 진입 경로로 역할을 판정한다.
+// 짤 회원 정보는 연락처·이메일을 포함하므로 광고주 화면에는 마크업 자체를 내보내지 않는다.
+function isAdminViewer() {
+  return document.body.dataset.viewerRole === 'admin';
+}
+
+// 짤 회원 조회 키 — CID(유튜브 채널 ID) 우선, 없으면 핸들(데모 폴백).
+// 실데이터 data-zeal.json 은 CID 로 키가 잡히고, 샘플은 핸들로 잡혀 둘 다 맞는다.
+function zealKey(ch) {
+  if (ch && ch.cid && ZEAL_MEMBERS[ch.cid]) return ch.cid;
+  if (ch && ZEAL_MEMBERS[ch.handle]) return ch.handle;
+  return '';
+}
+
+function zealBadgeHtml(ch) {
+  if (!isAdminViewer()) return '';
+  const key = zealKey(ch);
+  if (key) {
+    return `<button class="zeal-badge zeal-badge--member" data-fn="openZealPanel" data-stop="1" data-args="${encodeURIComponent(key)}">짤</button>`;
+  }
+  return `<span class="zeal-badge zeal-badge--none">-</span>`;
+}
+
+// ── 짤 회원 사이드패널 함수 (channels.js에서 공유 — admin/site 양쪽) ──
+function openZealPanel(keyEnc) {
+  if (!isAdminViewer()) return;
+  const handle = decodeURIComponent(keyEnc);
+  const m = ZEAL_MEMBERS[handle];
+  if (!m) return;
+  document.getElementById('zealPanelNick').textContent     = m.nick;
+  document.getElementById('zealPanelId').textContent       = m.id;
+  document.getElementById('zealPanelPhone').textContent    = m.phone;
+  document.getElementById('zealPanelChannels').textContent = m.channels.join(', ');
+  document.getElementById('zealPanelNote').textContent     = m.note || '-';
+  document.getElementById('zealPanelHandle').value         = handle;
+  _renderZealMemoHistory(handle);
+  document.getElementById('zealSheet').removeAttribute('hidden');
+}
+
+function closeZealPanel() {
+  const el = document.getElementById('zealSheet');
+  if (el) el.setAttribute('hidden', '');
+}
+
+// 서버 모드(관리자 로그인): 메모를 서버에 저장해 다른 관리자·다른 PC에서도 보이게 한다.
+// 서버가 없으면 이 브라우저(localStorage)에만 저장한다(데모).
+const _zealServerMode = async () => Api.enabled && Api.isLoggedIn() && Api.isAdmin() && (Api.isUp() || await Api.ping());
+const _fmtMemoDate = iso => {
+  const d = new Date(iso); if (isNaN(d)) return String(iso || '');
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
+async function saveZealMemo() {
+  const handle = document.getElementById('zealPanelHandle').value;
+  const ta = document.getElementById('zealMemoInput');
+  const text = (ta.value || '').trim();
+  if (!text) return;
+  if (await _zealServerMode()) {
+    const r = await Api.req('/api/zeal-memos', { method: 'POST', body: { key: handle, text } });
+    if (!r.ok) { alert(r.error || '메모 저장에 실패했습니다.'); return; }
+    ta.value = '';
+    _renderZealMemoItems((r.data.memos || []).map(m => ({ text: m.text, date: _fmtMemoDate(m.date) })));
+    return;
+  }
+  const key = 'zealMemo:' + handle;
+  let history = [];
+  try { history = JSON.parse(localStorage.getItem(key) || '[]'); } catch(_) {}
+  history.unshift({ text, date: _fmtMemoDate(new Date()) });
+  try { localStorage.setItem(key, JSON.stringify(history)); } catch(_) {}
+  ta.value = '';
+  _renderZealMemoItems(history);
+}
+
+async function _renderZealMemoHistory(handle) {
+  if (await _zealServerMode()) {
+    const r = await Api.req('/api/zeal-memos?key=' + encodeURIComponent(handle));
+    _renderZealMemoItems(r.ok ? (r.data.memos || []).map(m => ({ text: m.text, date: _fmtMemoDate(m.date) })) : []);
+    return;
+  }
+  let history = [];
+  try { history = JSON.parse(localStorage.getItem('zealMemo:' + handle) || '[]'); } catch(_) {}
+  _renderZealMemoItems(history);
+}
+
+function _renderZealMemoItems(history) {
+  const el = document.getElementById('zealMemoHistory');
+  if (!el) return;
+  if (!history.length) {
+    el.innerHTML = '<div class="zeal-memo-empty">작성된 메모가 없습니다.</div>';
+    return;
+  }
+  el.innerHTML = history.map(h => `
+    <div class="zeal-memo-item">
+      <div class="zeal-memo-date">${h.date}</div>
+      <div class="zeal-memo-text">${String(h.text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>
+    </div>`).join('');
+}
+
+// ── 채널별 검토용 영상 더미 데이터 (드라이브 링크) ──────────────────
+const CH_VIDEO = {
+  0: { url: 'https://drive.google.com/file/d/dummy_0/view', title: '궁금해소 × 토이스토리5 공식 협업 영상', dur: '12:34' },
+  2: { url: 'https://drive.google.com/file/d/dummy_2/view', title: '지우멍 × 토이스토리5 브이로그 영상',  dur: '8:17'  },
+  6: { url: 'https://drive.google.com/file/d/dummy_6/view', title: '겜쟁이남자 × 토이스토리5 협업 영상', dur: '15:02' },
+  9: { url: null }, // 영상 준비 중
+};
+
+// ── 채널별 배포 링크 더미 데이터 (게시물 URL + 업로드 시각) ─────────────
+// TODO: 어드민 구축 시 API 응답으로 대체
+const CH_POST = {
+  0:  { url: 'https://www.youtube.com/shorts/dR7kGv2x3Hs', uploadedAt: '2025-07-18 10:30' },
+  1:  { url: 'https://www.youtube.com/shorts/pLm4nQ8rWZo', uploadedAt: '2025-07-18 14:20' },
+  2:  { url: 'https://www.youtube.com/shorts/tKc9bJ6vNxY', uploadedAt: '2025-07-19 09:15' },
+  3:  { url: 'https://www.youtube.com/shorts/aHs5mR2pQeL', uploadedAt: '2025-07-19 11:00' },
+  4:  { url: 'https://www.instagram.com/reel/Cxk7mNpWqR8/', uploadedAt: '2025-07-19 15:30' },
+  5:  { url: 'https://www.instagram.com/reel/Dyk9pLqVwS3/', uploadedAt: '2025-07-20 08:30' },
+  6:  { url: 'https://www.youtube.com/shorts/gVr3hM7nBwP', uploadedAt: '2025-07-20 11:45' },
+  7:  { url: 'https://www.youtube.com/shorts/jFq8sN4mCkE', uploadedAt: '2025-07-20 14:20' },
+  8:  { url: 'https://www.tiktok.com/@healthking/video/7259384710234', uploadedAt: '2025-07-21 10:00' },
+  9:  { url: 'https://www.youtube.com/shorts/nWx2vB6kHrT', uploadedAt: '2025-07-21 13:15' },
+  10: { url: 'https://www.instagram.com/reel/Ezp4qMsRtU7/', uploadedAt: '2025-07-22 09:00' },
+  11: { url: 'https://www.youtube.com/shorts/oBn5tC9jLqM', uploadedAt: '2025-07-22 12:30' },
+};
+
+// 시뮬레이션: 초기 게시물 등록 완료 채널 인덱스 (관리자 미구축으로 클라이언트 토글)
+// TODO: 어드민 구축 시 서버 상태로 대체
+let _simPosted = new Set([0, 6]);
+
+// ── 채널별 수정 요청 히스토리 (더미: 시간순 누적) ────────────────────
+const chRevisions = {
+  0: [
+    { round: 1, ts: '2025-07-14 14:32', text: '인트로 부분 브랜드 로고 노출 시간이 짧습니다. 3초 이상으로 늘려주세요.' },
+  ],
+  6: [
+    { round: 1, ts: '2025-07-10 11:15', text: '제품 클로즈업 씬이 누락되었습니다. 편집본에 추가 부탁드립니다.' },
+    { round: 2, ts: '2025-07-12 16:48', text: '브랜드 멘션 타이밍이 영상 초반으로 당겨져야 합니다. 1분 이내 언급 부탁드려요.' },
+  ],
+  16: [
+    { round: 1, ts: '2025-07-16 09:40', text: '자막 글씨가 작아 모바일에서 읽기 어렵습니다. 크기를 키워주세요.' },
+  ],
+  20: [
+    { round: 1, ts: '2025-07-17 13:05', text: '경기 장면에 사용된 배경음악이 저작권 확인이 필요합니다. 교체 부탁드립니다.' },
+  ],
+  21: [
+    { round: 1, ts: '2025-07-17 15:22', text: '제품 사용 장면이 너무 짧습니다. 최소 5초 이상 노출해 주세요.' },
+    { round: 2, ts: '2025-07-18 10:05', text: '컷 전환이 빨라 제품명이 보이지 않습니다. 해당 구간 속도를 낮춰주세요.' },
+  ],
+  22: [
+    { round: 1, ts: '2025-07-18 16:50', text: '영상 마지막 브랜드 로고가 누락되었습니다. 아웃트로에 추가해 주세요.' },
+  ],
+};
+
+// ── 상태 ─────────────────────────────────────────────────────────────
+const chState = {};
+channels.forEach((_, i) => { chState[i] = 'pending'; });
+
+const chReviewState = {}; // '최종 확정 중'→'제작 중'→'검토 필요'→[수정시]'수정 중'→'검토 필요'→[승인]'업로드 대기'→'업로드 완료'
+
+// ── 데모 초기 상태 (탭2·탭3 바로 확인 가능하도록 일부 시딩) ─────────────
+// 검토 현황(탭2)의 다섯 상태를 모두 볼 수 있도록 상태별로 채널을 배분한다
+[0, 2, 5, 6, 9, 11, 12].forEach(i => { chState[i] = 'selected'; chReviewState[i] = '승인 완료'; });
+[1, 3, 4, 7].forEach(i => { chState[i] = 'selected'; chReviewState[i] = '제작 중'; });
+[13, 14, 15].forEach(i => { chState[i] = 'selected'; chReviewState[i] = '최종 확정 중'; });
+[16, 17, 18, 19].forEach(i => { chState[i] = 'selected'; chReviewState[i] = '검토 필요'; });
+[20, 21, 22].forEach(i => { chState[i] = 'selected'; chReviewState[i] = '수정 중'; });
+
+let _chChecked      = new Set();
+let _chPendingIdx   = null;
+let _chReviewIdx    = null; // 영상 검토 모달 대상 채널 인덱스
+// 캠페인 제작 영상 링크 — 채널 개별이 아니라 캠페인 1개 통일. 검토 시 이 링크를 연다.
+const CH_VIDEO_LINK_KEY = 'cs_ch_video_link';
+let _chVideoLink = '';
+try { _chVideoLink = localStorage.getItem(CH_VIDEO_LINK_KEY) || ''; } catch (e) {}
+let _chFilterStatus = '';
+let _chReviewFilter = '';
+let _chSort         = 'subs';
+let _chSortDir      = 'desc';
+
+// ── 유틸 ──────────────────────────────────────────────────────────────
+function fmtSubs(n) {
+  if (n >= 1000000) { const v = n / 1000000; return parseFloat(v.toFixed(1)) + 'M'; }
+  if (n >= 1000)    { const v = n / 1000;    return parseFloat(v.toFixed(1)) + 'K'; }
+  return String(n);
+}
+
+// ── 플랫폼 아이콘 ─────────────────────────────────────────────────────
+const PLAT_ICON = {
+  yt: `<span class="ch-plat-icon ch-plat-icon--yt" title="유튜브">
+    <svg viewBox="0 0 20 14" width="18" height="13" fill="none">
+      <rect width="20" height="14" rx="4" fill="#FF0000"/>
+      <polygon points="8,3.5 8,10.5 14.5,7" fill="#fff"/>
+    </svg>
+  </span>`,
+  ig: `<span class="ch-plat-icon ch-plat-icon--ig" title="인스타그램"></span>`,
+  tt: `<span class="ch-plat-icon ch-plat-icon--tt" title="틱톡">
+    <svg viewBox="0 0 20 20" width="15" height="15" fill="none">
+      <rect width="20" height="20" rx="5" fill="#010101"/>
+      <path d="M13.5 4.5c.3 1.8 1.5 2.8 3 3v2.2c-1.1 0-2.1-.4-3-1v4.3a4 4 0 1 1-2.5-3.7V11.5a2 2 0 1 0 1.5 1.9V4.5h1z" fill="#fff"/>
+    </svg>
+  </span>`,
+};
+function platBadge(p) { return PLAT_ICON[p] || `<span class="ch-plat-icon">${p}</span>`; }
+const PLAT_NAME_KO = { yt: '유튜브', ig: '인스타그램', tt: '틱톡' };
+
+// ── 참여 영상 / 프리미엄 지표 플랫폼 필터 ───────────────────────────────
+// 플랫폼이 1개뿐인 캠페인에서는 칩 자체를 만들지 않는다(renderResultPanel 참고)
+let _pmPlatformFilter = 'all';   // 'all' | 'yt' | 'ig' | 'tt'
+let _pmActiveSubTab   = 'videos'; // 'videos' | 'metrics' — 필터를 바꿔도 보던 탭 유지
+function pmSetPlatformFilter(p) {
+  _pmPlatformFilter = p;
+  renderResultPanel();
+}
+
+// 참여 영상 행 삭제 버튼 — 정적 표(site.html)와 같은 마크업을 쓴다
+const VID_DEL_BTN = `<button class="vid-del-btn" title="영상 삭제" aria-label="영상 삭제"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>`;
+
+// ── ER 바 ─────────────────────────────────────────────────────────────
+function erBar(rate) {
+  const pct = Math.min(rate / 20 * 100, 100).toFixed(1);
+  const cls = rate >= 12 ? 'hi' : rate >= 8 ? 'mid' : 'lo';
+  return `<div class="ch-er-wrap">
+    <div class="ch-er-bar-bg"><div class="ch-er-bar-fill ch-er-bar-fill--${cls}" style="width:${pct}%"></div></div>
+    <span class="ch-er-val ch-er-val--${cls}">${rate.toFixed(1)}%</span>
+  </div>`;
+}
+
+// ── 정렬·필터된 인덱스 ───────────────────────────────────────────────
+function filteredIndices() {
+  let list = channels.map((ch, i) => ({ ch, i }));
+  if (_chFilterStatus) list = list.filter(({ i }) => chState[i] === _chFilterStatus);
+
+  const d = _chSortDir === 'asc' ? 1 : -1;
+  list.sort((a, b) => {
+    let diff = 0;
+    if      (_chSort === 'repeat') diff = (a.ch.repeat || 0) - (b.ch.repeat || 0);
+    else if (_chSort === 'views')  diff = parseFloat(a.ch.views) - parseFloat(b.ch.views);
+    else if (_chSort === 'rate')   diff = a.ch.rate - b.ch.rate;
+    else                           diff = a.ch.subsNum - b.ch.subsNum;
+    return diff * d;
+  });
+  return list;
+}
+
+// ── 테이블 렌더 ──────────────────────────────────────────────────────
+function renderChannels() {
+  const tbody = document.getElementById('chTable');
+  if (!tbody) return;
+
+  const list = filteredIndices();
+  const rcEl = document.getElementById('chResultCount');
+  if (rcEl) rcEl.textContent = `${list.length}개 채널`;
+
+  const selCount = Object.values(chState).filter(s => s === 'selected').length;
+  const isMaxed  = selCount >= GOAL;
+
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:32px;color:var(--gray-light)">검색 결과가 없습니다.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(({ ch, i }) => {
+    const state = chState[i];
+    const rowCls = state === 'selected' ? 'ch-row--selected' : state === 'rejected' ? 'ch-row--rejected' : '';
+
+    const canCheck = state === 'pending' && !isMaxed;
+    const isChecked = _chChecked.has(i);
+    const checkCell = `<td class="ch-check-cell">
+      <input type="checkbox" class="ch-row-check" data-fn="toggleChCheck" data-args="${i}"
+        ${!canCheck && !isChecked ? 'disabled' : ''}
+        ${isChecked ? 'checked' : ''}>
+    </td>`;
+
+    let actionHtml = '';
+    if (state === 'pending') {
+      actionHtml = `<button class="ch-action-btn ch-action-select" data-fn="openChSelectModal" data-args="${i}">선정</button><button class="ch-action-btn ch-action-reject" data-fn="rejectCh" data-args="${i}">반려</button>`;
+    } else if (state === 'selected') {
+      actionHtml = `<span class="ch-action-done">✓ 선정됨</span>`;
+    } else {
+      actionHtml = `<span class="ch-action-rej">반려됨</span><button class="ch-undo-btn" data-fn="undoCh" data-args="${i}">되돌리기</button>`;
+    }
+
+    return `
+      <tr class="${rowCls}" id="chtr${i}">
+        ${checkCell}
+        <td style="text-align:center;padding:0 4px">${platBadge(ch.platform)}</td>
+        <td>
+          <div class="ch-cell">
+            <div class="ch-thumb">${ch.emoji}</div>
+            <div>
+              <div class="ch-name">${ch.name}</div>
+              <div class="ch-handle">${ch.handle}</div>
+            </div>
+          </div>
+        </td>
+        <td class="ch-cid-cell">${ch.cid ? `<span class="ch-cid">${ch.cid}</span>` : '<span class="ch-cid-none">-</span>'}</td>
+        <td style="text-align:center"><span class="cat-tag">${ch.cat}</span></td>
+        <td class="n-cell">${fmtSubs(ch.subsNum)}</td>
+        <td class="n-cell">${ch.views}<div class="n-sub">평균</div></td>
+        <td>${erBar(ch.rate)}</td>
+        <td style="text-align:center">${ch.repeat ? `<span class="ch-hist-val ch-hist-val--on">${ch.repeat}</span>` : `<span class="ch-hist-val ch-hist-val--off">-</span>`}</td>
+        <td class="zeal-col" style="text-align:center">${zealBadgeHtml(ch)}</td>
+        <td class="ch-action-cell">${actionHtml}</td>
+      </tr>`;
+  }).join('');
+}
+
+// ── 채널 리스트 업로드 (관리자) ───────────────────────────────────────
+// CID(유튜브 채널 ID)만 받아 두 소스를 따로 조회해 한 행으로 합친다.
+// 소스가 서로 독립이라 DB에 이력이 없는 채널도 유튜브 값만으로 행이 만들어진다.
+const CH_CID_RE = /UC[0-9A-Za-z_-]{22}/g;
+
+let _chuCids = [];      // 조회 대기 중인 신규 CID
+let _chuDupCount = 0;   // 이미 목록에 있어 제외된 수
+
+// 85만 · 1.2억 표기 (표의 평균 조회수 칸과 같은 단위)
+function fmtKoUnit(n) {
+  n = Number(n) || 0;
+  if (n >= 100000000) return parseFloat((n / 100000000).toFixed(1)) + '억';
+  if (n >= 10000)     return parseFloat((n / 10000).toFixed(1)) + '만';
+  return String(n);
+}
+
+// CID 문자열에서 만든 고정 시드 — 같은 CID면 항상 같은 더미 값이 나온다
+function _chuSeed(cid) {
+  let h = 0;
+  for (let i = 0; i < cid.length; i++) h = (h * 31 + cid.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+/* ① 유튜브 소스 — 채널명 · 구독자 · 평균 쇼츠 조회수(최근 5개)
+   서버가 있으면 서버가 YouTube Data API(channels / playlistItems / videos)로 조회한다.
+   서버가 없으면(데모) 아래 CID 고정 더미를 쓴다. */
+async function chUploadFetchYouTube(cids) {
+  if (Api.enabled && (Api.isUp() || await Api.ping())) {
+    if (!Api.isLoggedIn() || !Api.isAdmin()) throw new Error('관리자 계정으로 로그인해야 채널을 불러올 수 있습니다.');
+    const r = await Api.req('/api/youtube/channels', { method: 'POST', body: { cids } });
+    if (!r.ok) throw new Error(r.error || 'YouTube 조회에 실패했습니다.');
+    const out = {};
+    Object.entries(r.data.results || {}).forEach(([cid, v]) => {
+      if (!v.ok) return;                       // 유튜브에 없는 CID는 행을 만들지 않는다
+      const h = v.handle ? (v.handle.startsWith('@') ? v.handle : '@' + v.handle) : '@' + cid.slice(2, 10).toLowerCase();
+      out[cid] = {
+        name: v.name, handle: h,
+        subsNum: v.subscribers || 0,
+        subs: v.subscribers == null ? '비공개' : fmtKoUnit(v.subscribers),
+        views: v.avgShortsViews == null ? '-' : fmtKoUnit(v.avgShortsViews),
+      };
+    });
+    return out;
+  }
+  const out = {};
+  cids.forEach(cid => {
+    const s = _chuSeed(cid);
+    const subsNum = 3000 + (s % 900000);
+    const views   = Math.round(subsNum * (0.6 + (s >>> 8) % 90 / 100));
+    out[cid] = {
+      name:    '채널 ' + cid.slice(2, 8),
+      handle:  '@' + cid.slice(2, 10).toLowerCase(),
+      subsNum,
+      subs:    fmtKoUnit(subsNum),
+      views:   fmtKoUnit(views),
+    };
+  });
+  return out;
+}
+
+const CH_DB_CATS = ['엔터테인먼트', '커뮤니티·썰', '음악', '패션·뷰티', '게임·IT', '음식·요리', '운동·헬스'];
+
+/* ② 기존 DB 소스 — 평균 참여율 · 카테고리 · 참여 이력 · 짤 여부
+   카테고리·참여율·이력은 아직 연결할 DB가 없다 → 서버 모드에서는 지어낸 값을 넣지 않고
+   '미분류·0'으로 둔다(데모에서만 CID 고정 더미). 짤 여부는 항상 실제 회원 DB(ZEAL_MEMBERS)를 조회한다. */
+async function chUploadFetchDb(cids) {
+  const serverMode = Api.enabled && (Api.isUp() || await Api.ping());
+  const out = {};
+  cids.forEach(cid => {
+    const s = _chuSeed(cid);
+    const hasRecord = !serverMode && s % 3 !== 0;   // 데모 전용 더미
+    out[cid] = hasRecord
+      ? {
+          cat:    CH_DB_CATS[s % CH_DB_CATS.length],
+          rate:   Math.round((8 + (s >>> 4) % 90 / 10) * 10) / 10,
+          repeat: (s >>> 12) % 5,
+          hit:    true,
+        }
+      : { cat: '미분류', rate: 0, repeat: 0, hit: false };
+    out[cid].zeal = !!zealKey({ cid });
+  });
+  return out;
+}
+
+// ── 모달 ──
+function openChUploadModal() {
+  const ta = document.getElementById('chuCidText');
+  if (ta) ta.value = '';
+  const fi = document.getElementById('chuFileInput');
+  if (fi) fi.value = '';
+  const label = document.getElementById('chuFileLabel');
+  if (label) label.textContent = 'CSV·TXT 파일을 클릭하여 선택';
+  chUploadSwitchTab(0);
+  chUploadParse('');
+  document.getElementById('chUploadModal').classList.add('open');
+}
+
+function closeChUploadModal() {
+  document.getElementById('chUploadModal').classList.remove('open');
+}
+
+function chUploadSwitchTab(idx) {
+  const i = Number(idx);
+  document.querySelectorAll('#chUploadModal .ru-tab').forEach((btn, j) => {
+    btn.classList.toggle('ru-tab--active', j === i);
+  });
+  [0, 1].forEach(j => {
+    const pane = document.getElementById(`chuPane${j}`);
+    if (pane) pane.style.display = j === i ? '' : 'none';
+  });
+}
+
+// 붙여넣은 텍스트든 CSV든 CID 패턴만 뽑아내므로 구분자·따옴표를 안 가린다
+function chUploadParse(text) {
+  const found = String(text || '').match(CH_CID_RE) || [];
+  const have = new Set(channels.map(c => c.cid).filter(Boolean));
+  const seen = new Set();
+  _chuCids = [];
+  _chuDupCount = 0;
+  found.forEach(cid => {
+    if (seen.has(cid)) return;
+    seen.add(cid);
+    if (have.has(cid)) { _chuDupCount++; return; }
+    _chuCids.push(cid);
+  });
+
+  const btn = document.getElementById('chuSubmitBtn');
+  if (btn) {
+    btn.disabled = !_chuCids.length;
+    btn.textContent = `불러오기 (${_chuCids.length}개)`;
+  }
+  const status = document.getElementById('chuStatus');
+  if (status) {
+    if (!found.length) {
+      status.style.display = 'none';
+    } else {
+      status.style.display = '';
+      status.innerHTML = `<strong>${_chuCids.length}개</strong> 신규 CID` +
+        (_chuDupCount ? ` · 이미 등록된 <strong>${_chuDupCount}개</strong> 제외` : '');
+    }
+  }
+}
+
+async function chUploadRun() {
+  if (!_chuCids.length) return;
+  const cids = _chuCids.slice();
+  const btn = document.getElementById('chuSubmitBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '조회 중…'; }
+
+  // 두 소스는 서로 기다릴 필요가 없다
+  let yt, db;
+  try {
+    [yt, db] = await Promise.all([chUploadFetchYouTube(cids), chUploadFetchDb(cids)]);
+  } catch (e) {
+    // 키 미설정·할당량 초과·권한 없음 등 — 이유를 보여주고 모달은 그대로 둔다
+    if (btn) { btn.disabled = !_chuCids.length; btn.textContent = `불러오기 (${_chuCids.length}개)`; }
+    alert(e.message || '채널 정보를 불러오지 못했습니다.');
+    return;
+  }
+
+  let added = 0, missing = 0, dbHit = 0;
+  cids.forEach(cid => {
+    const y = yt[cid];
+    if (!y) { missing++; return; }   // 유튜브에 없는 CID는 행을 만들지 않는다
+    const d = db[cid] || {};
+    if (d.hit) dbHit++;
+    channels.push({
+      emoji: '🎬', name: y.name, handle: y.handle, cid, cat: d.cat || '미분류',
+      platform: 'yt', subsNum: y.subsNum, subs: y.subs, views: y.views,
+      rate: d.rate || 0, repeat: d.repeat || 0,
+    });
+    chState[channels.length - 1] = 'pending';
+    added++;
+  });
+
+  renderChannels();
+  updateChSummary();
+  closeChUploadModal();
+  showToast(`${added}개 채널 추가 · DB 이력 ${dbHit}개` + (missing ? ` · 조회 실패 ${missing}개` : ''));
+}
+
+(function initChUpload() {
+  const ta = document.getElementById('chuCidText');
+  if (ta) ta.addEventListener('input', () => chUploadParse(ta.value));
+
+  const fi = document.getElementById('chuFileInput');
+  if (fi) fi.addEventListener('change', async () => {
+    const file = fi.files && fi.files[0];
+    if (!file) return;
+    const label = document.getElementById('chuFileLabel');
+    if (label) label.textContent = file.name;
+    chUploadParse(await file.text());
+  });
+})();
+
+// ── 탭 전환 ──────────────────────────────────────────────────────────
+function chSwitchTab(idx) {
+  _chActiveTab = Number(idx);
+  document.querySelectorAll('.ch-tab-card').forEach((el, i) => {
+    el.classList.toggle('ch-tab-card--active', i === _chActiveTab);
+  });
+  [0, 1, 2].forEach(i => {
+    const p = document.getElementById(`chPanel${i}`);
+    if (p) p.style.display = i === _chActiveTab ? '' : 'none';
+  });
+}
+
+// ── 요약 갱신 ────────────────────────────────────────────────────────
+// ── 캠페인 지정 플랫폼 ───────────────────────────────────────────────
+// 캠페인 생성 시 지정한 집행 플랫폼만 보여준다. 값은 #p-channels 헤더의 data-platforms("yt,ig")이며,
+// 비어 있으면 모든 플랫폼을 보여준다(기존 동작).
+function chCampaignPlatforms() {
+  const el = document.querySelector('#p-channels [data-platforms]');
+  const list = ((el && el.dataset.platforms) || '').split(',').map(v => v.trim()).filter(Boolean);
+  return list.length ? list : ['yt', 'ig', 'tt'];
+}
+
+// 채널 선정 탭 카드의 플랫폼별 수량 — 지정된 플랫폼만 남기고 사이 점(·)도 다시 맞춘다
+function renderChPlatformDist() {
+  const dist = document.querySelector('#p-channels .ch-tab-card-dist');
+  if (!dist) return;
+  const plats = chCampaignPlatforms();
+  let shown = 0;
+  [...dist.children].forEach(el => {
+    if (el.classList.contains('ch-tab-dist-sep')) { el.hidden = true; return; }
+    const on = plats.includes(el.dataset.plat);
+    el.hidden = !on;
+    if (on) {
+      if (shown > 0) { const sep = el.previousElementSibling; if (sep && sep.classList.contains('ch-tab-dist-sep')) sep.hidden = false; }
+      shown++;
+    }
+  });
+}
+
+function updateChSummary() {
+  const selCount  = Object.values(chState).filter(s => s === 'selected').length;
+  const pendCount = Object.values(chState).filter(s => s === 'pending').length;
+
+  // 완료 배너
+  const bannerEl = document.getElementById('chCompleteBanner');
+  if (bannerEl) bannerEl.style.display = selCount >= GOAL ? '' : 'none';
+
+  // ① 탭 히어로 숫자
+  const heroSel = document.getElementById('chTabHeroSel');
+  if (heroSel) heroSel.textContent = selCount;
+  // ② 탭 히어로 + 분포
+  const rvCounts = { '최종 확정 중': 0, '제작 중': 0, '검토 필요': 0, '수정 중': 0, '승인 완료': 0 };
+  channels.forEach((_, i) => {
+    if (chState[i] === 'selected') {
+      const rs = chReviewState[i] || '최종 확정 중';
+      if (rvCounts[rs] !== undefined) rvCounts[rs]++;
+    }
+  });
+  const hero2 = document.getElementById('chTabHero2Sel');
+  if (hero2) hero2.textContent = rvCounts['검토 필요'];
+  const eConf = document.getElementById('chT2Confirming');
+  const eProd = document.getElementById('chT2Producing');
+  const eDone = document.getElementById('chT2Done');
+  if (eConf) eConf.textContent = `최종 확정 중 ${rvCounts['최종 확정 중']}`;
+  if (eProd) eProd.textContent = `제작 중 ${rvCounts['제작 중']}`;
+  if (eDone) eDone.textContent = `승인 ${rvCounts['승인 완료']}`;
+
+  // 플랫폼별 선정 수 (분포 텍스트)
+  const platSel = { yt: 0, ig: 0, tt: 0 };
+  channels.forEach((ch, i) => {
+    if (chState[i] === 'selected') platSel[ch.platform] = (platSel[ch.platform] || 0) + 1;
+  });
+  const ytEl = document.getElementById('chBdYtNum');
+  const igEl = document.getElementById('chBdIgNum');
+  const ttEl = document.getElementById('chBdTtNum');
+  if (ytEl) ytEl.textContent = platSel.yt || 0;
+  if (igEl) igEl.textContent = platSel.ig || 0;
+  if (ttEl) ttEl.textContent = platSel.tt || 0;
+  renderChPlatformDist();
+
+  renderReviewPanel();
+  renderResultPanel();
+}
+
+// ── 검토 현황 패널 ────────────────────────────────────────────────────
+const REVIEW_ORDER = ['최종 확정 중', '제작 중', '검토 필요', '수정 중'];
+const REVIEW_BADGE_CLS = {
+  '최종 확정 중': 'ch-rv-badge--confirming',
+  '제작 중':      'ch-rv-badge--producing',
+  '검토 필요':    'ch-rv-badge--needcheck',
+  '수정 중':      'ch-rv-badge--revision',
+};
+const PLAT_LABEL = { yt: 'YT', ig: 'IG', tt: 'TT' };
+
+function renderReviewPanel() {
+  const container = document.getElementById('chReviewList');
+  if (!container) return;
+
+  const isAdmin = document.body.dataset.viewerRole === 'admin';
+
+  // 캠페인 영상 링크 입력값 동기화 (편집 중이 아닐 때만)
+  const linkInput = document.getElementById('chVideoLink');
+  if (linkInput && document.activeElement !== linkInput) linkInput.value = _chVideoLink;
+
+  // 상태별 카운트 집계
+  const counts = { '': 0, '최종 확정 중': 0, '제작 중': 0, '검토 필요': 0, '수정 중': 0 };
+  channels.forEach((_, i) => {
+    if (chState[i] === 'selected' && (chReviewState[i] || '최종 확정 중') !== '승인 완료') {
+      const rs = chReviewState[i] || '최종 확정 중';
+      counts['']++;
+      if (counts[rs] !== undefined) counts[rs]++;
+    }
+  });
+
+  // 칩 카운트 텍스트 + 비활성 처리
+  const CHIP_LABELS = { '': '전체', '최종 확정 중': '최종 확정 중', '제작 중': '제작 중', '검토 필요': '검토 필요', '수정 중': '수정 중' };
+  document.querySelectorAll('#chReviewChipsRow .ch-chip').forEach(btn => {
+    const key = btn.dataset.args || '';
+    const cnt = counts[key] ?? 0;
+    btn.textContent = cnt > 0 ? `${CHIP_LABELS[key]} ${cnt}` : CHIP_LABELS[key];
+    btn.classList.toggle('ch-chip--active', key === _chReviewFilter);
+    btn.classList.toggle('ch-chip--zero', cnt === 0 && key !== '');
+  });
+
+  const allItems = channels
+    .map((ch, i) => ({ ch, i }))
+    .filter(({ i }) => chState[i] === 'selected' && (chReviewState[i] || '최종 확정 중') !== '승인 완료')
+    .sort((a, b) => {
+      const oa = REVIEW_ORDER.indexOf(chReviewState[a.i] || '최종 확정 중');
+      const ob = REVIEW_ORDER.indexOf(chReviewState[b.i] || '최종 확정 중');
+      return oa - ob;
+    });
+
+  const items = _chReviewFilter
+    ? allItems.filter(({ i }) => (chReviewState[i] || '최종 확정 중') === _chReviewFilter)
+    : allItems;
+
+  // 총계 카운트
+  const cntEl = document.getElementById('chReviewResultCount');
+  if (cntEl) cntEl.textContent = `${items.length}개 채널`;
+
+  if (!items.length) {
+    container.innerHTML = `<div class="ch-placeholder">
+      <div class="ch-placeholder-icon">📋</div>
+      <div class="ch-placeholder-title">검토 현황</div>
+      <div class="ch-placeholder-desc">채널을 선정하면 여기서 크리에이터별 진행 상황을 확인할 수 있습니다.</div>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = items.map(({ ch, i }) => {
+    const rs = chReviewState[i] || '최종 확정 중';
+    const badgeCls = REVIEW_BADGE_CLS[rs] || '';
+    // 관리자 = 진행을 움직이는 버튼, 광고주 = 영상 검토(승인·수정 요청)
+    // 거절·철회는 모두 1단계의 '반려됨'으로 되돌린다
+    const WITHDRAW = `<button class="ch-rv-sim-btn ch-rv-sim-btn--reject" data-fn="creatorRejectCh" data-args="${i}">철회</button>`;
+    const ADMIN_BTN = {
+      '최종 확정 중': `<button class="ch-rv-sim-btn" data-fn="advanceReviewState" data-args="${i}">확정 →</button><button class="ch-rv-sim-btn ch-rv-sim-btn--reject" data-fn="creatorRejectCh" data-args="${i}">크리에이터 거절</button>`,
+      '제작 중':      `<button class="ch-rv-sim-btn" data-fn="advanceReviewState" data-args="${i}">검토 요청 →</button>${WITHDRAW}`,
+      '검토 필요':    WITHDRAW,
+      '수정 중':      `<button class="ch-rv-sim-btn" data-fn="advanceReviewState" data-args="${i}">재제작 완료 →</button>${WITHDRAW}`,
+    };
+    const revs = chRevisions[i] || [];
+    const unchecked = revs.filter(r => !_revChecked.has(`${i}-${r.round}`)).length;
+    // 영상은 채널별이 아니라 캠페인 공통 드라이브 링크 1개를 그대로 연다
+    const VIEW_BTN = _chVideoLink
+      ? `<a class="ch-rv-view-btn" href="${_chVideoLink}" target="_blank" rel="noopener">영상 보기 →</a>`
+      : `<span class="ch-rv-view-btn ch-rv-view-btn--off" title="관리자가 캠페인 영상 링크를 등록해야 합니다">영상 보기 →</span>`;
+    // 수정 중이어도 수정 요청을 다시 보낼 수 있어야 한다
+    const BRAND_BTN = {
+      '검토 필요': `${VIEW_BTN}<button class="ch-rv-sim-btn" data-fn="openRevisionModal" data-args="${i}">수정 요청</button><button class="ch-rv-review-btn" data-fn="approveReview" data-args="${i}">승인</button>`,
+      '수정 중':   `${VIEW_BTN}<button class="ch-rv-sim-btn" data-fn="openRevisionModal" data-args="${i}">수정 요청</button><button class="ch-rv-review-btn" data-fn="approveReview" data-args="${i}">승인</button>`,
+    };
+    const LOG_BTN = revs.length
+      ? `<button class="ch-rv-log-btn" data-fn="openRevLogPanel" data-args="${i}">수정 요청 ${revs.length}건${unchecked ? `<span class="ch-rv-log-dot"></span>` : ''}</button>`
+      : '';
+    const simBtns = ADMIN_BTN[rs] || `<span class="ch-rv-sim-inactive">진행 중</span>`;
+    return `<div class="ch-rv-item">
+      <div class="ch-rv-left">
+        <div class="ch-thumb">${ch.emoji}</div>
+        <div class="ch-rv-info">
+          <div class="ch-rv-name">${ch.name}${isAdminViewer() && zealKey(ch) ? ' <span class="zeal-rv-badge">짤</span>' : ''}</div>
+          <div class="ch-rv-meta">${ch.handle} · ${PLAT_LABEL[ch.platform] || ch.platform} · 구독자 ${fmtSubs(ch.subsNum)}</div>
+        </div>
+      </div>
+      <span class="ch-rv-badge ${badgeCls}">${rs}</span>
+      ${isAdmin
+        ? `<div class="ch-rv-sim">${LOG_BTN}<span class="ch-rv-sim-label">시뮬</span>${simBtns}</div>`
+        : (BRAND_BTN[rs] ? `<div class="ch-rv-sim">${BRAND_BTN[rs]}</div>` : '')}
+    </div>`;
+  }).join('');
+}
+
+// ── 결과 패널 렌더 ────────────────────────────────────────────────────
+function renderResultPanel() {
+  const container = document.getElementById('chResultContent');
+  if (!container) return;
+
+  const isAdmin = document.body.dataset.viewerRole === 'admin';
+
+  const doneItems = channels
+    .map((ch, i) => ({ ch, i }))
+    .filter(({ i }) => chState[i] === 'selected' && chReviewState[i] === '승인 완료');
+
+  const doneCount = doneItems.length;
+  const postedCount = doneItems.filter(({ i }) => _simPosted.has(i)).length;
+  const pct = GOAL > 0 ? Math.round(postedCount / GOAL * 100) : 0;
+
+  // 플랫폼이 복수인 캠페인에서만 필터 칩을 보여준다. 상단 완료/집계 통계는
+  // 캠페인 전체 기준을 유지하고, 테이블 행 + 프리미엄 지표만 필터를 반영한다.
+  const donePlatforms = [...new Set(doneItems.map(({ i }) => channels[i].platform))];
+  if (_pmPlatformFilter !== 'all' && !donePlatforms.includes(_pmPlatformFilter)) _pmPlatformFilter = 'all';
+  const filteredItems = _pmPlatformFilter === 'all'
+    ? doneItems
+    : doneItems.filter(({ i }) => channels[i].platform === _pmPlatformFilter);
+  const platFilterHtml = donePlatforms.length > 1 ? `
+    <div class="vid-plat-filter" role="tablist" aria-label="플랫폼 필터">
+      <button class="vid-plat-chip${_pmPlatformFilter === 'all' ? ' active' : ''}" data-fn="pmSetPlatformFilter" data-args="all">전체</button>
+      ${donePlatforms.map(p => `<button class="vid-plat-chip${_pmPlatformFilter === p ? ' active' : ''}" data-fn="pmSetPlatformFilter" data-args="${p}">${platBadge(p)}${PLAT_NAME_KO[p] || p}</button>`).join('')}
+    </div>` : '';
+  // 조회수 갱신 대상 선택 — 복수 플랫폼일 때만 노출
+  const refreshSelectHtml = donePlatforms.length > 1 ? `
+    <select class="vid-plat-select" id="pmRefreshPlat" aria-label="갱신 대상 플랫폼">
+      <option value="all">전체 플랫폼</option>
+      ${donePlatforms.map(p => `<option value="${p}">${PLAT_NAME_KO[p] || p}</option>`).join('')}
+    </select>` : '';
+
+  // 탭3 카드 카운트 + 뱃지 갱신
+  const hero3 = document.getElementById('chTabHero3Sel');
+  if (hero3) hero3.textContent = postedCount;
+  const badge3 = document.getElementById('chTab3Badge');
+  if (badge3) {
+    const isDone = postedCount >= GOAL;
+    badge3.textContent = isDone ? '완료' : '진행 중';
+    badge3.className = isDone ? 'ch-tab3-badge ch-tab3-badge--done' : 'ch-tab3-badge ch-tab3-badge--progress';
+  }
+
+  // 헤더 액션 버튼 + 뱃지 갱신
+  const headerActions = document.getElementById('chHeaderActions');
+  const campaignBadge = document.getElementById('chCampaignBadge');
+  if (headerActions) headerActions.style.display = doneCount > 0 ? '' : 'none';
+  if (campaignBadge) {
+    // 캠페인 상태는 광고주 카드와 동일하게 표기(채널 선정 중). 양쪽 상태값 통일.
+    // 실서비스에선 카드와 같은 캠페인 상태값을 그대로 읽어 온다.
+    campaignBadge.textContent = '채널 선정 중';
+    campaignBadge.className   = 'cd-badge running';
+  }
+
+  if (!doneCount) {
+    container.innerHTML = `<div class="ch-placeholder">
+      <div class="ch-placeholder-icon">📊</div>
+      <div class="ch-placeholder-title">캠페인 결과</div>
+      <div class="ch-placeholder-desc">승인된 영상이 생기면 결과 리포트가 표시됩니다.</div>
+    </div>`;
+    return;
+  }
+
+  const tableRows = filteredItems.map(({ ch, i }) => {
+    const post = CH_POST[i];
+    const isPosted = _simPosted.has(i);
+    const postCell = isPosted
+      ? `<div class="ch-result-post-cell">
+           <a class="ch-result-link" href="${post?.url || '#'}" target="_blank" rel="noopener">게시물 보기 →</a>
+           ${isAdmin ? `<button class="ch-sim-btn ch-sim-btn--on" data-fn="toggleSimPost" data-args="${i}">✓ 등록됨</button>` : ''}
+         </div>`
+      : `<div class="ch-result-post-cell">
+           <span class="ch-result-wait">업로드전</span>
+           ${isAdmin ? `<button class="ch-sim-btn ch-sim-btn--off" data-fn="toggleSimPost" data-args="${i}">+ 등록</button>` : ''}
+         </div>`;
+    const vidUrl = (post?.url && post.url !== '#') ? post.url : '';
+    return `<tr data-platform="${ch.platform}">
+      <td class="vid-cb-td"><input type="checkbox" class="vid-row-cb" data-cid="${encodeURIComponent(ch.handle)}" data-url="${vidUrl}"></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:18px">${ch.emoji}</span>
+          <div>
+            <div style="font-weight:600;font-size:12px;color:var(--gray-dark)">${ch.name}</div>
+            <div style="font-size:11px;color:var(--gray-light)">${ch.handle}</div>
+          </div>
+        </div>
+      </td>
+      <td class="ch-cid-cell">${ch.cid ? `<span class="ch-cid">${ch.cid}</span>` : '<span class="ch-cid-none">-</span>'}</td>
+      <td style="text-align:center;padding:0 4px">${platBadge(ch.platform)}</td>
+      <td style="text-align:center">${postCell}</td>
+      <td style="text-align:right;font-size:12px;color:var(--gray-light)">집계 예정</td>
+      <td style="text-align:right;font-size:12px;color:var(--gray-light)">집계 예정</td>
+      <td style="text-align:right;font-size:12px;color:var(--gray-light)">집계 예정</td>
+      ${premiumCells(i)}
+      <td class="zeal-col" style="text-align:center">${zealBadgeHtml(ch)}</td>
+      <td style="text-align:center">${isPosted ? '<span class="vid-vis vid-vis--public">공개</span>' : '<span class="vid-vis vid-vis--none">-</span>'}</td>
+      <td class="vid-del-col" style="text-align:center">${VID_DEL_BTN}</td>
+    </tr>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="cd-report-row">
+
+      <!-- 1열: 포스터 이미지 -->
+      <div class="cd-poster-col">
+        <div class="cd-poster-placeholder">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gray-light)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          <span>포스터 이미지</span>
+        </div>
+      </div>
+
+      <!-- 2열: 리포트 타임라인 -->
+      <div class="cd-timeline-card">
+        <div class="cd-timeline-head">
+          <span>리포트 타임라인</span>
+          <button class="cd-add-round-btn admin-only" data-fn="openAddRoundModal">+ 회차 추가</button>
+        </div>
+        <div class="cd-tl-track-row">
+          <span class="cd-timeline-period">성과 집계 예정</span>
+          <div class="cd-tl-progress">
+          <div class="cd-tl-prog-track">
+            <div class="cd-tl-prog-fill" style="width:${pct >= 100 ? 84 : 0}%"></div>
+            <div class="cd-tl-marker" style="left:25%">
+              <div class="cd-tl-marker-dot"></div>
+              <div class="cd-tl-marker-lbl">1차</div>
+              <div class="cd-tl-marker-tip">1차 · 전체 완료 시점</div>
+            </div>
+            <div class="cd-tl-marker" style="left:70%">
+              <div class="cd-tl-marker-dot"></div>
+              <div class="cd-tl-marker-lbl">2차</div>
+              <div class="cd-tl-marker-tip">2차 · 완료 2주 후</div>
+            </div>
+            <div class="cd-tl-marker cd-tl-marker--final" style="left:100%">
+              <div class="cd-tl-marker-dot"></div>
+              <div class="cd-tl-marker-lbl">최종</div>
+              <div class="cd-tl-marker-tip">최종 · 완료 4주 후</div>
+            </div>
+          </div>
+          </div><!-- /cd-tl-progress -->
+        </div><!-- /cd-tl-track-row -->
+        <div class="cd-tl-list">
+          <div class="cd-tl-row">
+            <div class="cd-tl-num">1</div>
+            <div class="cd-tl-info">
+              <div class="cd-tl-title">1차 <span class="cd-tl-pct">집계 예정</span></div>
+              <div class="cd-tl-meta">전체 승인 완료 시점 기준</div>
+            </div>
+          
+            <div class="cd-tl-act admin-only">
+              <button class="cd-tl-act-btn" data-tl-act="edit" title="수정" aria-label="회차 수정"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+              <button class="cd-tl-act-btn cd-tl-act-btn--del" data-tl-act="delete" title="삭제" aria-label="회차 삭제"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+            </div>
+          </div>
+          <div class="cd-tl-row">
+            <div class="cd-tl-num">2</div>
+            <div class="cd-tl-info">
+              <div class="cd-tl-title">2차 <span class="cd-tl-pct">집계 예정</span></div>
+              <div class="cd-tl-meta">완료 2주 후 기준</div>
+            </div>
+          
+            <div class="cd-tl-act admin-only">
+              <button class="cd-tl-act-btn" data-tl-act="edit" title="수정" aria-label="회차 수정"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+              <button class="cd-tl-act-btn cd-tl-act-btn--del" data-tl-act="delete" title="삭제" aria-label="회차 삭제"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+            </div>
+          </div>
+          <div class="cd-tl-row cd-tl-row--final">
+            <div class="cd-tl-num cd-tl-num--final">🏆</div>
+            <div class="cd-tl-info">
+              <div class="cd-tl-title">최종 <span class="cd-tl-pct">집계 예정</span></div>
+              <div class="cd-tl-meta">완료 4주 후 기준</div>
+            </div>
+          
+            <div class="cd-tl-act admin-only">
+              <button class="cd-tl-act-btn" data-tl-act="edit" title="수정" aria-label="회차 수정"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+              <button class="cd-tl-act-btn cd-tl-act-btn--del" data-tl-act="delete" title="삭제" aria-label="회차 삭제"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3열: 결과 카드 -->
+      <div class="cd-result-card">
+        ${pct >= 100 ? '<div class="cd-result-badge">🏆 영상 목표 달성!</div>' : ''}
+        <div class="cd-result-hero">${pct}%</div>
+        <div class="cd-result-list">
+          <div class="cd-result-item">
+            <span class="cd-result-lbl">목표 영상 수</span>
+            <span class="cd-result-val">${GOAL}개</span>
+          </div>
+          <div class="cd-result-item">
+            <span class="cd-result-lbl">게시물 등록 완료</span>
+            <span class="cd-result-val cd-result-val--accent">${postedCount}개</span>
+          </div>
+          <div class="cd-result-item">
+            <span class="cd-result-lbl">달성 조회수</span>
+            <span class="cd-result-val" style="opacity:.6;font-size:12px">집계 예정</span>
+          </div>
+          <div class="cd-result-item" style="border-bottom:none">
+            <span class="cd-result-lbl">집행 금액</span>
+            <span class="cd-result-val">₩150,000,000</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="vid-card">
+      <div class="vid-card-head">
+        참여 영상
+        ${isAdmin ? `<div class="vid-head-actions">
+          ${refreshSelectHtml}
+          <button class="cd-btn cd-btn-excel vid-refresh-btn" data-fn="refreshViewCounts"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>조회수 갱신</button>
+          <button class="cd-btn cd-btn-edit" data-fn="openReportUploadModal"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>리포트 업로드</button>
+        </div>` : ''}
+      </div>
+      <div class="vid-stat-strip">
+        <div class="vid-stat-col">
+          <div class="vid-stat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="3"/><path d="m9 9 6 3-6 3V9z" fill="currentColor" stroke="none"/></svg>
+          </div>
+          <div class="vid-stat-num vid-stat-num--accent">${doneCount}</div>
+          <div class="vid-stat-lbl">완료 영상</div>
+        </div>
+        <div class="vid-stat-col">
+          <div class="vid-stat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>
+          </div>
+          <div class="vid-stat-num" style="font-size:13px;color:var(--gray-light)">집계 예정</div>
+          <div class="vid-stat-lbl">총 조회수</div>
+        </div>
+        <div class="vid-stat-col">
+          <div class="vid-stat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+          <div class="vid-stat-num" style="font-size:13px;color:var(--gray-light)">집계 예정</div>
+          <div class="vid-stat-lbl">총 좋아요</div>
+        </div>
+        <div class="vid-stat-col">
+          <div class="vid-stat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="vid-stat-num" style="font-size:13px;color:var(--gray-light)">집계 예정</div>
+          <div class="vid-stat-lbl">총 댓글</div>
+        </div>
+      </div>
+      ${isAdmin ? `<div class="ch-sim-notice">
+        <span class="ch-sim-notice-icon">🔧</span>
+        게시물 등록은 관리자가 설정합니다 · 아래 [+ 등록] 버튼은 표시 시뮬레이션용입니다
+      </div>` : ''}
+      ${platFilterHtml}
+      <div class="pm-tabs">
+        <button class="pm-tab${_pmActiveSubTab === 'videos' ? ' active' : ''}" data-pm-tab="videos">참여 영상</button>
+        <button class="pm-tab${_pmActiveSubTab === 'metrics' ? ' active' : ''}" data-pm-tab="metrics">프리미엄 지표</button>
+      </div>
+
+      <div class="pm-pane${_pmActiveSubTab === 'videos' ? ' active' : ''}" id="pmPaneVideos">
+        <div class="vid-table-wrap">
+          <table class="vid-table" data-vid-mode="premium">
+            <thead>
+              <tr>
+                <th class="vid-cb-th"><input type="checkbox" class="vid-select-all" aria-label="전체선택"></th>
+                <th style="width:140px">채널</th>
+                <th style="width:150px">CID</th>
+                <th style="text-align:center;width:50px">플랫폼</th>
+                <th style="text-align:center;width:160px">게시물 (관리자 등록)</th>
+                <th style="text-align:right;width:72px">조회수</th>
+                <th style="text-align:right;width:72px">좋아요</th>
+                <th style="text-align:right;width:72px">댓글</th>
+                <th class="pm-cell--num" style="width:56px">공유</th>
+                <th class="pm-cell--num" style="width:68px">평균 시청</th>
+                <th style="width:72px">국가</th>
+                <th style="width:74px">연령대</th>
+                <th style="width:64px">성별</th>
+                <th class="zeal-col" style="text-align:center;width:52px">짤</th>
+                <th class="vid-vis-col">상태</th>
+                <th class="vid-del-col"></th>
+              </tr>
+            </thead>
+            <tbody>${tableRows}</tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="pm-pane${_pmActiveSubTab === 'metrics' ? ' active' : ''}" id="pmPaneMetrics">${renderPremiumMetrics(filteredItems)}</div>
+    </div>`;
+}
+
+// 참여 영상 ↔ 프리미엄 지표 전환. 결과 패널은 매번 새로 그려지므로 위임으로 처리한다.
+document.addEventListener('click', function(e) {
+  const tab = e.target.closest('[data-pm-tab]');
+  if (!tab) return;
+  const card = tab.closest('.vid-card');
+  if (!card) return;
+  _pmActiveSubTab = tab.dataset.pmTab; // 플랫폼 필터로 재렌더링해도 보던 탭이 유지되도록 기억
+  card.querySelectorAll('[data-pm-tab]').forEach(b => b.classList.toggle('active', b === tab));
+  const want = tab.dataset.pmTab === 'metrics' ? 'pmPaneMetrics' : 'pmPaneVideos';
+  card.querySelectorAll('.pm-pane').forEach(p => p.classList.toggle('active', p.id === want));
+});
+
+// ── 프리미엄 지표 ─────────────────────────────────────────────────────
+// 채널별 상세 지표. CH_POST 와 같은 형태로 두어 실제 API 수신값으로 교체하기 쉽게 한다.
+// watch=평균 시청 시간(초), reach=도달, shares=공유수, age=연령대, country=국가코드
+// age/country 가 null 이면 "조회 불가"(크리에이터가 데이터를 제공하지 않은 경우)
+const CH_PREMIUM = {
+  0:  { watch: 34, reach: 128400, shares: 412, age: '25-34', country: 'KR', gender: 'F' },
+  1:  { watch: 21, reach:  46200, shares: 133, age: '25-34', country: 'KR', gender: 'M' },
+  2:  { watch: 29, reach:  31800, shares:  96, age: '35-44', country: 'KR', gender: 'F' },
+  3:  { watch: 18, reach:  14900, shares:  51, age: '25-34', country: 'KR', gender: 'F' },
+  4:  { watch: 26, reach:   9800, shares:  38, age: '25-34', country: 'KR', gender: 'M' },
+  5:  { watch: 41, reach:  52300, shares: 187, age: '45-54', country: 'KR', gender: 'M' },
+  6:  { watch: 33, reach:  74100, shares: 260, age: '25-34', country: 'KR', gender: 'F' },
+  7:  { watch: 37, reach:  43600, shares: 155, age: '35-44', country: 'KR', gender: 'M' },
+  8:  { watch: 24, reach:  18700, shares:  62, age: '45-54', country: 'KR', gender: 'F' },
+  9:  { watch: 45, reach:  96500, shares: 331, age: '25-34', country: 'KR', gender: 'F' },
+  10: { watch: 30, reach:  22400, shares:  79, age: null,    country: null, gender: null },
+  11: { watch: null, reach: 11200, shares:  44, age: null,   country: null, gender: null },
+};
+
+const GENDER_LABEL = { F: '여성', M: '남성' };
+const GENDER_COLOR = { F: '#DB2777', M: '#2563EB' };
+
+// 연령대 색 — dataviz 검증(전체 쌍, CVD 포함)을 통과한 조합.
+// 참조 시안의 indigo/purple/blue 조합은 적록색맹에서 ΔE 0.9~6.9 로 구분이 안 돼 교체했다.
+const AGE_ORDER  = ['25-34', '35-44', '45-54', '55+'];
+const AGE_COLOR  = { '25-34': '#FF4500', '35-44': '#2563EB', '45-54': '#16A34A', '55+': '#DB2777' };
+const NO_DATA_COLOR = '#94A3B8';
+const NO_DATA_LABEL = '기타';
+const COUNTRY_NAME = { KR: '대한민국', US: '미국', JP: '일본' };
+const COUNTRY_FLAG = { KR: '🇰🇷', US: '🇺🇸', JP: '🇯🇵' };
+// 국가 색 — AGE_COLOR와 동일한 검증된 3색(주황·파랑·초록)을 재사용(CVD 전체쌍 통과 조합)
+const COUNTRY_COLOR = { KR: '#FF4500', US: '#2563EB', JP: '#16A34A' };
+
+function hexA(hex, alpha) {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.substring(0, 2), 16), g = parseInt(h.substring(2, 4), 16), b = parseInt(h.substring(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+// 원형(도넛) 차트 — segments: [{ label, count, pct, color }], 그려지는 순서 = 배열 순서
+// 연령대·성별은 고정 순서를 유지해야 하므로 정렬은 호출부 책임, 여기서는 그리기만 한다
+// 세그먼트가 2개 이상일 때만 끝을 둥글린다 — 1개(100%)일 땐 이음매가 생겨 보기 흉해진다
+function donutSVG(segments, size, stroke) {
+  size = size || 148; stroke = stroke || 26;
+  const cx = size / 2, r = (size - stroke) / 2;
+  const circumf = 2 * Math.PI * r;
+  const rounded = segments.length > 1;
+  const gap = rounded ? stroke * 0.55 : 0; // 둥근 끝 두께만큼 여백을 넉넉히 둬 겹침 방지
+  let offset = 0;
+  const arcs = segments.map((seg, i) => {
+    const raw = (seg.pct / 100) * circumf;
+    const len = Math.max(raw - gap, 0.0001);
+    const circle = `<circle class="pm-arc" data-idx="${i}" cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${seg.color}"
+      stroke-width="${stroke}" stroke-linecap="${rounded ? 'round' : 'butt'}"
+      stroke-dasharray="${len} ${circumf - len}" stroke-dashoffset="${-offset}"
+      transform="rotate(-90 ${cx} ${cx})"><title>${seg.label} ${seg.pct}% · ${seg.count}개</title></circle>`;
+    offset += raw;
+    return circle;
+  }).join('');
+  const srLabel = segments.map(s => `${s.label} ${s.pct}%`).join(', ');
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="${srLabel}">
+    <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="var(--gray-bg)" stroke-width="${stroke}"/>
+    ${arcs}
+  </svg>`;
+}
+
+// 범례에 수치를 항상 함께 적어 색에만 의존하지 않게 한다 (도넛 공통 사용). 각 항목에
+// 도넛 세그먼트와 같은 data-idx를 달아 마우스오버 시 서로 강조되도록 연결한다.
+function donutLegend(segments) {
+  return `<div class="pm-dlegend">${segments.map((s, i) => `
+    <div class="pm-dlegend-item" data-idx="${i}">
+      <i style="background:${s.color}"></i>
+      <span class="pm-dlegend-lbl" title="${s.label}">${s.label}</span>
+      <span class="pm-dlegend-pct">${s.pct}%</span>
+    </div>`).join('')}</div>`;
+}
+
+// 도넛 중앙에는 비중이 가장 큰 구간을 그 색으로 강조해 띄운다 (그려지는 순서와 무관).
+// 전체 래퍼에 1등 구간 색의 은은한 글로우를 깔아 단조로운 링에 포인트를 준다.
+function donutCard(title, segments) {
+  const top = segments.reduce((a, b) => (b.pct > a.pct ? b : a), segments[0]);
+  return `
+    <div class="pm-chart-card">
+      <p class="pm-section-title">${title}</p>
+      <div class="pm-donut-wrap" style="--glow:${hexA(top.color, 0.30)}">
+        ${donutSVG(segments)}
+        <div class="pm-donut-center">
+          <span class="pm-donut-center-pct" style="color:${top.color}">${top.pct}%</span>
+          <span class="pm-donut-center-lbl" title="${top.label}">${top.label}</span>
+        </div>
+      </div>
+      ${donutLegend(segments)}
+    </div>`;
+}
+
+// 연령대는 구간이 순서를 가진 값(어릴수록/많을수록)이라 좌측 가로 막대가 더 바로 읽힌다 —
+// 라벨(좌) · 막대(가운데, 폭 = 비중) · 퍼센트(우) 한 줄에 한 구간씩.
+function ageBarCard(title, segments) {
+  // 막대 길이는 비중(%)을 그대로 쓴다 — 전체 대비 몫이므로 상대 스케일링 없이 그려야 왜곡이 없다.
+  const rows = segments.map(s => `
+    <div class="pm-hbar-row">
+      <span class="pm-hbar-lbl" title="${s.label}">${s.label}</span>
+      <div class="pm-hbar-track">
+        <div class="pm-hbar-fill" style="width:${s.pct}%;background:${s.color}"></div>
+      </div>
+      <span class="pm-hbar-val">${s.pct}%</span>
+    </div>`).join('');
+  return `
+    <div class="pm-chart-card pm-chart-card--bars">
+      <p class="pm-section-title">${title}</p>
+      <div class="pm-hbar-list">${rows}</div>
+    </div>`;
+}
+
+// 범례 ↔ 도넛 세그먼트 상호 강조 (마우스오버). 결과 패널은 매번 새로 그려지므로 위임으로 처리한다.
+function pmDonutFocus(card, idx) {
+  card.querySelectorAll('.pm-arc').forEach(c => {
+    const match = c.dataset.idx === idx;
+    c.classList.toggle('pm-arc--focus', match);
+    c.classList.toggle('pm-arc--dim', !match);
+  });
+  card.querySelectorAll('.pm-dlegend-item').forEach(it => it.classList.toggle('pm-dlegend-item--focus', it.dataset.idx === idx));
+}
+function pmDonutBlur(card) {
+  card.querySelectorAll('.pm-arc').forEach(c => c.classList.remove('pm-arc--focus', 'pm-arc--dim'));
+  card.querySelectorAll('.pm-dlegend-item').forEach(it => it.classList.remove('pm-dlegend-item--focus'));
+}
+document.addEventListener('mouseover', function(e) {
+  const target = e.target.closest('.pm-arc, .pm-dlegend-item');
+  if (!target) return;
+  const card = target.closest('.pm-chart-card');
+  if (!card) return;
+  pmDonutFocus(card, target.dataset.idx);
+});
+document.addEventListener('mouseout', function(e) {
+  const target = e.target.closest('.pm-arc, .pm-dlegend-item');
+  if (!target) return;
+  const card = target.closest('.pm-chart-card');
+  if (card) pmDonutBlur(card);
+});
+
+function fmtNum(n) { return n.toLocaleString('ko-KR'); }
+
+// 프리미엄 캠페인 전용 열. 프리미엄 지표 탭이 바로 이 값들을 집계한다.
+// 조회수당(p-detail)·업로드당(p-detail-upload) 표에는 넣지 않는다.
+function premiumCells(i) {
+  const d = CH_PREMIUM[i];
+  const none = '<span class="pm-cell-none">–</span>';
+  if (!d) return `<td class="pm-cell">${none}</td>`.repeat(5);
+  const age = d.age
+    ? `<span class="pm-chip" style="--c:${AGE_COLOR[d.age] || NO_DATA_COLOR}">${d.age}</span>` : none;
+  const cty = d.country
+    ? `<span class="pm-chip pm-chip--plain">${COUNTRY_FLAG[d.country] || '🌐'} ${d.country}</span>` : none;
+  const gen = d.gender
+    ? `<span class="pm-chip" style="--c:${GENDER_COLOR[d.gender] || NO_DATA_COLOR}">${GENDER_LABEL[d.gender] || d.gender}</span>` : none;
+  return `
+      <td class="pm-cell pm-cell--num">${d.shares != null ? fmtNum(d.shares) : none}</td>
+      <td class="pm-cell pm-cell--num">${d.watch != null ? d.watch + '초' : none}</td>
+      <td class="pm-cell">${cty}</td>
+      <td class="pm-cell">${age}</td>
+      <td class="pm-cell">${gen}</td>`;
+}
+
+function renderPremiumMetrics(doneItems) {
+  const total = doneItems.length;
+  if (!total) {
+    return `<div class="pm-empty">승인 완료된 영상이 없어 지표를 집계할 수 없습니다.</div>`;
+  }
+
+  const rows = doneItems.map(({ i }) => CH_PREMIUM[i]).filter(Boolean);
+  const provided = rows.length;
+  const watchRows = rows.filter(r => r.watch != null);
+  const avgWatch = watchRows.length
+    ? Math.round(watchRows.reduce((s, r) => s + r.watch, 0) / watchRows.length) : 0;
+  const totalReach  = rows.reduce((s, r) => s + (r.reach || 0), 0);
+  const totalShares = rows.reduce((s, r) => s + (r.shares || 0), 0);
+
+  // 연령대 집계 — 고정 순서 유지, 값이 있는 구간만 표시하고 미제공은 맨 뒤 중립색
+  const ageCount = {};
+  rows.forEach(r => { const k = r.age || '조회 불가'; ageCount[k] = (ageCount[k] || 0) + 1; });
+  const ageKeys = AGE_ORDER.filter(k => ageCount[k]).concat(ageCount['조회 불가'] ? ['조회 불가'] : []);
+  const ageSegments = ageKeys.map(k => ({
+    label: k === '조회 불가' ? NO_DATA_LABEL : k, count: ageCount[k], pct: Math.round(ageCount[k] / provided * 100),
+    color: k === '조회 불가' ? NO_DATA_COLOR : AGE_COLOR[k],
+  }));
+
+  // 성별 집계 — 연령대와 동일한 집계 방식. 미제공은 중립색으로 맨 뒤.
+  const genCount = {};
+  rows.forEach(r => { const k = r.gender || '조회 불가'; genCount[k] = (genCount[k] || 0) + 1; });
+  const genKeys = ['F', 'M'].filter(k => genCount[k]).concat(genCount['조회 불가'] ? ['조회 불가'] : []);
+  const genSegments = genKeys.map(k => ({
+    label: k === '조회 불가' ? NO_DATA_LABEL : (GENDER_LABEL[k] || k), count: genCount[k],
+    pct: Math.round(genCount[k] / provided * 100),
+    color: k === '조회 불가' ? NO_DATA_COLOR : GENDER_COLOR[k],
+  }));
+
+  // 국가 집계 — 최다 국가 순으로 정렬(국가는 연령대·성별과 달리 고정 순서가 없다)
+  const ctyCount = {};
+  rows.forEach(r => { const k = r.country || '조회 불가'; ctyCount[k] = (ctyCount[k] || 0) + 1; });
+  const ctyKeys = Object.keys(ctyCount).sort((a, b) => ctyCount[b] - ctyCount[a]);
+  const ctySegments = ctyKeys.map(k => ({
+    label: k === '조회 불가' ? NO_DATA_LABEL : (COUNTRY_NAME[k] || k), count: ctyCount[k],
+    pct: Math.round(ctyCount[k] / provided * 100),
+    color: k === '조회 불가' ? NO_DATA_COLOR : (COUNTRY_COLOR[k] || NO_DATA_COLOR),
+  }));
+
+  return `
+    <div class="pm-stat-grid">
+      <div class="pm-stat pm-stat--a"><p class="pm-stat-lbl">데이터 제공 영상</p><p class="pm-stat-num">${provided}개</p><p class="pm-stat-sub">전체 ${total}개 중</p></div>
+      <div class="pm-stat pm-stat--b"><p class="pm-stat-lbl">평균 시청 시간</p><p class="pm-stat-num">${avgWatch}초</p><p class="pm-stat-sub">${watchRows.length}개 영상 기준</p></div>
+      <div class="pm-stat pm-stat--c"><p class="pm-stat-lbl">총 도달</p><p class="pm-stat-num">${fmtNum(totalReach)}</p></div>
+      <div class="pm-stat pm-stat--d"><p class="pm-stat-lbl">총 공유수</p><p class="pm-stat-num">${fmtNum(totalShares)}</p></div>
+    </div>
+
+    <div class="pm-section-row">
+      ${ageBarCard('주요 연령대', ageSegments)}
+      ${donutCard('주요 성별', genSegments)}
+      ${donutCard('주요 국가', ctySegments)}
+    </div>`;
+}
+
+// ── 관리자 확정 시뮬레이션 (더미 토글) ──────────────────────────────
+const ADVANCE_MAP = { '최종 확정 중': '제작 중', '제작 중': '검토 필요', '수정 중': '검토 필요' };
+
+function advanceReviewState(idx) {
+  const i = Number(idx);
+  if (chState[i] !== 'selected') return;
+  const cur = chReviewState[i] || '최종 확정 중';
+  const next = ADVANCE_MAP[cur];
+  if (next) chReviewState[i] = next;
+  updateChSummary(); // renderReviewPanel + 탭 카드 ② 분포 갱신
+}
+
+// ── 크리에이터 거절 시뮬레이션 (더미 토글) ──────────────────────────
+function creatorRejectCh(idx) {
+  const i = Number(idx);
+  if (chState[i] !== 'selected') return;
+  chState[i] = 'rejected';
+  delete chReviewState[i];
+  renderChannels();
+  updateChSummary();
+}
+
+// ── 토스트 ───────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'ch-toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(() => t.classList.add('ch-toast--show'));
+  setTimeout(() => {
+    t.classList.remove('ch-toast--show');
+    setTimeout(() => t.remove(), 280);
+  }, 2500);
+}
+
+// ── 영상 검토 모달 ────────────────────────────────────────────────────
+// 캠페인 영상 링크 저장 (1개 통일)
+function saveChVideoLink() {
+  const input = document.getElementById('chVideoLink');
+  if (!input) return;
+  _chVideoLink = input.value.trim();
+  try { localStorage.setItem(CH_VIDEO_LINK_KEY, _chVideoLink); } catch (e) {}
+  const status = document.getElementById('chVideoLinkStatus');
+  if (status) {
+    status.textContent = _chVideoLink ? '✓ 저장됨 · 검토 시 이 링크가 열립니다' : '링크를 비웠습니다';
+    status.className = 'ch-rv-linkbar-status' + (_chVideoLink ? ' is-saved' : '');
+  }
+}
+
+// 수정 요청 팝업 — 영상은 행의 [영상 보기]로 빠졌으므로 이력 + 입력란만 보여준다
+function openRevisionModal(idx) {
+  _chReviewIdx = Number(idx);
+  const ch = channels[_chReviewIdx];
+  if (!ch) return;
+
+  const nameEl = document.getElementById('chRvModalName');
+  const metaEl = document.getElementById('chRvModalMeta');
+  if (nameEl) nameEl.textContent = `${ch.name} 수정 요청`;
+  if (metaEl) metaEl.textContent = `${ch.handle} · ${PLAT_LABEL[ch.platform] || ch.platform}`;
+
+  _renderRevisionHistory(_chReviewIdx);
+
+  const ta = document.getElementById('chRvRevisionText');
+  if (ta) { ta.value = ''; ta.addEventListener('input', _onRevisionInput); }
+  const btn = document.getElementById('chRvFooterSubmit');
+  if (btn) btn.disabled = true;
+  document.getElementById('chReviewModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (ta) ta.focus();
+}
+
+function _renderRevisionHistory(i) {
+  const histBox = document.getElementById('chRvHistBox');
+  if (!histBox) return;
+  const list = chRevisions[i] || [];
+  if (!list.length) { histBox.style.display = 'none'; histBox.innerHTML = ''; return; }
+  histBox.style.display = '';
+  histBox.innerHTML = `<div class="ch-rv-hist-title">수정 요청 내역</div>` + list.map(r => `
+    <div class="ch-rv-hist-item">
+      <div class="ch-rv-hist-meta"><span class="ch-rv-hist-round">${r.round}차 요청</span><span class="ch-rv-hist-ts">${r.ts}</span></div>
+      <div class="ch-rv-hist-text">${r.text}</div>
+    </div>`).join('');
+}
+
+function _onRevisionInput() {
+  const btn = document.getElementById('chRvFooterSubmit');
+  if (btn) btn.disabled = !this.value.trim();
+}
+
+function closeReviewModal() {
+  const modal = document.getElementById('chReviewModal');
+  if (modal) { modal.classList.remove('open'); document.body.style.overflow = ''; }
+  const ta = document.getElementById('chRvRevisionText');
+  if (ta) ta.removeEventListener('input', _onRevisionInput);
+  _chReviewIdx = null;
+}
+
+function approveReview(idx) {
+  const i = idx !== undefined ? Number(idx) : _chReviewIdx;
+  if (i === null || i === undefined) return;
+  chReviewState[i] = '승인 완료';
+  closeReviewModal();
+  updateChSummary();
+  showToast('승인되었습니다');
+}
+
+function submitRevision() {
+  const ta = document.getElementById('chRvRevisionText');
+  if (!ta || !ta.value.trim()) return;
+  if (_chReviewIdx === null) return;
+  const text = ta.value.trim();
+  if (!chRevisions[_chReviewIdx]) chRevisions[_chReviewIdx] = [];
+  const round = chRevisions[_chReviewIdx].length + 1;
+  const now = new Date();
+  const ts = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  chRevisions[_chReviewIdx].push({ round, ts, text });
+  chReviewState[_chReviewIdx] = '수정 중';
+  closeReviewModal();
+  updateChSummary();
+  showToast('수정 요청이 전달되었습니다');
+}
+
+// ── 수정 요청 로그 (관리자) ──────────────────────────────────────────
+// 확인 처리한 요청은 '<채널>-<회차>' 로 기억한다. TODO: 서버 저장으로 대체
+const _revChecked = new Set();
+let _revLogIdx = null;
+
+function openRevLogPanel(idx) {
+  if (!isAdminViewer()) return;
+  _revLogIdx = Number(idx);
+  const ch = channels[_revLogIdx];
+  if (!ch) return;
+  const meta = document.getElementById('chRevLogMeta');
+  if (meta) meta.textContent = `${ch.name} · ${ch.handle}`;
+  _renderRevLog();
+  document.getElementById('chRevSheet').removeAttribute('hidden');
+}
+
+function closeRevLogPanel() {
+  const el = document.getElementById('chRevSheet');
+  if (el) el.setAttribute('hidden', '');
+}
+
+function toggleRevCheck(idx, round) {
+  const key = `${idx}-${round}`;
+  if (_revChecked.has(key)) _revChecked.delete(key);
+  else _revChecked.add(key);
+  _renderRevLog();
+  renderReviewPanel();
+}
+
+function _renderRevLog() {
+  const list = document.getElementById('chRevLogList');
+  if (!list || _revLogIdx === null) return;
+  const revs = chRevisions[_revLogIdx] || [];
+  if (!revs.length) { list.innerHTML = `<div class="ch-revlog-empty">수정 요청 내역이 없습니다.</div>`; return; }
+  list.innerHTML = revs.slice().reverse().map(r => {
+    const key = `${_revLogIdx}-${r.round}`;
+    const on = _revChecked.has(key);
+    return `<div class="ch-revlog-item${on ? ' is-checked' : ''}">
+      <div class="ch-revlog-main">
+        <div class="ch-revlog-head"><span class="ch-revlog-round">${r.round}차 요청</span><span class="ch-revlog-ts">${r.ts}</span></div>
+        <div class="ch-revlog-text">${r.text}</div>
+      </div>
+      <button class="ch-revlog-check${on ? ' is-on' : ''}" data-fn="toggleRevCheck" data-args="${_revLogIdx}|${r.round}" title="확인 처리">
+        <span class="ch-revlog-box">${on ? '✓' : ''}</span><span>확인</span>
+      </button>
+    </div>`;
+  }).join('');
+}
+
+// ── 게시물 등록 시뮬레이션 토글 ─────────────────────────────────────────
+// TODO: 어드민 구축 시 POST /api/result/:channelId/register 로 대체
+function toggleSimPost(idx) {
+  const i = Number(idx);
+  if (_simPosted.has(i)) _simPosted.delete(i);
+  else _simPosted.add(i);
+  renderResultPanel();
+}
+
+// ── 컬럼 정렬 토글 ───────────────────────────────────────────────────
+const SORT_KEYS = ['subs', 'views', 'rate', 'repeat'];
+
+function chSortBy(key) {
+  if (_chSort === key) {
+    _chSortDir = _chSortDir === 'desc' ? 'asc' : 'desc';
+  } else {
+    _chSort = key;
+    _chSortDir = 'desc';
+  }
+  updateSortArrows();
+  renderChannels();
+}
+
+function updateSortArrows() {
+  SORT_KEYS.forEach(k => {
+    const el = document.getElementById(`chSortArr-${k}`);
+    if (!el) return;
+    if (k === _chSort) {
+      el.textContent = _chSortDir === 'desc' ? '↓' : '↑';
+      el.classList.add('ch-sort-arrow--active');
+    } else {
+      el.textContent = '↕';
+      el.classList.remove('ch-sort-arrow--active');
+    }
+  });
+}
+
+// ── 체크박스 & 벌크 선정 ────────────────────────────────────────────
+function toggleChCheck(idx) {
+  const i = Number(idx);
+  if (chState[i] !== 'pending') return;
+
+  if (_chChecked.has(i)) {
+    _chChecked.delete(i);
+  } else {
+    const selCount = Object.values(chState).filter(s => s === 'selected').length;
+    if (selCount + _chChecked.size >= GOAL) {
+      alert(`최대 ${GOAL}개까지 선정 가능합니다.\n현재 선정: ${selCount}개, 선택 중: ${_chChecked.size}개`);
+      return;
+    }
+    _chChecked.add(i);
+  }
+  updateChActionBar();
+  renderChannels();
+}
+
+function updateChActionBar() {
+  const bar   = document.getElementById('chBulkBar');
+  const label = document.getElementById('chBulkLabel');
+  if (!bar) return;
+  if (_chChecked.size > 0) {
+    bar.style.display = '';
+    if (label) label.textContent = `${_chChecked.size}개 선택됨`;
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+function selectChecked() {
+  if (_chChecked.size === 0) return;
+  const selCount = Object.values(chState).filter(s => s === 'selected').length;
+  if (selCount + _chChecked.size > GOAL) {
+    alert(`최대 ${GOAL}개까지 선정 가능합니다.\n현재 선정 ${selCount}개 + 선택 ${_chChecked.size}개 = ${selCount + _chChecked.size}개`);
+    return;
+  }
+  const countEl = document.getElementById('chModalCount');
+  const listEl  = document.getElementById('chModalList');
+  if (countEl) countEl.textContent = _chChecked.size;
+  if (listEl) {
+    listEl.innerHTML = [..._chChecked].sort((a, b) => a - b).map(i => {
+      const ch = channels[i];
+      return `<div class="ch-modal-row">
+        <div class="ch-modal-emoji">${ch.emoji}</div>
+        <div>
+          <div class="ch-modal-name">${ch.name}</div>
+          <div class="ch-modal-meta">${ch.handle} · 구독자 ${fmtSubs(ch.subsNum)}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  const modal = document.getElementById('chSelectModal');
+  if (modal) { modal.classList.add('open'); document.body.style.overflow = 'hidden'; }
+}
+
+// ── 단일 채널 선정 모달 ──────────────────────────────────────────────
+function openChSelectModal(idx) {
+  _chPendingIdx = Number(idx);
+  const ch = channels[_chPendingIdx];
+  if (!ch) return;
+  const thumbEl = document.getElementById('chSingleThumb');
+  const nameEl  = document.getElementById('chSingleName');
+  const metaEl  = document.getElementById('chSingleMeta');
+  if (thumbEl) thumbEl.textContent = ch.emoji;
+  if (nameEl)  nameEl.textContent  = ch.name;
+  if (metaEl)  metaEl.textContent  = `${ch.handle} · ${ch.cat} · 구독자 ${fmtSubs(ch.subsNum)}`;
+  const modal = document.getElementById('chSingleModal');
+  if (modal) { modal.classList.add('open'); document.body.style.overflow = 'hidden'; }
+}
+
+function closeSingleModal() {
+  const modal = document.getElementById('chSingleModal');
+  if (modal) { modal.classList.remove('open'); document.body.style.overflow = ''; }
+  _chPendingIdx = null;
+}
+
+function confirmChSelect() {
+  if (_chPendingIdx === null) return;
+  const selCount = Object.values(chState).filter(s => s === 'selected').length;
+  if (selCount >= GOAL) { closeSingleModal(); return; }
+  chState[_chPendingIdx] = 'selected';
+  chReviewState[_chPendingIdx] = '최종 확정 중';
+  _chChecked.delete(_chPendingIdx);
+  closeSingleModal();
+  updateChActionBar();
+  renderChannels();
+  updateChSummary();
+}
+
+function closeChSelectModal() {
+  const modal = document.getElementById('chSelectModal');
+  if (modal) { modal.classList.remove('open'); document.body.style.overflow = ''; }
+}
+
+function confirmChSelectMulti() {
+  [..._chChecked].forEach(i => { chState[i] = 'selected'; chReviewState[i] = '최종 확정 중'; });
+  _chChecked.clear();
+  closeChSelectModal();
+  updateChActionBar();
+  renderChannels();
+  updateChSummary();
+}
+
+function clearChecked() {
+  _chChecked.clear();
+  updateChActionBar();
+  renderChannels();
+}
+
+// ── 개별 액션 ────────────────────────────────────────────────────────
+function rejectCh(idx) {
+  const i = Number(idx);
+  _chChecked.delete(i);
+  chState[i] = 'rejected';
+  updateChActionBar();
+  renderChannels();
+  updateChSummary();
+}
+
+function undoCh(idx) {
+  const i = Number(idx);
+  if (chState[i] !== 'rejected') return; // 선정 취소 불가, 반려만 되돌리기 가능
+  chState[i] = 'pending';
+  renderChannels();
+  updateChSummary();
+}
+
+// ── 상태 필터 칩 ─────────────────────────────────────────────────────
+function chSetStatus(val) {
+  _chFilterStatus = val || '';
+  document.querySelectorAll('#chPanel0 .ch-chip').forEach(btn => {
+    btn.classList.toggle('ch-chip--active', (btn.dataset.args || '') === _chFilterStatus);
+  });
+  renderChannels();
+}
+
+function chSetReviewStatus(val) {
+  _chReviewFilter = val || '';
+  renderReviewPanel();
+}
+
+// ── 프리미엄 카드 진행률 갱신 (광고주 p-list + 관리자 p-admin 공통) ───────
+function updateListCardPremium() {
+  const doneCount = channels.reduce((n, _, i) =>
+    n + (chState[i] === 'selected' && chReviewState[i] === '승인 완료' ? 1 : 0), 0);
+  const pct     = Math.round(doneCount / GOAL * 100);
+  const fillPct = Math.min(pct, 100);
+  const pctCls  = pct >= 100 ? 'card-progress-pct over' : 'card-progress-pct';
+  const textHtml = `${doneCount} / ${GOAL}개 <span class="${pctCls}">(${pct}%)</span>`;
+
+  // 광고주 카드(premium*)와 관리자 카드(admPremium*) 둘 다 갱신
+  [['premiumCardProgress', 'premiumCardHint', 'premiumProgressFill', 'premiumProgressText'],
+   ['admPremiumCardProgress', 'admPremiumCardHint', 'admPremiumProgressFill', 'admPremiumProgressText']]
+    .forEach(([wrapId, hintId, fillId, textId]) => {
+      const wrap = document.getElementById(wrapId), hint = document.getElementById(hintId);
+      if (!wrap || !hint) return;
+      wrap.style.display = '';
+      hint.style.display = 'none';
+      const fill = document.getElementById(fillId); if (fill) fill.style.width = `${fillPct}%`;
+      const text = document.getElementById(textId); if (text) text.innerHTML = textHtml;
+    });
+}
+
+// ── 조회수 갱신 (API / 크롤링 연동 예정) ──────────────────────────────
+// TODO: GET /api/result/:campaignId/views 응답으로 테이블 행 업데이트
+// 플랫폼이 복수인 캠페인에서는 옆에 .vid-plat-select가 함께 렌더링되고,
+// 선택된 플랫폼별로 "하루 1회" 제한과 갱신 동작이 독립적으로 적용된다.
+// 서버가 알려준 다음 갱신 가능 시각(nextAt)으로 제한 모달을 연다
+function _openRefreshLimitModal(nextAt, platSuffix) {
+  const next = nextAt ? new Date(nextAt) : (() => { const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(0, 0, 0, 0); return d; })();
+  const nextEl = document.getElementById('refreshNextTime');
+  if (nextEl) nextEl.textContent = '다음 갱신 가능 시간' + platSuffix + ': ' + next.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' }) + ' 오전 12:00';
+  const modal = document.getElementById('refreshLimitModal');
+  if (modal) modal.classList.add('open');
+}
+
+async function refreshViewCounts() {
+  // 페이지 wrapper 전체가 DOM에 항상 존재하므로(비활성 페이지는 display:none)
+  // 동일 클래스 버튼이 여럿일 수 있다 — 실제로 보이는 것만 대상으로 한다.
+  const btn = [...document.querySelectorAll('.vid-refresh-btn')].find(b => b.offsetParent !== null);
+  if (!btn || btn.disabled) return;
+
+  const select = btn.closest('.vid-head-actions')?.querySelector('.vid-plat-select');
+  const platform = select ? select.value : 'all';
+  const platLabel = platform === 'all' ? '전체' : (PLAT_NAME_KO[platform] || platform);
+  const platSuffix = select ? ` · ${platLabel}` : '';
+
+  // ── 서버 모드: 관리자 로그인 + 참여 영상 표 화면 → 서버가 하루 1회 한도를 관리하고 YouTube API로 실제 수치를 가져온다 ──
+  const pageId = ruCampaignKey();
+  if (Api.enabled && Api.isLoggedIn() && Api.isAdmin() && ['p-detail', 'p-detail-upload'].includes(pageId) && (Api.isUp() || await Api.ping())) {
+    const orig0 = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = select ? `갱신 중… (${platLabel})` : '갱신 중…';
+    const r = await Api.req('/api/refresh', { method: 'POST', body: { campaign: pageId, platform } });
+    btn.disabled = false;
+    btn.innerHTML = orig0;
+    if (r.status === 429 && r.data && r.data.error === 'limit') { _openRefreshLimitModal(r.data.nextAt, platSuffix); return; }
+    if (!r.ok) { alert(r.error || '조회수 갱신에 실패했습니다.'); return; }
+    const table = findVisibleVidTable();
+    if (table && r.data.rows) ruApplyRowsToTable(table, r.data.rows);
+    if (r.data.pub) ruShowPubState(r.data.pub);
+    const lines = Object.entries(r.data.results || {}).map(([p, v]) => {
+      const n = PLAT_NAME_KO[p] || p;
+      if (v.status === 'ok') return `${n}: ${v.updated}/${v.requested}개 갱신`;
+      if (v.status === 'limited') return `${n}: 오늘 이미 갱신함`;
+      return `${n}: ${v.message || v.status}`;
+    });
+    showToast(lines.join(' · '));
+    return;
+  }
+
+  const TODAY = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
+  const LAST_KEY = 'cs_refresh_last_' + platform; // 플랫폼별 독립된 하루 1회 제한
+
+  if (localStorage.getItem(LAST_KEY) === TODAY) {
+    // 오늘 이미 갱신 완료(해당 플랫폼) → 제한 모달 표시
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    const nextEl = document.getElementById('refreshNextTime');
+    if (nextEl) {
+      nextEl.textContent = '다음 갱신 가능 시간' + platSuffix + ': ' + tomorrow.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' }) + ' 오전 12:00';
+    }
+    const modal = document.getElementById('refreshLimitModal');
+    if (modal) modal.classList.add('open');
+    return;
+  }
+
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = select ? `갱신 중… (${platLabel})` : '갱신 중…';
+  // 연동 전 1.2s 로딩 시뮬레이션
+  setTimeout(() => {
+    localStorage.setItem(LAST_KEY, TODAY);
+    btn.disabled = false;
+    btn.innerHTML = orig;
+    // 연동 완료 후: renderResultPanel() 또는 개별 행 업데이트(platform 스코프로 교체)
+  }, 1200);
+}
+
+// 광고주 프리미엄 카드 진행바를 로드 시점에 반영 (goTo 경로를 안 거쳐도 정확한 값)
+try { updateListCardPremium(); } catch (e) {}

@@ -4794,3 +4794,5 @@ body[data-viewer-role="admin"] span.admin-only { display: inline !important; }
 .ch-revlog-item--admin { border-left:3px solid var(--orange); background:var(--orange-pale, #FFF5EE); }
 .ch-revlog-item--brand { border-left:3px solid var(--gray-mid, #9ca3af); }
 .ch-rv-hist-item--admin { border-left:3px solid var(--orange); padding-left:8px; }
+
+.adm-logout[hidden] { display:none; }

@@ -396,6 +396,9 @@ function goMyPage() {
 function updateGnbSession() {
   const mp = document.getElementById('gnb-mypage');
   if (mp) mp.hidden = !Api.isLoggedIn();
+  // 로그인한 상태에서는 내 페이지의 [돌아가기](로그인 화면으로 가는 버튼)를 보이지 않는다 — 로그아웃은 상단 메뉴에 있다
+  const back = document.getElementById('admBackBtn');
+  if (back) back.hidden = Api.isLoggedIn();
   const b = document.querySelector('.gnb-btn-login:not(.gnb-btn-mypage)');
   if (!b) return;
   if (Api.isLoggedIn()) { b.textContent = '로그아웃'; b.dataset.fn = 'doLogout'; delete b.dataset.args; }

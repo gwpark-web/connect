@@ -135,7 +135,7 @@ function goTo(id) {
     if (id === 'p-channels' && window._pmNextCtx) { const n = window._pmNextCtx; window._pmNextCtx = null; pmEnsureContext(n.key, n.vals); }
     else pmEnsureContext('demo');
   }
-  if (id === 'p-channels') { updateSortArrows(); renderChannels(); updateChSummary(); }
+  if (id === 'p-channels') { updateSortArrows(); renderChannels(); updateChSummary(); if (typeof pmLogLoad === 'function') pmLogLoad(); }
   if (id === 'p-list' || id === 'p-admin') { if (typeof updateListCardPremium === 'function') updateListCardPremium(); }
   if (id === 'p1') { setTimeout(runStatCountUp, 200); }
   // 검토용 백엔드에 저장된 참여 영상 데이터가 있으면 복원(서버 미실행 시 조용히 무시)
@@ -2551,7 +2551,7 @@ async function submitCampaignReg() {
     chSortBy, chSetStatus, chSetReviewStatus, chSwitchTab,
     advanceReviewState, creatorRejectCh,
     openRevisionModal, closeReviewModal, approveReview, submitRevision, saveChVideoLink,
-    openRevLogPanel, closeRevLogPanel, toggleRevCheck,
+    openRevLogPanel, closeRevLogPanel, toggleRevCheck, postRevLogComment,
     toggleSimPost,
     pmSetPlatformFilter,
     refreshViewCounts,

@@ -241,6 +241,47 @@ async function route(req, res) {
     store.save();
     return send(req, res, 200, { meta: cur, pub: pubState(db, key) });
   }
+  /* 짤 회원 조회(CID 목록) — 프리미엄 채널 업로드가 YouTube 정보와 함께 짤 회원 여부를 확인한다. 저장된 목록 + 짤 어드민 직접 조회 */
+  if (p === '/api/zeal/lookup' && m === 'POST') {
+    const user = need(req, res, 'admin'); if (!user) return;
+    const b = await readJson(req);
+    const cids = [...new Set((Array.isArray(b.cids) ? b.cids : []).map(c => str(c, 30)).filter(c => /^UC[0-9A-Za-z_-]{22}$/.test(c)))].slice(0, 60);
+    if (!cids.length) return send(req, res, 400, { error: '올바른 채널 ID(UC...)가 없습니다.' });
+    const r = await zeal.lookup(cids);
+    const out = {};
+    Object.keys(r.members).forEach(cid => { const mem = r.members[cid]; out[cid] = { id: mem.id, nick: mem.nick, phone: mem.phone, channels: mem.channels, note: mem.note }; });
+    return send(req, res, 200, { members: out, status: r.status, warning: r.warning });
+  }
+
+  /* 프리미엄 채널별 소통 로그 — 광고주의 수정 요청과 관리자·광고주의 의견을 한 흐름으로 저장한다.
+     key 는 기본 예시(p-channels) 또는 등록한 프리미엄 캠페인 id, ch 는 채널 식별자(CID·핸들·이름) */
+  if (p === '/api/premium-log' && m === 'GET') {
+    const user = need(req, res); if (!user) return;
+    const key = url.searchParams.get('campaign') || '';
+    if (!CAMPAIGN_KEY.test(key)) return send(req, res, 400, { error: 'campaign 값이 올바르지 않습니다.' });
+    const db = store.get();
+    if (!canReadKey(user, db, key)) return send(req, res, 403, { error: '이 캠페인을 볼 권한이 없습니다.' });
+    return send(req, res, 200, { log: db.premiumLog[key] || {} });
+  }
+  if (p === '/api/premium-log' && m === 'POST') {
+    const user = need(req, res); if (!user) return;
+    const key = url.searchParams.get('campaign') || '';
+    if (!CAMPAIGN_KEY.test(key)) return send(req, res, 400, { error: 'campaign 값이 올바르지 않습니다.' });
+    const db = store.get();
+    if (!canReadKey(user, db, key)) return send(req, res, 403, { error: '이 캠페인을 볼 권한이 없습니다.' });
+    const b = await readJson(req);
+    const ch = str(b.ch, 80); const text = str(b.text, 1000);
+    if (!ch || !text) return send(req, res, 400, { error: '채널과 내용을 입력해주세요.' });
+    const kind = b.kind === 'revision' ? 'revision' : 'comment';
+    if (kind === 'revision' && user.role === 'admin') return send(req, res, 403, { error: '수정 요청은 광고주만 보낼 수 있습니다.' });
+    const camp = (db.premiumLog[key] = db.premiumLog[key] || {});
+    const thread = (camp[ch] = camp[ch] || []);
+    if (thread.length >= 300) return send(req, res, 400, { error: '이 채널의 소통 기록이 너무 많습니다.' });
+    const entry = { id: 'm_' + crypto.randomBytes(5).toString('hex'), kind, by: user.role === 'admin' ? 'admin' : 'advertiser', name: user.role === 'admin' ? '관리자' : (user.brand || user.name || '광고주'), text, at: new Date().toISOString() };
+    thread.push(entry); store.save();
+    return send(req, res, 201, { entry, thread });
+  }
+
   /* 참여 영상 행 삭제 — 서버에 올린 행이면 지우고, 예시(화면에만 있는) 행이면 '삭제됨' 표시를 남긴다. 광고주에게는 [연동] 후 반영된다 */
   if (p === '/api/videos/delete' && m === 'POST') {
     const user = need(req, res, 'admin'); if (!user) return;

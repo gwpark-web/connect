@@ -216,6 +216,9 @@ const CH_POST = {
 let _simPosted = new Set([0, 6]);
 
 // ── 채널별 수정 요청 히스토리 (더미: 시간순 누적) ────────────────────
+// 채널별 의견(광고주·관리자가 수정 요청과 별개로 남기는 글): { 채널 index: [{by, name, text, ts, sid?}] }
+const chComments = {};
+
 const chRevisions = {
   0: [
     { round: 1, ts: '2025-07-14 14:32', text: '인트로 부분 브랜드 로고 노출 시간이 짧습니다. 3초 이상으로 늘려주세요.' },
@@ -272,7 +275,7 @@ let _chSortDir      = 'desc';
 //  · 그 외  : 관리자가 보고서로 등록한 새 프리미엄 캠페인 — 채널 0개로 시작해서 [채널 업로드]로 채운다
 // 상태는 이 브라우저 탭 안에서만 유지된다(서버 저장은 아직 없다 — 선정·검토 상태 저장은 별도 작업).
 const PM = { current: 'demo', store: new Map(), demoHeader: null };
-const _pmObjs = () => ({ chState, chReviewState, CH_VIDEO, CH_POST, chRevisions, CH_PREMIUM });
+const _pmObjs = () => ({ chState, chReviewState, CH_VIDEO, CH_POST, chRevisions, chComments, CH_PREMIUM });
 
 function _pmCapture() {
   const snap = {
@@ -297,7 +300,7 @@ function _pmApply(s) {
 const _pmEmpty = goal => ({
   channels: [], goal, simPosted: new Set(), checked: new Set(), filter: '', rvFilter: '', sort: 'subs', sortDir: 'desc',
   tab: 0, platFilter: 'all', subTab: 'videos', videoLink: '',
-  chState: {}, chReviewState: {}, CH_VIDEO: {}, CH_POST: {}, chRevisions: {}, CH_PREMIUM: {},
+  chState: {}, chReviewState: {}, CH_VIDEO: {}, CH_POST: {}, chRevisions: {}, chComments: {}, CH_PREMIUM: {},
 });
 
 // 헤더(이름·상태·목표·플랫폼)와 "/ 30" 같은 정적 문구를 현재 캠페인에 맞춘다. vals 가 없으면 데모 원래 문구로 되돌린다.
@@ -563,8 +566,24 @@ const CH_DB_CATS = ['엔터테인먼트', '커뮤니티·썰', '음악', '패션
 /* ② 기존 DB 소스 — 평균 참여율 · 카테고리 · 참여 이력 · 짤 여부
    카테고리·참여율·이력은 아직 연결할 DB가 없다 → 서버 모드에서는 지어낸 값을 넣지 않고
    '미분류·0'으로 둔다(데모에서만 CID 고정 더미). 짤 여부는 항상 실제 회원 DB(ZEAL_MEMBERS)를 조회한다. */
+// 짤 회원 확인 — 서버가 있으면 저장된 목록 + 짤 어드민 직접 조회(CID 기준), 없으면 이 화면의 목록만 본다.
+// 조회된 회원 정보는 ZEAL_MEMBERS 에 합쳐 표의 짤 배지·짤 패널이 바로 쓴다. 경고(로그인 만료 등)는 _chZealWarning 에 남긴다.
+let _chZealWarning = '';
+async function chZealLookup(cids) {
+  _chZealWarning = '';
+  const valid = [...new Set(cids)].filter(c => /^UC[0-9A-Za-z_-]{22}$/.test(c));
+  if (!valid.length || !(Api.enabled && Api.isLoggedIn() && Api.isAdmin() && (Api.isUp() || await Api.ping()))) return;
+  for (let k = 0; k < valid.length; k += 60) {
+    const r = await Api.req('/api/zeal/lookup', { method: 'POST', body: { cids: valid.slice(k, k + 60) } });
+    if (!r.ok) { _chZealWarning = r.error || '짤 회원 조회에 실패했습니다.'; return; }
+    Object.assign(ZEAL_MEMBERS, r.data.members || {});
+    if (r.data.warning) _chZealWarning = r.data.warning;
+  }
+}
+
 async function chUploadFetchDb(cids) {
   const serverMode = Api.enabled && (Api.isUp() || await Api.ping());
+  await chZealLookup(cids);
   const out = {};
   cids.forEach(cid => {
     const s = _chuSeed(cid);
@@ -658,12 +677,13 @@ async function chUploadRun() {
     return;
   }
 
-  let added = 0, missing = 0, dbHit = 0;
+  let added = 0, missing = 0, dbHit = 0, zealHit = 0;
   cids.forEach(cid => {
     const y = yt[cid];
     if (!y) { missing++; return; }   // 유튜브에 없는 CID는 행을 만들지 않는다
     const d = db[cid] || {};
     if (d.hit) dbHit++;
+    if (d.zeal) zealHit++;
     channels.push({
       emoji: '🎬', name: y.name, handle: y.handle, cid, cat: d.cat || '미분류',
       platform: 'yt', subsNum: y.subsNum, subs: y.subs, views: y.views, viewsNum: y.viewsNum, shortsCounted: y.shortsCounted,
@@ -676,7 +696,7 @@ async function chUploadRun() {
   renderChannels();
   updateChSummary();
   closeChUploadModal();
-  showToast(`${added}개 채널 추가 · DB 이력 ${dbHit}개` + (missing ? ` · 조회 실패 ${missing}개` : ''));
+  showToast(`${added}개 채널 추가 · 짤 회원 ${zealHit}명` + (missing ? ` · 조회 실패 ${missing}개` : '') + (_chZealWarning ? ` · ⚠ ${_chZealWarning}` : ''));
 }
 
 
@@ -715,9 +735,15 @@ async function chRefreshStats() {
     _chStatsBusy = false;
     if (btn) { btn.disabled = false; btn.innerHTML = orig; }
   }
+  await chZealLookup(targets.map(t => t.ch.cid));
   renderChannels();
-  showToast(`${ok}개 채널을 갱신했습니다` + (fail ? ` · 조회 실패 ${fail}개` : '') + (channels.length > targets.length ? ` · CID가 없는 ${channels.length - targets.length}개는 그대로` : ''));
+  showToast(`${ok}개 채널을 갱신했습니다` + (fail ? ` · 조회 실패 ${fail}개` : '') + (channels.length > targets.length ? ` · CID가 없는 ${channels.length - targets.length}개는 그대로` : '') + (_chZealWarning ? ` · ⚠ ${_chZealWarning}` : ''));
 }
+
+// 소통 창: ⌘/Ctrl + Enter 로 의견 등록
+document.addEventListener('keydown', e => {
+  if (e.target && e.target.id === 'chRevLogInput' && (e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); postRevLogComment(); }
+});
 
 (function initChUpload() {
   const ta = document.getElementById('chuCidText');
@@ -906,9 +932,10 @@ function renderReviewPanel() {
       '검토 필요': `${VIEW_BTN}<button class="ch-rv-sim-btn" data-fn="openRevisionModal" data-args="${i}">수정 요청</button><button class="ch-rv-review-btn" data-fn="approveReview" data-args="${i}">승인</button>`,
       '수정 중':   `${VIEW_BTN}<button class="ch-rv-sim-btn" data-fn="openRevisionModal" data-args="${i}">수정 요청</button><button class="ch-rv-review-btn" data-fn="approveReview" data-args="${i}">승인</button>`,
     };
-    const LOG_BTN = revs.length
-      ? `<button class="ch-rv-log-btn" data-fn="openRevLogPanel" data-args="${i}">수정 요청 ${revs.length}건${unchecked ? `<span class="ch-rv-log-dot"></span>` : ''}</button>`
-      : '';
+    const cmts = chComments[i] || [];
+    // 소통 버튼: 관리자·광고주 모두 — 수정 요청 N건 · 의견 M건, 아무것도 없으면 "의견 남기기"
+    const logLabel = [revs.length ? `수정 요청 ${revs.length}건` : '', cmts.length ? `의견 ${cmts.length}건` : ''].filter(Boolean).join(' · ') || '의견 남기기';
+    const LOG_BTN = `<button class="ch-rv-log-btn" data-fn="openRevLogPanel" data-args="${i}">${logLabel}${isAdmin && unchecked ? `<span class="ch-rv-log-dot"></span>` : ''}</button>`;
     const simBtns = ADMIN_BTN[rs] || `<span class="ch-rv-sim-inactive">진행 중</span>`;
     return `<div class="ch-rv-item">
       <div class="ch-rv-left">
@@ -921,7 +948,7 @@ function renderReviewPanel() {
       <span class="ch-rv-badge ${badgeCls}">${rs}</span>
       ${isAdmin
         ? `<div class="ch-rv-sim">${LOG_BTN}<span class="ch-rv-sim-label">시뮬</span>${simBtns}</div>`
-        : (BRAND_BTN[rs] ? `<div class="ch-rv-sim">${BRAND_BTN[rs]}</div>` : '')}
+        : `<div class="ch-rv-sim">${LOG_BTN}${BRAND_BTN[rs] || ''}</div>`}
     </div>`;
   }).join('');
 }
@@ -1520,17 +1547,67 @@ function openRevisionModal(idx) {
   if (ta) ta.focus();
 }
 
+// ── 채널별 소통(수정 요청 + 의견) ────────────────────────────────────
+// 광고주의 수정 요청과 관리자·광고주의 의견을 한 흐름으로 보여 준다. 서버에 연결되어 있으면 서버에 저장되어
+// 다른 브라우저(관리자 ↔ 광고주)에서도 보인다. 화면은 이 페이지를 열 때·소통 창을 열 때 서버 내용으로 맞춘다.
+const chKey = ch => String((ch && (ch.cid || ch.handle || ch.name)) || '');
+const _logKey = () => (PM.current === 'demo' ? 'p-channels' : PM.current);
+const _logServer = () => Api.enabled && Api.isLoggedIn() && !String(_logKey()).startsWith('local-');
+const _pad2 = n => String(n).padStart(2, '0');
+const _logTs = iso => { const d = new Date(iso); return isNaN(d) ? String(iso || '') : `${d.getFullYear()}-${_pad2(d.getMonth() + 1)}-${_pad2(d.getDate())} ${_pad2(d.getHours())}:${_pad2(d.getMinutes())}`; };
+
+// 서버 로그를 이 화면의 상태에 합친다. 예시(데모)로 들어 있던 항목(sid 없음)은 그대로 두고 서버 항목만 갈아 끼운다.
+function _pmMergeLog(log, onlyKey) {
+  channels.forEach((ch, i) => {
+    const k = chKey(ch);
+    if (!k || (onlyKey && k !== onlyKey)) return;
+    const thread = log[k];
+    if (!thread && !onlyKey) { chRevisions[i] = (chRevisions[i] || []).filter(r => !r.sid && !r.tmp); chComments[i] = (chComments[i] || []).filter(m => !m.sid && !m.tmp); return; }
+    const base = (chRevisions[i] || []).filter(r => !r.sid && !r.tmp);
+    let n = base.length;
+    const revs = (thread || []).filter(e => e.kind === 'revision').map(e => ({ round: ++n, ts: _logTs(e.at), text: e.text, sid: e.id, by: e.by, name: e.name }));
+    chRevisions[i] = base.concat(revs);
+    chComments[i] = (thread || []).filter(e => e.kind === 'comment').map(e => ({ by: e.by, name: e.name, text: e.text, ts: _logTs(e.at), sid: e.id }));
+  });
+}
+
+async function pmLogLoad() {
+  if (!_logServer()) return;
+  const r = await Api.req('/api/premium-log?campaign=' + encodeURIComponent(_logKey()));
+  if (!r.ok || !r.data) return;
+  _pmMergeLog(r.data.log || {});
+  if (typeof renderReviewPanel === 'function') renderReviewPanel();
+  if (_revLogIdx !== null && !document.getElementById('chRevSheet')?.hasAttribute('hidden')) _renderRevLog();
+}
+
+// 서버에 한 건 올리고, 돌려받은 그 채널의 전체 흐름으로 맞춘다. 서버가 없으면 이 화면에만 남긴다.
+async function _pmLogPost(i, kind, text) {
+  const ch = channels[i]; if (!ch) return false;
+  if (!_logServer()) return false;
+  const r = await Api.req('/api/premium-log?campaign=' + encodeURIComponent(_logKey()), { method: 'POST', body: { ch: chKey(ch), kind, text } });
+  if (!r.ok) { alert(r.error || '서버에 저장하지 못했습니다. 이 화면에만 남았습니다.'); return false; }
+  _pmMergeLog({ [chKey(ch)]: r.data.thread }, chKey(ch));
+  return true;
+}
+
 function _renderRevisionHistory(i) {
   const histBox = document.getElementById('chRvHistBox');
   if (!histBox) return;
   const list = chRevisions[i] || [];
-  if (!list.length) { histBox.style.display = 'none'; histBox.innerHTML = ''; return; }
+  const adminCmts = (chComments[i] || []).filter(m => m.by === 'admin');
+  if (!list.length && !adminCmts.length) { histBox.style.display = 'none'; histBox.innerHTML = ''; return; }
   histBox.style.display = '';
-  histBox.innerHTML = `<div class="ch-rv-hist-title">수정 요청 내역</div>` + list.map(r => `
+  const items = list.map(r => ({ ts: r.ts, html: `
     <div class="ch-rv-hist-item">
-      <div class="ch-rv-hist-meta"><span class="ch-rv-hist-round">${r.round}차 요청</span><span class="ch-rv-hist-ts">${r.ts}</span></div>
-      <div class="ch-rv-hist-text">${r.text}</div>
-    </div>`).join('');
+      <div class="ch-rv-hist-meta"><span class="ch-rv-hist-round">${r.round}차 요청</span><span class="ch-rv-hist-ts">${escHtml(r.ts)}</span></div>
+      <div class="ch-rv-hist-text">${escHtml(r.text)}</div>
+    </div>` })).concat(adminCmts.map(m => ({ ts: m.ts, html: `
+    <div class="ch-rv-hist-item ch-rv-hist-item--admin">
+      <div class="ch-rv-hist-meta"><span class="ch-rv-hist-round">관리자 답변</span><span class="ch-rv-hist-ts">${escHtml(m.ts)}</span></div>
+      <div class="ch-rv-hist-text">${escHtml(m.text)}</div>
+    </div>` })));
+  items.sort((a, b) => String(a.ts).localeCompare(String(b.ts)));
+  histBox.innerHTML = `<div class="ch-rv-hist-title">수정 요청 내역</div>` + items.map(x => x.html).join('');
 }
 
 function _onRevisionInput() {
@@ -1564,11 +1641,14 @@ function submitRevision() {
   const round = chRevisions[_chReviewIdx].length + 1;
   const now = new Date();
   const ts = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-  chRevisions[_chReviewIdx].push({ round, ts, text });
-  chReviewState[_chReviewIdx] = '수정 중';
+  const idxSent = _chReviewIdx;
+  chRevisions[idxSent].push({ round, ts, text, tmp: true });
+  chReviewState[idxSent] = '수정 중';
   closeReviewModal();
   updateChSummary();
   showToast('수정 요청이 전달되었습니다');
+  // 서버에 올려 관리자 화면(다른 브라우저)에서도 보이게 한다 — 성공하면 서버 기록으로 교체된다
+  _pmLogPost(idxSent, 'revision', text).then(ok => { if (ok) { renderReviewPanel(); } });
 }
 
 // ── 수정 요청 로그 (관리자) ──────────────────────────────────────────
@@ -1577,14 +1657,36 @@ const _revChecked = new Set();
 let _revLogIdx = null;
 
 function openRevLogPanel(idx) {
-  if (!isAdminViewer()) return;
   _revLogIdx = Number(idx);
   const ch = channels[_revLogIdx];
   if (!ch) return;
   const meta = document.getElementById('chRevLogMeta');
   if (meta) meta.textContent = `${ch.name} · ${ch.handle}`;
+  const input = document.getElementById('chRevLogInput'); if (input) input.value = '';
   _renderRevLog();
   document.getElementById('chRevSheet').removeAttribute('hidden');
+  pmLogLoad();   // 다른 사람이 남긴 글이 있으면 최신으로 맞춘다
+}
+
+// 소통 창에서 의견 등록 — 관리자·광고주 모두 쓸 수 있다
+async function postRevLogComment() {
+  const input = document.getElementById('chRevLogInput');
+  const text = (input?.value || '').trim();
+  if (!text || _revLogIdx === null) return;
+  const i = _revLogIdx;
+  const btn = document.getElementById('chRevLogPost'); if (btn) btn.disabled = true;
+  const role = isAdminViewer() ? 'admin' : 'advertiser';
+  if (_logServer()) {
+    const ok = await _pmLogPost(i, 'comment', text);
+    if (!ok) { if (btn) btn.disabled = false; return; }
+  } else {
+    // 서버가 없으면(데모) 이 화면에만 남긴다
+    (chComments[i] = chComments[i] || []).push({ by: role, name: role === 'admin' ? '관리자' : '광고주', text, ts: _logTs(new Date()), tmp: true });
+  }
+  if (input) input.value = '';
+  if (btn) btn.disabled = false;
+  _renderRevLog();
+  renderReviewPanel();
 }
 
 function closeRevLogPanel() {
@@ -1603,19 +1705,31 @@ function toggleRevCheck(idx, round) {
 function _renderRevLog() {
   const list = document.getElementById('chRevLogList');
   if (!list || _revLogIdx === null) return;
-  const revs = chRevisions[_revLogIdx] || [];
-  if (!revs.length) { list.innerHTML = `<div class="ch-revlog-empty">수정 요청 내역이 없습니다.</div>`; return; }
-  list.innerHTML = revs.slice().reverse().map(r => {
-    const key = `${_revLogIdx}-${r.round}`;
-    const on = _revChecked.has(key);
+  const admin = isAdminViewer();
+  const items = [];
+  (chRevisions[_revLogIdx] || []).forEach(r => items.push({ type: 'rev', ts: r.ts, r }));
+  (chComments[_revLogIdx] || []).forEach(m => items.push({ type: 'cmt', ts: m.ts, m }));
+  if (!items.length) { list.innerHTML = `<div class="ch-revlog-empty">아직 소통 내역이 없습니다. 아래에서 의견을 남겨 보세요.</div>`; return; }
+  items.sort((a, b) => String(b.ts).localeCompare(String(a.ts)));   // 최신이 위
+  list.innerHTML = items.map(it => {
+    if (it.type === 'cmt') {
+      const m = it.m, mine = m.by === (admin ? 'admin' : 'advertiser');
+      return `<div class="ch-revlog-item ch-revlog-item--${m.by === 'admin' ? 'admin' : 'brand'}${mine ? ' is-mine' : ''}">
+        <div class="ch-revlog-main">
+          <div class="ch-revlog-head"><span class="ch-revlog-round">${m.by === 'admin' ? '관리자' : escHtml(m.name || '광고주')} 의견</span><span class="ch-revlog-ts">${escHtml(m.ts)}</span></div>
+          <div class="ch-revlog-text">${escHtml(m.text)}</div>
+        </div>
+      </div>`;
+    }
+    const r = it.r, key = `${_revLogIdx}-${r.round}`, on = _revChecked.has(key);
     return `<div class="ch-revlog-item${on ? ' is-checked' : ''}">
       <div class="ch-revlog-main">
-        <div class="ch-revlog-head"><span class="ch-revlog-round">${r.round}차 요청</span><span class="ch-revlog-ts">${r.ts}</span></div>
-        <div class="ch-revlog-text">${r.text}</div>
+        <div class="ch-revlog-head"><span class="ch-revlog-round">${r.round}차 요청</span><span class="ch-revlog-ts">${escHtml(r.ts)}</span></div>
+        <div class="ch-revlog-text">${escHtml(r.text)}</div>
       </div>
-      <button class="ch-revlog-check${on ? ' is-on' : ''}" data-fn="toggleRevCheck" data-args="${_revLogIdx}|${r.round}" title="확인 처리">
+      ${admin ? `<button class="ch-revlog-check${on ? ' is-on' : ''}" data-fn="toggleRevCheck" data-args="${_revLogIdx}|${r.round}" title="확인 처리">
         <span class="ch-revlog-box">${on ? '✓' : ''}</span><span>확인</span>
-      </button>
+      </button>` : ''}
     </div>`;
   }).join('');
 }

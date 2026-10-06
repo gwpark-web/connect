@@ -4784,3 +4784,13 @@ body[data-viewer-role="admin"] span.admin-only { display: inline !important; }
 .ch-name-link:hover { color: var(--orange); border-bottom-color: var(--orange); }
 .ch-bulk-confirm-btn:disabled { opacity: .45; cursor: not-allowed; }
 #chPanel0 .ch-check-all { cursor: pointer; width: 16px; height: 16px; accent-color: var(--orange); }
+
+/* 수정 요청·의견 소통 창 */
+.ch-revlog-compose { display:flex; flex-direction:column; gap:8px; margin:12px 0 16px; }
+.ch-revlog-input { width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid var(--border); border-radius:10px; font:inherit; font-size:13px; resize:vertical; min-height:70px; }
+.ch-revlog-input:focus { outline:none; border-color:var(--orange); }
+.ch-revlog-post { align-self:flex-end; margin:0; padding:7px 18px; font-size:12px; }
+.ch-revlog-post:disabled { opacity:.5; cursor:not-allowed; }
+.ch-revlog-item--admin { border-left:3px solid var(--orange); background:var(--orange-pale, #FFF5EE); }
+.ch-revlog-item--brand { border-left:3px solid var(--gray-mid, #9ca3af); }
+.ch-rv-hist-item--admin { border-left:3px solid var(--orange); padding-left:8px; }

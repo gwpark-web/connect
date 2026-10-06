@@ -7,7 +7,7 @@
 <title>커넥트 스튜디오 — 광고주 플랫폼</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/bebas-neue@5/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
-<link href="style.css?v=20261006m" rel="stylesheet">
+<link href="style.css?v=20261006n" rel="stylesheet">
 <script>
   // 이모지 세로 보정값이 폰트마다 달라 Windows(Segoe UI Emoji)만 따로 표시한다
   if (/Win/i.test(navigator.userAgentData?.platform || navigator.platform || '')) {
@@ -2886,20 +2886,24 @@
 </div>
 
 <script src="emailjs.min.js"></script>
-<script src="api.js?v=20261006m"></script>
-<script src="xlsx.js?v=20261006m"></script>
-<script src="channels.js?v=20261006m"></script>
+<script src="api.js?v=20261006n"></script>
+<script src="xlsx.js?v=20261006n"></script>
+<script src="channels.js?v=20261006n"></script>
 <!-- ── 짤 회원 사이드패널 ── -->
 <!-- ── 수정 요청 로그 (관리자) ── -->
 <div class="sc-sheet" id="chRevSheet" hidden>
   <div class="sc-sheet-scrim" data-fn="closeRevLogPanel"></div>
   <div class="sc-sheet-panel">
     <div class="sc-sheet-head">
-      <h2>수정 요청 로그</h2>
+      <h2>수정 요청 · 의견</h2>
       <button class="adm-modal-x" data-fn="closeRevLogPanel">&#x2715;</button>
     </div>
     <div class="sc-sheet-body">
       <div class="ch-revlog-meta" id="chRevLogMeta"></div>
+      <div class="ch-revlog-compose">
+        <textarea id="chRevLogInput" class="ch-revlog-input" rows="3" maxlength="1000" placeholder="이 채널에 대한 의견을 남겨 주세요. (⌘/Ctrl + Enter 로 등록)"></textarea>
+        <button class="btn-new-campaign ch-revlog-post" id="chRevLogPost" data-fn="postRevLogComment">등록</button>
+      </div>
       <div class="ch-revlog-list" id="chRevLogList"></div>
     </div>
   </div>
@@ -3219,6 +3223,6 @@
   </div>
 </div>
 
-<script src="site.js?v=20261006m"></script>
+<script src="site.js?v=20261006n"></script>
 </body>
 </html>

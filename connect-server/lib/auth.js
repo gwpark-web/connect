@@ -72,6 +72,8 @@ function fromRequest(req) {
 
 const configured = () => accounts().length > 0;
 // 비밀번호가 8자 미만인 계정(시작할 때 경고용). 비밀번호 값은 내보내지 않고 계정 이름만 돌려준다.
+// 비밀번호가 8자 미만인 계정인지(인터넷으로 들어오는 로그인을 막을 때 쓴다). 없는 계정은 false
+const isWeak = email => { const em = String(email || '').trim().toLowerCase(); const f = accounts().find(a => a.email === em); return !!f && f.password.length < 8; };
 const weakAccounts = () => accounts().filter(a => a.password.length < 8).map(a => a.email);
 
-module.exports = { login, sign, fromRequest, configured, weakAccounts };
+module.exports = { login, sign, fromRequest, configured, weakAccounts, isWeak };

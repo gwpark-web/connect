@@ -63,8 +63,10 @@ node server.js           # http://localhost:4000
 
 내 컴퓨터에서 켠 서버를 GitHub Pages 사이트에 연결해 다른 사람이 쓰게 하는 방법입니다(시연·검토용).
 
-1. `.env` 의 `ADMIN_PASSWORD`, `ADVERTISERS` 비밀번호를 **8자 이상 긴 값**으로 바꾸고 `TOKEN_SECRET` 에 긴 임의 문자열을 넣습니다.
-   (터널로 들어오는 로그인은 비밀번호가 8자 미만이면 서버가 막습니다.)
+1. 기존 계정 비밀번호는 그대로 둬도 됩니다. 다만 **비밀번호가 8자 미만인 계정은 터널(인터넷) 로그인이 막히고**, 이 컴퓨터에서 직접 접속할 때만 쓸 수 있습니다.
+   다른 사람에게 줄 **공유용 계정**은 `.env` 의 `ADVERTISERS` 에 8자 이상 긴 비밀번호로 새로 추가하세요(예: `ADVERTISERS=기존계정;share@회사.com|긴-비밀번호|브랜드명`).
+   약한 비밀번호 계정도 터널로 쓰려면 `.env` 에 `ALLOW_WEAK_TUNNEL_LOGIN=1` 을 넣을 수 있습니다(위험: 터널 주소를 아는 사람이 추측해 들어올 수 있고, 관리자 계정은 짤 회원 연락처까지 볼 수 있음).
+   `TOKEN_SECRET` 에는 긴 임의 문자열을 넣습니다(서버를 처음 켜면 자동 생성되기도 합니다).
 2. `.env` 의 `ALLOWED_ORIGINS` 에 `https://gwpark-web.github.io` 를 추가합니다.
 3. 처음 한 번 `node gen-identity.js` 를 실행합니다. `.env` 에 신원 키가 생기고 공개키가 출력됩니다.
    공개키가 `connect/api.js` 의 `SERVER_PUBKEY` 와 같아야 합니다(다르면 사이트가 서버를 거부합니다).

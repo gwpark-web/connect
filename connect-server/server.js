@@ -69,6 +69,8 @@ function need(req, res, role) {
 /* ── 접속자 구분 ──
    Cloudflare 터널을 거치면 서버에는 모든 요청이 이 컴퓨터(127.0.0.1)에서 온 것처럼 보인다.
    그래서 요청이 이 컴퓨터에서 왔을 때만 터널이 붙여 주는 CF-Connecting-IP(실제 접속자 주소)를 믿는다. */
+// .env 에 ALLOW_WEAK_TUNNEL_LOGIN=1 을 직접 넣으면, 약한 비밀번호 계정도 터널(인터넷)로 로그인할 수 있다(기본은 꺼짐 — 위험을 알고 쓰는 선택)
+const ALLOW_WEAK_TUNNEL = /^(1|true|yes)$/i.test(String(process.env.ALLOW_WEAK_TUNNEL_LOGIN || '').trim());
 const isLoopback = a => a === '127.0.0.1' || a === '::1' || a === '::ffff:127.0.0.1';
 const viaTunnel = req => isLoopback(req.socket.remoteAddress) && !!req.headers['cf-connecting-ip'];
 const clientIp = req => viaTunnel(req) ? String(req.headers['cf-connecting-ip']).slice(0, 64) : req.socket.remoteAddress;
@@ -125,8 +127,9 @@ async function route(req, res) {
     if (tooManyLogins(clientIp(req))) return send(req, res, 429, { error: '로그인 시도가 너무 많습니다. 잠시 후 다시 시도하세요.' });
     const b = await readJson(req);
     if (!auth.configured()) return send(req, res, 503, { error: '서버에 계정이 설정되어 있지 않습니다(.env 의 ADMIN_EMAIL/ADMIN_PASSWORD).' });
-    // 터널(인터넷)을 통한 로그인은 비밀번호가 약하면 막는다 — 이 컴퓨터에서 직접 접속하는 것만 허용
-    if (viaTunnel(req) && auth.weakAccounts().length) return send(req, res, 503, { error: '서버 비밀번호가 약해서(8자 미만) 외부 접속 로그인을 막아 두었습니다. 서버 .env 의 비밀번호를 바꾼 뒤 서버를 다시 켜주세요.' });
+    // 터널(인터넷)을 통한 로그인은 비밀번호가 약한(8자 미만) 계정만 막는다 — 그 계정은 이 컴퓨터에서 직접 접속할 때만 쓸 수 있다.
+    // 긴 비밀번호의 공유용 계정은 터널로도 로그인된다.
+    if (!ALLOW_WEAK_TUNNEL && viaTunnel(req) && auth.isWeak(b.email)) return send(req, res, 503, { error: '이 계정은 비밀번호가 짧아(8자 미만) 인터넷(터널) 접속에서는 로그인할 수 없습니다. 이 컴퓨터에서 직접 접속하거나, 8자 이상 비밀번호의 공유용 계정을 쓰세요.' });
     const user = auth.login(b.email, b.password);
     if (!user) return send(req, res, 401, { error: '아이디(이메일) 또는 비밀번호를 확인해주세요.' });
     return send(req, res, 200, { token: auth.sign(user), user });
@@ -435,6 +438,7 @@ server.listen(PORT, HOST, () => {
   const weak = auth.weakAccounts();
   if (weak.length) console.log(`  ⚠ 짧은 비밀번호 계정이 있습니다(${weak.join(', ')}) — 로컬 테스트용으로만 쓰고, 서버를 공개하기 전에 바꾸세요.`);
   console.log(`  로그인 계정: ${auth.configured() ? '설정됨' : '없음(.env 필요)'}  ·  YouTube API: ${yt.configured() ? '설정됨' : '키 없음'}  ·  짤 어드민: ${zeal.liveConfigured() ? '직접 조회' : '연결 안 됨(저장된 목록만)'}`);
+  if (ALLOW_WEAK_TUNNEL && weak.length) console.log(`  ⚠ ALLOW_WEAK_TUNNEL_LOGIN 이 켜져 있어 약한 비밀번호 계정(${weak.join(', ')})도 터널(인터넷)로 로그인됩니다. 터널 주소를 아는 사람은 누구나 시도할 수 있으니 공유 범위를 좁히고, 쓰지 않을 때는 터널을 끄세요.`);
   console.log(`  서버 신원 키: ${identity.configured() ? '있음(?api= 연결 가능)' : '없음 — node gen-identity.js 로 만드세요(?api= 연결 불가)'}`);
   if (migrated) console.log(`  짤 회원 ${migrated}명을 data-zeal.json 에서 가져왔습니다.`);
   console.log(`  허용 출처: ${ORIGINS.join(', ')}`);

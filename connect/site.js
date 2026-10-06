@@ -2546,7 +2546,7 @@ async function submitCampaignReg() {
     openStatModal, closeStatModal,
     openChSelectModal, closeSingleModal, confirmChSelect,
     closeChSelectModal, confirmChSelectMulti,
-    toggleChCheck, selectChecked, viewCheckedChannels, clearChecked, openPremiumCampaign, openCampaignDetail, chRefreshStats,
+    toggleChCheck, toggleChCheckAll, selectChecked, viewCheckedChannels, clearChecked, openPremiumCampaign, openCampaignDetail, chRefreshStats,
     rejectCh, undoCh,
     chSortBy, chSetStatus, chSetReviewStatus, chSwitchTab,
     advanceReviewState, creatorRejectCh,

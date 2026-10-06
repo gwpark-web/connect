@@ -4778,3 +4778,9 @@ body[data-viewer-role="admin"] span.admin-only { display: inline !important; }
 
 /* 헤더 썸네일에 이미지가 들어갈 때 */
 .cd-thumb img { width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block; }
+
+/* 채널명 링크 — 눌러서 해당 플랫폼의 채널 페이지 열기 */
+.ch-name-link { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; }
+.ch-name-link:hover { color: var(--orange); border-bottom-color: var(--orange); }
+.ch-bulk-confirm-btn:disabled { opacity: .45; cursor: not-allowed; }
+#chPanel0 .ch-check-all { cursor: pointer; width: 16px; height: 16px; accent-color: var(--orange); }

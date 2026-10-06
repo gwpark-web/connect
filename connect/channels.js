@@ -453,9 +453,6 @@ function renderChannels() {
   const rcEl = document.getElementById('chResultCount');
   if (rcEl) rcEl.textContent = `${list.length}개 채널`;
 
-  const selCount = Object.values(chState).filter(s => s === 'selected').length;
-  const isMaxed  = selCount >= GOAL;
-
   if (!list.length) {
     const noneYet = !channels.length;
     const msg = !noneYet ? '검색 결과가 없습니다.'
@@ -468,11 +465,10 @@ function renderChannels() {
     const state = chState[i];
     const rowCls = state === 'selected' ? 'ch-row--selected' : state === 'rejected' ? 'ch-row--rejected' : '';
 
-    const canCheck = state === 'pending' && !isMaxed;
+    // 체크는 모든 행에서 할 수 있다(채널 보기용). 선정은 체크한 것 중 '미검토' 채널만 대상이 된다.
     const isChecked = _chChecked.has(i);
     const checkCell = `<td class="ch-check-cell">
-      <input type="checkbox" class="ch-row-check" data-fn="toggleChCheck" data-args="${i}"
-        ${!canCheck && !isChecked ? 'disabled' : ''}
+      <input type="checkbox" class="ch-row-check" data-fn="toggleChCheck" data-args="${i}" aria-label="${escHtml(ch.name)} 선택"
         ${isChecked ? 'checked' : ''}>
     </td>`;
 
@@ -489,7 +485,7 @@ function renderChannels() {
       <tr class="${rowCls}" id="chtr${i}">
         ${checkCell}
         <td style="text-align:center;padding:0 4px">${platBadge(ch.platform)}</td>
-        <td><div class="ch-name">${escHtml(ch.name)}</div></td>
+        <td><div class="ch-name">${(() => { const u = chChannelUrl(ch); return u ? `<a class="ch-name-link" href="${escHtml(u)}" target="_blank" rel="noopener noreferrer" title="${escHtml(PLAT_NAME_KO[ch.platform] || '')} 채널 열기">${escHtml(ch.name)}</a>` : escHtml(ch.name); })()}</div></td>
         <td style="text-align:center"><span class="cat-tag">${ch.cat}</span></td>
         <td class="n-cell">${fmtSubs(ch.subsNum)}</td>
         <td class="n-cell"${ch.shortsCounted ? ` title="최근 쇼츠 ${ch.shortsCounted}개의 평균 조회수"` : ''}>${ch.views}<div class="n-sub">평균</div></td>
@@ -498,6 +494,7 @@ function renderChannels() {
         <td class="ch-action-cell">${actionHtml}</td>
       </tr>`;
   }).join('');
+  updateChActionBar();   // 머리글 체크박스 상태도 목록에 맞춘다
 }
 
 // ── 채널 리스트 업로드 (관리자) ───────────────────────────────────────
@@ -1663,18 +1660,20 @@ function updateSortArrows() {
 // ── 체크박스 & 벌크 선정 ────────────────────────────────────────────
 function toggleChCheck(idx) {
   const i = Number(idx);
-  if (chState[i] !== 'pending') return;
+  if (!channels[i]) return;
+  if (_chChecked.has(i)) _chChecked.delete(i); else _chChecked.add(i);
+  updateChActionBar();
+  renderChannels();
+}
 
-  if (_chChecked.has(i)) {
-    _chChecked.delete(i);
-  } else {
-    const selCount = Object.values(chState).filter(s => s === 'selected').length;
-    if (selCount + _chChecked.size >= GOAL) {
-      alert(`최대 ${GOAL}개까지 선정 가능합니다.\n현재 선정: ${selCount}개, 선택 중: ${_chChecked.size}개`);
-      return;
-    }
-    _chChecked.add(i);
-  }
+// 체크한 채널 중 선정할 수 있는(미검토) 채널
+const _chPendingChecked = () => [..._chChecked].filter(i => chState[i] === 'pending');
+
+// 머리글 체크박스 — 지금 표에 보이는 채널을 모두 체크/해제(일괄 보기)
+function toggleChCheckAll() {
+  const shown = filteredIndices().map(({ i }) => i);
+  const allOn = shown.length > 0 && shown.every(i => _chChecked.has(i));
+  shown.forEach(i => { if (allOn) _chChecked.delete(i); else _chChecked.add(i); });
   updateChActionBar();
   renderChannels();
 }
@@ -1711,23 +1710,35 @@ function updateChActionBar() {
   if (_chChecked.size > 0) {
     bar.style.display = '';
     if (label) label.textContent = `${_chChecked.size}개 선택됨`;
+    // 선정은 미검토 채널만 — 체크한 것 중 미검토가 없으면 선정 버튼을 쓸 수 없다
+    const pend = _chPendingChecked().length;
+    const sel = bar.querySelector('.ch-bulk-confirm-btn');
+    if (sel) { sel.disabled = pend === 0; sel.textContent = pend ? `선택 채널 선정하기 (${pend})` : '선택 채널 선정하기'; sel.title = pend ? '' : '체크한 채널 중 미검토 채널이 없습니다'; }
   } else {
     bar.style.display = 'none';
+  }
+  // 머리글 체크박스 상태
+  const all = document.querySelector('#chPanel0 .ch-check-all');
+  if (all) {
+    const shown = filteredIndices().map(({ i }) => i), n = shown.filter(i => _chChecked.has(i)).length;
+    all.checked = shown.length > 0 && n === shown.length;
+    all.indeterminate = n > 0 && n < shown.length;
   }
 }
 
 function selectChecked() {
-  if (_chChecked.size === 0) return;
+  const pending = _chPendingChecked();
+  if (pending.length === 0) { showToast('체크한 채널 중 선정할 수 있는(미검토) 채널이 없습니다.'); return; }
   const selCount = Object.values(chState).filter(s => s === 'selected').length;
-  if (selCount + _chChecked.size > GOAL) {
-    alert(`최대 ${GOAL}개까지 선정 가능합니다.\n현재 선정 ${selCount}개 + 선택 ${_chChecked.size}개 = ${selCount + _chChecked.size}개`);
+  if (selCount + pending.length > GOAL) {
+    alert(`최대 ${GOAL}개까지 선정 가능합니다.\n현재 선정 ${selCount}개 + 선택 ${pending.length}개 = ${selCount + pending.length}개`);
     return;
   }
   const countEl = document.getElementById('chModalCount');
   const listEl  = document.getElementById('chModalList');
-  if (countEl) countEl.textContent = _chChecked.size;
+  if (countEl) countEl.textContent = pending.length;
   if (listEl) {
-    listEl.innerHTML = [..._chChecked].sort((a, b) => a - b).map(i => {
+    listEl.innerHTML = pending.sort((a, b) => a - b).map(i => {
       const ch = channels[i];
       return `<div class="ch-modal-row">
         <div class="ch-modal-emoji">${ch.emoji}</div>
@@ -1782,8 +1793,7 @@ function closeChSelectModal() {
 }
 
 function confirmChSelectMulti() {
-  [..._chChecked].forEach(i => { chState[i] = 'selected'; chReviewState[i] = '최종 확정 중'; });
-  _chChecked.clear();
+  _chPendingChecked().forEach(i => { chState[i] = 'selected'; chReviewState[i] = '최종 확정 중'; _chChecked.delete(i); });
   closeChSelectModal();
   updateChActionBar();
   renderChannels();

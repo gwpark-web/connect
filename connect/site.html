@@ -7,7 +7,7 @@
 <title>커넥트 스튜디오 — 광고주 플랫폼</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/bebas-neue@5/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
-<link href="style.css?v=20261006o" rel="stylesheet">
+<link href="style.css?v=20261006p" rel="stylesheet">
 <script>
   // 이모지 세로 보정값이 폰트마다 달라 Windows(Segoe UI Emoji)만 따로 표시한다
   if (/Win/i.test(navigator.userAgentData?.platform || navigator.platform || '')) {
@@ -1143,7 +1143,7 @@
             <th style="width:56px"><button class="vid-sort-btn">참여율 ↕</button></th>
             <th style="width:56px"><button class="vid-sort-btn">좋아요 ↕</button></th>
             <th style="width:48px"><button class="vid-sort-btn">댓글 ↕</button></th>
-            <th style="width:52px;text-align:center">유료광고</th>
+            <th style="width:72px;text-align:center">유료광고</th>
             <th class="zeal-col" style="width:52px;text-align:center">짤</th>
             <th class="vid-vis-col">상태</th>
             <th class="vid-del-col"></th>
@@ -1461,7 +1461,7 @@
             <th style="width:56px"><button class="vid-sort-btn">참여율 ↕</button></th>
             <th style="width:56px"><button class="vid-sort-btn">좋아요 ↕</button></th>
             <th style="width:48px"><button class="vid-sort-btn">댓글 ↕</button></th>
-            <th style="width:52px;text-align:center">유료광고</th>
+            <th style="width:72px;text-align:center">유료광고</th>
             <th class="zeal-col" style="width:52px;text-align:center">짤</th>
             <th class="vid-vis-col">상태</th>
             <th class="vid-del-col"></th>
@@ -2060,7 +2060,7 @@
             <th style="width:56px"><button class="vid-sort-btn">참여율 ↕</button></th>
             <th style="width:56px"><button class="vid-sort-btn">좋아요 ↕</button></th>
             <th style="width:48px"><button class="vid-sort-btn">댓글 ↕</button></th>
-            <th style="width:52px;text-align:center">유료광고</th>
+            <th style="width:72px;text-align:center">유료광고</th>
             <th class="zeal-col" style="width:52px;text-align:center">짤</th>
             <th class="vid-vis-col">상태</th>
             <th class="vid-del-col"></th>
@@ -2824,7 +2824,7 @@
               <p class="ru-info-title">자동 조회</p>
               <p class="ru-info-desc">엑셀(.xlsx) 또는 CSV 파일에서 <b>URL</b> 열만 읽습니다. 다른 열은 무시합니다.</p>
               <p class="ru-info-desc">① URL로 YouTube에서 채널명·구독자·영상 정보·조회수를 가져오고 ② 채널 ID(CID)로 짤 회원 정보까지 조회해 표를 채웁니다.</p>
-              <p class="ru-info-note">유튜브 영상 주소만 가능합니다(인스타그램·틱톡은 준비 중). 같은 채널의 영상은 한 줄로 합쳐집니다. 조회 후 [저장]을 누르면 유튜브 기존 데이터는 모두 지워지고 조회한 내용으로 교체됩니다(다른 플랫폼·다른 캠페인은 그대로).</p>
+              <p class="ru-info-note">유튜브 영상 주소만 가능합니다(인스타그램·틱톡은 준비 중). 유료광고 표기도 YouTube에서 함께 확인합니다. 같은 채널의 영상은 한 줄로 합쳐집니다. 조회 후 [저장]을 누르면 유튜브 기존 데이터는 모두 지워지고 조회한 내용으로 교체됩니다(다른 플랫폼·다른 캠페인은 그대로).</p>
             </div>
             <button class="ru-sample-btn" data-fn="downloadSampleFile" data-args="auto">
               샘플 다운로드(.xlsx)
@@ -2886,9 +2886,9 @@
 </div>
 
 <script src="emailjs.min.js"></script>
-<script src="api.js?v=20261006o"></script>
-<script src="xlsx.js?v=20261006o"></script>
-<script src="channels.js?v=20261006o"></script>
+<script src="api.js?v=20261006p"></script>
+<script src="xlsx.js?v=20261006p"></script>
+<script src="channels.js?v=20261006p"></script>
 <!-- ── 짤 회원 사이드패널 ── -->
 <!-- ── 수정 요청 로그 (관리자) ── -->
 <div class="sc-sheet" id="chRevSheet" hidden>
@@ -2924,8 +2924,7 @@
         <span class="zeal-info-label">닉네임</span><span class="zeal-info-value" id="zealPanelNick">-</span>
         <span class="zeal-info-label">짤ID</span><span class="zeal-info-value" id="zealPanelId">-</span>
         <span class="zeal-info-label">연락처</span><span class="zeal-info-value" id="zealPanelPhone">-</span>
-        <span class="zeal-info-label">보유채널</span><span class="zeal-info-value" id="zealPanelChannels">-</span>
-        <span class="zeal-info-label">채널 ID(CID)</span><span class="zeal-info-value" id="zealPanelCid">-</span>
+        <span class="zeal-info-label">채널 ID</span><span class="zeal-info-value" id="zealPanelCid">-</span>
         <span class="zeal-info-label">비고</span><span class="zeal-info-value" id="zealPanelNote">-</span>
       </div>
 
@@ -3223,6 +3222,6 @@
   </div>
 </div>
 
-<script src="site.js?v=20261006o"></script>
+<script src="site.js?v=20261006p"></script>
 </body>
 </html>

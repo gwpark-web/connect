@@ -1293,6 +1293,19 @@ function ruApplyRowsToTable(table, rows, opts) {
         if (!tds[colIdx].querySelector('.ch-plat-icon')) tds[colIdx].innerHTML = key ? platBadge(key) : escHtml(val);
         return;
       }
+      if (field === '유료광고') {
+        // 유튜브가 영상에 붙인 유료광고 표기 — 있음/없음/확인불가 배지(값이 '-' 이면 건드리지 않는다)
+        const raw = String(val).trim();
+        // '✓'·'-' 는 예시 행이 쓰는 표기라 그대로 둔다(내려받아 다시 올려도 모양이 바뀌지 않게)
+        const yes = /^(있음|✅|yes|y|true)$/i.test(raw), no = /^(없음|❌|no|n|false)$/i.test(raw), unk = /^(확인불가|❓)$/.test(raw);
+        if (yes || no || unk) {
+          const sp = document.createElement('span'); sp.className = 'vid-paid vid-paid--' + (yes ? 'yes' : no ? 'no' : 'unk');
+          sp.textContent = yes ? '있음' : no ? '없음' : '확인불가';
+          tds[colIdx].textContent = ''; tds[colIdx].appendChild(sp);
+          return;
+        }
+        // 그 밖의 값('✓' 등 예시 표기)은 아래 일반 글자 처리로 넘긴다
+      }
       if (field === '상태') {
         // 공개/비공개 배지 — 글자와 함께 색 클래스도 맞춘다
         const v = tds[colIdx].querySelector('.vid-vis');
@@ -1483,10 +1496,11 @@ function ruKeptRows(table, plats) {
 }
 
 // 저장 결과 안내 — 올린 플랫폼은 새로 덮어썼고, 올리지 않은 플랫폼은 그대로 뒀다는 것을 알려준다
-function ruSaveSummary(count, plats, replaced, kept, where) {
+function ruSaveSummary(count, plats, replaced, kept, where, paid) {
   const names = plats.map(p => PLAT_NAME_KO[p] || p).join('·');
   let msg = `${count}개 ${where} 저장 완료\n${names} 기존 ${replaced}개를 지우고 새로 등록했습니다`;
   if (kept) msg += `\n(올리지 않은 다른 플랫폼 ${kept}개는 그대로 유지)`;
+  if (paid) msg += `\n유료광고 표기를 YouTube에서 확인한 영상 ${paid}개`;
   return msg;
 }
 
@@ -1500,7 +1514,7 @@ async function saveAutoLookup() {
   ruApplyRowsToTable(table, r.data.rows, { replace: true });
   ruShowPubState(r.data.pub);
   closeReportUploadModal();
-  alert(ruSaveSummary(r.data.added, r.data.platforms, r.data.replaced, ruKeptRows(table, r.data.platforms), '서버에'));
+  alert(ruSaveSummary(r.data.added, r.data.platforms, r.data.replaced, ruKeptRows(table, r.data.platforms), '서버에', r.data.paidChecked));
 }
 
 async function applyReportCsv() {
@@ -1515,7 +1529,7 @@ async function applyReportCsv() {
     ruApplyRowsToTable(table, r.data.rows, { replace: true });
     ruShowPubState(r.data.pub);
     closeReportUploadModal();
-    alert(ruSaveSummary(r.data.added, r.data.platforms, r.data.replaced, ruKeptRows(table, r.data.platforms), '서버에'));
+    alert(ruSaveSummary(r.data.added, r.data.platforms, r.data.replaced, ruKeptRows(table, r.data.platforms), '서버에', r.data.paidChecked));
     return;
   }
   // 서버가 없으면 화면에만 반영(새로고침하면 초기화)

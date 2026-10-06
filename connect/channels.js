@@ -64,7 +64,7 @@ const ZEAL_MEMBERS = {
 // 짤 회원 정보를 화면 메모리·패널에서 모두 지운다(로그아웃하거나 관리자가 아닌 계정으로 바뀔 때)
 function zealClear() {
   Object.keys(ZEAL_MEMBERS).forEach(k => delete ZEAL_MEMBERS[k]);
-  ['zealPanelNick', 'zealPanelId', 'zealPanelPhone', 'zealPanelChannels', 'zealPanelNote'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = ''; });
+  ['zealPanelNick', 'zealPanelId', 'zealPanelPhone', 'zealPanelCid', 'zealPanelNote'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = ''; });
   const memo = document.getElementById('zealMemoHistory'); if (memo) memo.innerHTML = '';
   const input = document.getElementById('zealMemoInput'); if (input) input.value = '';
   try { closeZealPanel(); } catch (e) {}
@@ -115,7 +115,6 @@ function openZealPanel(keyEnc) {
   document.getElementById('zealPanelNick').textContent     = m.nick;
   document.getElementById('zealPanelId').textContent       = m.id;
   document.getElementById('zealPanelPhone').textContent    = m.phone;
-  document.getElementById('zealPanelChannels').textContent = m.channels.join(', ');
   document.getElementById('zealPanelNote').textContent     = m.note || '-';
   // CID 는 내부 기록용이라 표에는 두지 않고, 짤 회원을 열었을 때만 보여 준다
   const chRow = (typeof channels !== 'undefined' ? channels : []).find(c => zealKey(c) === handle);

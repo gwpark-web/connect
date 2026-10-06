@@ -56,16 +56,22 @@ function videoId(url) {
   return '';
 }
 
-// 영상 ID 목록 → { id: {views, likes, comments} } (50개씩 묶어서 호출)
+// 유료광고(유료 프로모션 포함) 표기 — YouTube 가 영상에 붙인 값(paidProductPlacementDetails)만 본다.
+// true/false, 값이 없으면 null(확인불가). 제목·설명의 #광고 같은 글자는 보지 않는다.
+const paidFlag = v => (v && v.paidProductPlacementDetails && typeof v.paidProductPlacementDetails.hasPaidProductPlacement === 'boolean')
+  ? v.paidProductPlacementDetails.hasPaidProductPlacement : null;
+const paidLabel = p => p === true ? '있음' : p === false ? '없음' : '확인불가';
+
+// 영상 ID 목록 → { id: {views, likes, comments, paid} } (50개씩 묶어서 호출)
 async function videoStats(ids) {
   const out = {};
   const uniq = [...new Set(ids.filter(Boolean))];
   for (let i = 0; i < uniq.length; i += 50) {
     const chunk = uniq.slice(i, i + 50);
-    const data = await call('videos', { part: 'statistics', id: chunk.join(','), maxResults: 50 });
+    const data = await call('videos', { part: 'statistics,paidProductPlacementDetails', id: chunk.join(','), maxResults: 50 });
     (data.items || []).forEach(v => {
       const s = v.statistics || {};
-      out[v.id] = { views: +s.viewCount || 0, likes: +s.likeCount || 0, comments: +s.commentCount || 0 };
+      out[v.id] = { views: +s.viewCount || 0, likes: +s.likeCount || 0, comments: +s.commentCount || 0, paid: paidFlag(v) };
     });
   }
   return out;
@@ -121,13 +127,14 @@ async function videoDetails(ids) {
   const uniq = [...new Set(ids.filter(Boolean))];
   for (let i = 0; i < uniq.length; i += 50) {
     const chunk = uniq.slice(i, i + 50);
-    const data = await call('videos', { part: 'snippet,contentDetails,statistics', id: chunk.join(','), maxResults: 50 });
+    const data = await call('videos', { part: 'snippet,contentDetails,statistics,paidProductPlacementDetails', id: chunk.join(','), maxResults: 50 });
     (data.items || []).forEach(v => {
       const sn = v.snippet || {}, st = v.statistics || {};
       out[v.id] = {
         title: sn.title || '', channelId: sn.channelId || '', channelTitle: sn.channelTitle || '',
         publishedAt: sn.publishedAt || '', seconds: seconds(v.contentDetails && v.contentDetails.duration),
         views: +st.viewCount || 0, likes: +st.likeCount || 0, comments: +st.commentCount || 0,
+        paid: paidFlag(v),
       };
     });
   }
@@ -166,4 +173,4 @@ async function topComments(vid, max = 5) {
   }
 }
 
-module.exports = { topComments, configured, YtError, videoId, videoStats, channelInfo, videoDetails, channelStats };
+module.exports = { paidLabel, topComments, configured, YtError, videoId, videoStats, channelInfo, videoDetails, channelStats };

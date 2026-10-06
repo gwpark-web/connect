@@ -4796,3 +4796,9 @@ body[data-viewer-role="admin"] span.admin-only { display: inline !important; }
 .ch-rv-hist-item--admin { border-left:3px solid var(--orange); padding-left:8px; }
 
 .adm-logout[hidden] { display:none; }
+
+/* 유료광고 표기 배지 */
+.vid-paid { display:inline-block; padding:2px 7px; border-radius:10px; font-size:11px; font-weight:600; white-space:nowrap; }
+.vid-paid--yes { background:#E7F6EC; color:#1E8E4E; }
+.vid-paid--no  { background:#FDECEC; color:#C0392B; }
+.vid-paid--unk { background:var(--gray-bg); color:var(--gray-light); }

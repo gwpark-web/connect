@@ -331,6 +331,17 @@ async function route(req, res) {
       if (prev) Object.assign(prev, row); else byName.set(k, row);
     });
     if (!byName.size) return send(req, res, 400, { error: '등록할 수 있는 행(채널명)이 없습니다. 기존 데이터는 그대로 두었습니다.' });
+    // 유튜브 영상 주소가 있는 행은 유료광고 표기를 YouTube 에서 확인해 채운다(파일에 이미 값이 있으면 그대로 둔다)
+    let paidChecked = 0;
+    if (yt.configured()) {
+      const need = [...byName.values()].filter(r => rowPlat(r) === 'yt' && !['있음', '없음', '확인불가'].includes(String(r['유료광고'] || '').trim()) && yt.videoId(r['영상 URL'] || r.url || r['URL'] || ''));
+      if (need.length) {
+        try {
+          const st = await yt.videoStats(need.slice(0, 500).map(r => yt.videoId(r['영상 URL'] || r.url || r['URL'])));
+          need.slice(0, 500).forEach(r => { const x = st[yt.videoId(r['영상 URL'] || r.url || r['URL'])]; r['유료광고'] = x ? yt.paidLabel(x.paid) : '확인불가'; if (x) paidChecked++; });
+        } catch (e) { /* 키 오류·할당량 초과면 표기 확인만 건너뛴다(리포트 저장은 그대로) */ }
+      }
+    }
     const scope = new Set([...byName.values()].map(rowPlat));
     const existing = db.videos[key] || [];
     const kept = existing.filter(r => !scope.has(rowPlat(r)));
@@ -340,7 +351,7 @@ async function route(req, res) {
     const back = new Set([...byName.values()].map(r => rowPlat(r) + '|' + r.name));
     if (db.hidden[key]) db.hidden[key] = db.hidden[key].filter(h => !back.has(h.platform + '|' + h.name));
     store.save();
-    return send(req, res, 200, { rows: db.videos[key], added: byName.size, replaced, kept: kept.length, platforms: [...scope], pub: pubState(db, key) });
+    return send(req, res, 200, { rows: db.videos[key], added: byName.size, replaced, kept: kept.length, platforms: [...scope], paidChecked, pub: pubState(db, key) });
   }
 
   /* 베스트 댓글 — 관리자가 [댓글 불러오기]를 눌렀을 때만 YouTube 에서 가져온다(영상마다 API 호출이 필요해서 별도 기능) */
@@ -448,7 +459,7 @@ const fmtDur = s => `${s}초`;
         rows.forEach(r => {
           const s = stats[yt.videoId(r['영상 URL'] || r.url || r['URL'])];
           if (!s) return;
-          r['조회수'] = String(s.views); r['좋아요'] = String(s.likes); r['댓글'] = String(s.comments); n++;
+          r['조회수'] = String(s.views); r['좋아요'] = String(s.likes); r['댓글'] = String(s.comments); r['유료광고'] = yt.paidLabel(s.paid); n++;
         });
         db.refreshLog[logKey] = today; store.save();
         results[t] = { status: 'ok', requested: rows.length, updated: n };
@@ -500,7 +511,7 @@ const fmtDur = s => `${s}초`;
       rows.push({
         name: d.channelTitle || ch.name || '', '업로드일': kstParts(d.publishedAt), '구독자': fmtSubs(ch.subscribers),
         '영상 제목': d.title, '영상 길이': fmtDur(d.seconds), '조회수': String(d.views), '좋아요': String(d.likes), '댓글': String(d.comments),
-        '참여율': eng.toFixed(1) + '%', '플랫폼': 'yt', '영상 URL': url, cid: d.channelId, handle: ch.handle || '',
+        '참여율': eng.toFixed(1) + '%', '유료광고': yt.paidLabel(d.paid), '플랫폼': 'yt', '영상 URL': url, cid: d.channelId, handle: ch.handle || '',
         zeal: !!zres.members[d.channelId],
       });
     });

@@ -1176,11 +1176,26 @@ function ruLoadFromServer(pageId) {
   if (!Api.enabled || !Api.isLoggedIn()) return;
   Api.req(`/api/videos?campaign=${encodeURIComponent(pageId)}`).then(async r => {
     if (r.ok && r.data && r.data.pub) ruShowPubState(r.data.pub);
-    if (!r.ok || !r.data || !r.data.rows || !r.data.rows.length) return;
-    if (Api.isAdmin()) await zealSyncFromServer();      // 짤 칸을 채우려면 회원 목록이 먼저 있어야 한다
+    if (!r.ok || !r.data) return;
+    const rows = r.data.rows || [], hidden = r.data.hidden || [];
+    if (!rows.length && !hidden.length) return;
+    if (rows.length && Api.isAdmin()) await zealSyncFromServer();      // 짤 칸을 채우려면 회원 목록이 먼저 있어야 한다
     const table = findVisibleVidTable();
     if (!table) return;
-    ruApplyRowsToTable(table, r.data.rows, { replace: true });   // 서버에 저장된 플랫폼의 행은 서버 내용으로 바꾸고, 서버에 없는 플랫폼의 행(예시 데이터 등)은 그대로 둔다
+    if (rows.length) ruApplyRowsToTable(table, rows, { replace: true });   // 서버에 저장된 플랫폼의 행은 서버 내용으로 바꾸고, 서버에 없는 플랫폼의 행(예시 데이터 등)은 그대로 둔다
+    ruApplyHidden(table, hidden);
+  });
+}
+
+// 관리자가 삭제한 행('삭제됨' 표시)을 표에서 뺀다 — 예시(화면에만 있는) 행의 삭제도 서버에서 이어받는다
+function ruApplyHidden(table, hidden) {
+  if (!hidden || !hidden.length) return;
+  const ni = ruTableColIndex(table, '채널명');
+  const gone = new Set(hidden.map(h => (h.platform || 'yt') + '|' + ruNormalizeName(h.name)));
+  table.querySelectorAll('tbody tr').forEach(tr => {
+    const c = tr.children[ni];
+    const nm = ruNormalizeName((c && (c.getAttribute('title') || c.textContent)) || '');
+    if (gone.has((tr.dataset.platform || 'yt') + '|' + nm)) tr.remove();
   });
 }
 
@@ -3249,7 +3264,22 @@ document.addEventListener('click', function(e) {
   var name = title ? title.textContent.trim().replace(/\s+/g, ' ') : '이 영상';
   if (name.length > 40) name = name.slice(0, 40) + '…';
   if (!confirm('"' + name + '"\n\n이 영상을 캠페인에서 삭제할까요?')) return;
-  row.remove();
+  // 서버에 연결된 관리자 화면(조회수당·업로드당)이면 서버에도 반영한다 — 광고주에게는 [연동] 후 보인다
+  var table = row.closest('table');
+  var pageId = ruCampaignKey();
+  if (Api.enabled && Api.isLoggedIn() && Api.isAdmin() && table && ['p-detail', 'p-detail-upload'].indexOf(pageId) !== -1) {
+    var ni = ruTableColIndex(table, '채널명');
+    var cell = row.children[ni];
+    var chName = ruNormalizeName((cell && (cell.getAttribute('title') || cell.textContent)) || '');
+    Api.req('/api/videos/delete?campaign=' + encodeURIComponent(pageId), { method: 'POST', body: { name: chName, platform: row.dataset.platform || 'yt' } }).then(function(r) {
+      if (!r.ok) { alert(r.error || '서버에 삭제를 반영하지 못했습니다.'); return; }
+      row.remove();
+      if (r.data.pub) ruShowPubState(r.data.pub);
+      if (typeof showToast === 'function') showToast('삭제했습니다. 광고주 화면에는 [연동]을 누르면 반영됩니다.');
+    });
+    return;
+  }
+  row.remove();   // 서버가 없는 데모에서는 화면에서만 지운다
 });
 
 // 정적 테이블(캠페인 생성, 계정 관리) 열 정렬

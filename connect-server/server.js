@@ -174,8 +174,24 @@ async function route(req, res) {
     if (!CAMPAIGN_KEY.test(key)) return send(req, res, 400, { error: 'campaign 값이 올바르지 않습니다.' });
     const db = store.get();
     // 관리자는 작업본, 광고주는 [광고주 연동]으로 내보낸 공개본만 본다
-    if (user.role !== 'admin') return send(req, res, 200, { rows: (db.videosPub[key] || {}).rows || [] });
-    return send(req, res, 200, { rows: db.videos[key] || [], pub: pubState(db, key) });
+    if (user.role !== 'admin') return send(req, res, 200, { rows: (db.videosPub[key] || {}).rows || [], hidden: (db.videosPub[key] || {}).hidden || [] });
+    return send(req, res, 200, { rows: db.videos[key] || [], hidden: db.hidden[key] || [], pub: pubState(db, key) });
+  }
+  /* 참여 영상 행 삭제 — 서버에 올린 행이면 지우고, 예시(화면에만 있는) 행이면 '삭제됨' 표시를 남긴다. 광고주에게는 [연동] 후 반영된다 */
+  if (p === '/api/videos/delete' && m === 'POST') {
+    const user = need(req, res, 'admin'); if (!user) return;
+    const key = url.searchParams.get('campaign') || 'default';
+    if (!CAMPAIGN_KEY.test(key)) return send(req, res, 400, { error: 'campaign 값이 올바르지 않습니다.' });
+    const b = await readJson(req);
+    const name = normName(b.name); if (!name) return send(req, res, 400, { error: '삭제할 채널명이 없습니다.' });
+    const platform = rowPlat({ '플랫폼': b.platform });
+    const db = store.get();
+    const before = (db.videos[key] || []).length;
+    db.videos[key] = (db.videos[key] || []).filter(r => !(rowPlat(r) === platform && normName(r.name) === name));
+    const list = db.hidden[key] || (db.hidden[key] = []);
+    if (!list.some(h => h.platform === platform && h.name === name)) list.push({ platform, name });
+    store.save();
+    return send(req, res, 200, { removed: before - db.videos[key].length, pub: pubState(db, key) });
   }
   if (p === '/api/videos/publish' && m === 'POST') {
     const user = need(req, res, 'admin'); if (!user) return;
@@ -183,8 +199,8 @@ async function route(req, res) {
     if (!CAMPAIGN_KEY.test(key)) return send(req, res, 400, { error: 'campaign 값이 올바르지 않습니다.' });
     const db = store.get();
     const rows = db.videos[key] || [];
-    if (!rows.length) return send(req, res, 400, { error: '연동할 리포트 데이터가 없습니다. 먼저 리포트를 업로드해주세요.' });
-    db.videosPub[key] = { rows: JSON.parse(JSON.stringify(rows)), comments: JSON.parse(JSON.stringify(db.comments[key] || { items: [] })), at: new Date().toISOString() };
+    if (!rows.length && !(db.hidden[key] || []).length) return send(req, res, 400, { error: '연동할 리포트 데이터가 없습니다. 먼저 리포트를 업로드해주세요.' });
+    db.videosPub[key] = { rows: JSON.parse(JSON.stringify(rows)), comments: JSON.parse(JSON.stringify(db.comments[key] || { items: [] })), hidden: JSON.parse(JSON.stringify(db.hidden[key] || [])), at: new Date().toISOString() };
     store.save();
     return send(req, res, 200, { count: rows.length, pub: pubState(db, key) });
   }
@@ -214,7 +230,11 @@ async function route(req, res) {
     const existing = db.videos[key] || [];
     const kept = existing.filter(r => !scope.has(rowPlat(r)));
     const replaced = existing.length - kept.length;
-    db.videos[key] = [...kept, ...byName.values()]; store.save();
+    db.videos[key] = [...kept, ...byName.values()];
+    // 다시 올린 행은 '삭제됨' 표시를 지운다
+    const back = new Set([...byName.values()].map(r => rowPlat(r) + '|' + r.name));
+    if (db.hidden[key]) db.hidden[key] = db.hidden[key].filter(h => !back.has(h.platform + '|' + h.name));
+    store.save();
     return send(req, res, 200, { rows: db.videos[key], added: byName.size, replaced, kept: kept.length, platforms: [...scope], pub: pubState(db, key) });
   }
 
@@ -419,7 +439,8 @@ function pubState(db, key) {
   const pub = db.videosPub[key];
   if (!pub) return { state: 'never', at: null };
   const same = JSON.stringify(pub.rows) === JSON.stringify(db.videos[key] || [])
-    && JSON.stringify((pub.comments || {}).items || []) === JSON.stringify((db.comments[key] || {}).items || []);
+    && JSON.stringify((pub.comments || {}).items || []) === JSON.stringify((db.comments[key] || {}).items || [])
+    && JSON.stringify(pub.hidden || []) === JSON.stringify(db.hidden[key] || []);
   return { state: same ? 'synced' : 'pending', at: pub.at, count: pub.rows.length };
 }
 

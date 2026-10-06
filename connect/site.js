@@ -128,11 +128,18 @@ function goTo(id) {
   window.scrollTo(0,0);
   document.getElementById('p1').scrollTop = 0;
 
+  // 프리미엄 3단계 화면은 캠페인마다 상태가 다르다 — 카드에서 열었으면 그 캠페인으로, 아니면 기본(데모)으로 맞춘다
+  if (typeof pmEnsureContext === 'function') {
+    if (id === 'p-channels' && window._pmNextCtx) { const n = window._pmNextCtx; window._pmNextCtx = null; pmEnsureContext(n.key, n.vals); }
+    else pmEnsureContext('demo');
+  }
   if (id === 'p-channels') { updateSortArrows(); renderChannels(); updateChSummary(); }
   if (id === 'p-list' || id === 'p-admin') { if (typeof updateListCardPremium === 'function') updateListCardPremium(); }
   if (id === 'p1') { setTimeout(runStatCountUp, 200); }
   // 검토용 백엔드에 저장된 참여 영상 데이터가 있으면 복원(서버 미실행 시 조용히 무시)
   if (id === 'p-detail' || id === 'p-detail-upload') { ruLoadFromServer(id); }
+  // 캠페인 카드 정보·회차 타임라인(관리자는 작업본, 광고주는 연동된 내용)
+  if (['p-list', 'p-admin', 'p-detail', 'p-detail-upload', 'p-channels'].includes(id)) { metaLoad(); }
 }
 
 function goToAuth(id) {
@@ -176,6 +183,7 @@ async function doLogin() {
     updateGnbSession();
     await syncCampaigns();
     if (Api.isAdmin()) zealSyncFromServer(); else zealClear();
+    metaLoad();
     goTo(Api.isAdmin() ? 'p-admin' : 'p-list');
     return;
   }
@@ -198,12 +206,27 @@ const _vidTableBaseline = new Map();
 const _vidStatBaseline = new Map();
 document.querySelectorAll('.vid-table tbody').forEach(tb => _vidTableBaseline.set(tb, tb.innerHTML));
 document.querySelectorAll('.vid-card .vid-stat-strip').forEach(st => _vidStatBaseline.set(st, [...st.querySelectorAll('.vid-stat-num')].map(n => n.textContent)));
+// 타임라인·정적 캠페인 카드도 처음 상태를 기억했다가 로그아웃/로그인 때 되돌린다(이전 계정이 고친 내용이 남지 않게)
+const _tlBaseline = new Map();
+document.querySelectorAll('.cd-tl-list').forEach(l => _tlBaseline.set(l, l.innerHTML));
+const _cardBaseline = new Map();
+document.querySelectorAll('.campaign-card:not([data-server-id])').forEach(c => {
+  _cardBaseline.set(c, { html: c.innerHTML, attrs: [...c.attributes].map(a => [a.name, a.value]) });
+});
 function ruResetVidTables() {
   _vidTableBaseline.forEach((html, tb) => { tb.innerHTML = html; });
   _vidStatBaseline.forEach((texts, st) => {
     st.querySelectorAll('.vid-stat-num').forEach((n, i) => { n.textContent = texts[i]; });
     const card = st.closest('.vid-card'); if (card) delete card.dataset.statLive;
   });
+  _tlBaseline.forEach((html, l) => { l.innerHTML = html; });
+  _cardBaseline.forEach((b, c) => {
+    [...c.attributes].forEach(a => c.removeAttribute(a.name));
+    b.attrs.forEach(([n, v]) => c.setAttribute(n, v));
+    c.innerHTML = b.html;
+  });
+  window._pubByKey = {};
+  if (typeof pmReset === 'function') pmReset();   // 새 프리미엄 캠페인에서 만든 채널·선정 상태는 계정이 바뀌면 버린다
 }
 
 // ── 참여 영상 요약(총 업로드수·조회수·좋아요·댓글) — 리포트가 반영되면 표의 행에서 다시 계산한다 ──
@@ -1175,7 +1198,7 @@ function ruLoadFromServer(pageId) {
   if (!['p-detail', 'p-detail-upload'].includes(pageId)) return;
   if (!Api.enabled || !Api.isLoggedIn()) return;
   Api.req(`/api/videos?campaign=${encodeURIComponent(pageId)}`).then(async r => {
-    if (r.ok && r.data && r.data.pub) ruShowPubState(r.data.pub);
+    if (r.ok && r.data && r.data.pub) ruNotePub(pageId, r.data.pub);
     if (!r.ok || !r.data) return;
     const rows = r.data.rows || [], hidden = r.data.hidden || [];
     if (!rows.length && !hidden.length) return;
@@ -1203,13 +1226,26 @@ function ruApplyHidden(table, hidden) {
 const RU_PUB_LABEL = { never: '연동 전', pending: '연동 필요', synced: '연동 완료', busy: '연동 중…' };
 function ruShowPubState(pub, busy) {
   const st = busy ? 'busy' : ((pub && pub.state) || 'never');
-  document.querySelectorAll('.vid-publish-btn').forEach(btn => {
+  // 지금 보고 있는 화면의 버튼만 바꾼다(캠페인마다 연동 상태가 따로 있다)
+  document.querySelectorAll('.page-wrapper.active .vid-publish-btn').forEach(btn => {
     btn.dataset.state = st;
     const lb = btn.querySelector('.vid-publish-label');
     if (lb) lb.textContent = RU_PUB_LABEL[st];
     const tip = pub && pub.at ? '마지막 연동: ' + new Date(pub.at).toLocaleString('ko-KR') : '관리자가 올린 리포트를 광고주 사이트에 반영합니다';
-    btn.title = st === 'pending' ? '연동 후 리포트가 바뀌었습니다. 눌러서 광고주 사이트에 다시 반영하세요. ' + tip : tip;
+    btn.title = st === 'pending' ? '연동 후 내용이 바뀌었습니다. 눌러서 광고주 사이트에 다시 반영하세요. ' + tip : tip;
   });
+}
+
+// 캠페인(화면 key)별 연동 상태를 기억해 두고, 해당 화면이 보일 때 버튼에 표시한다
+window._pubByKey = window._pubByKey || {};
+function ruNotePub(key, pub) {
+  if (!pub) return;
+  window._pubByKey[key] = pub;
+  if (ruCampaignKey() === key) ruShowPubState(pub);
+}
+function ruRefreshPubButton() {
+  const k = ruCampaignKey();
+  if (window._pubByKey[k]) ruShowPubState(window._pubByKey[k]);
 }
 
 async function publishToAdvertiser() {
@@ -1222,8 +1258,8 @@ async function publishToAdvertiser() {
   const r = await Api.req(`/api/videos/publish?campaign=${encodeURIComponent(ruCampaignKey())}`, { method: 'POST' });
   if (btn) btn.disabled = false;
   if (!r.ok) { ruShowPubState({ state: prevState }); alert(r.error || '광고주 연동에 실패했습니다.'); return; }
-  ruShowPubState(r.data.pub);
-  alert(`리포트 ${r.data.count}개를 광고주 사이트에 연동했습니다.`);
+  ruNotePub(ruCampaignKey(), r.data.pub);
+  alert(r.data.count ? `리포트 ${r.data.count}개와 변경된 캠페인 정보를 광고주 사이트에 연동했습니다.` : '변경된 캠페인 정보를 광고주 사이트에 연동했습니다.');
 }
 
 // ── 자동 조회: URL 열만 읽는다 → 서버가 YouTube 에서 영상·채널 정보를 가져오고 → 채널 ID(CID)로 짤 회원까지 조회 ──
@@ -1359,7 +1395,7 @@ document.body.classList.add('p0-active');
 // 서버가 있으면 이전 로그인(같은 탭)을 복원한다
 Api.ping().then(async up => {
   if (!up) return;
-  if (await Api.restore()) { updateGnbSession(); syncCampaigns(); if (Api.isAdmin()) zealSyncFromServer(); }
+  if (await Api.restore()) { updateGnbSession(); syncCampaigns(); metaLoad(); if (Api.isAdmin()) zealSyncFromServer(); }
   else { Api.logout(); updateGnbSession(); }
 });
 
@@ -1705,6 +1741,81 @@ function p0CcToggle(mode) {
     _card = null;
   }
 
+  // 카드 한 장을 값(v)대로 다시 그린다 — 수정 패널 저장과 서버에서 받은 값 적용이 함께 쓴다.
+  // 값은 모두 textContent/속성으로만 넣는다(관리자가 입력한 글이 다른 사용자 화면에서 코드로 실행되지 않게).
+  // v: { title, client, product, status, goalType, goalValue, current, start, end, thumb, platforms[] }
+  function applyCardValues(card, v) {
+    Object.assign(card.dataset, {
+      editTitle: v.title, editClient: v.client, editProduct: v.product, editStatus: v.status,
+      editGoalType: v.goalType, editGoalValue: v.goalValue, editCurrent: v.current,
+      editStart: v.start, editEnd: v.end, editThumb: v.thumb, editPlatforms: v.platforms.join(','),
+      campaignStatus: v.status,
+    });
+    card.dataset.campaignStatus = v.status;
+
+    const titleEl = card.querySelector('.card-title');
+    if (titleEl) titleEl.textContent = v.title;
+    const tagEl = card.querySelector('.card-product-tag');
+    if (tagEl) tagEl.textContent = v.product;
+
+    const badgeEl = card.querySelector('.status-badge');
+    if (badgeEl) {
+      const s = STATUS_MAP[v.status] || { cls: v.status, text: v.status };
+      badgeEl.className = `status-badge ${s.cls}`;
+      badgeEl.textContent = s.text;
+    }
+
+    // 플랫폼 배지 + 광고주 계정(우측)을 함께 다시 그린다. 배지만 덮어쓰면 같은 행에 있던 계정 칩이 지워진다.
+    const platEl = card.querySelector('.card-platform-badges');
+    if (platEl) {
+      platEl.innerHTML = v.platforms.map(p => `<span class="platform-badge ${p}">${PLAT_SVG[p] || ''}</span>`).join('');
+      if (v.client) {
+        const chip = document.createElement('span');
+        chip.className = 'card-agency'; chip.title = '광고주 계정'; chip.textContent = v.client;
+        platEl.appendChild(chip);
+      }
+    }
+
+    // 썸네일(http(s) 또는 img/ 상대경로만)
+    const thumbDiv = card.querySelector('.card-thumb');
+    if (thumbDiv && /^(https?:\/\/[^\s"'()<>\\]+|img\/[A-Za-z0-9_./-]+)$/.test(v.thumb || '')) {
+      const img = thumbDiv.querySelector('img');
+      if (img) { img.src = v.thumb; }
+      else { thumbDiv.style.backgroundImage = `url(${v.thumb})`; }
+      thumbDiv.style.background = '';
+    }
+
+    // 진행률
+    const gv = parseInt(v.goalValue) || 0;
+    const cv = parseInt(v.current) || 0;
+    const pct = gv > 0 ? Math.min(Math.round(cv / gv * 100), 100) : 0;
+    card.dataset.pct = gv > 0 ? Math.round(cv / gv * 100) : 0;
+    const fillEl = card.querySelector('.card-progress-fill');
+    if (fillEl) fillEl.style.width = pct + '%';
+    const textEl = card.querySelector('.card-progress-text');
+    if (textEl) {
+      const unit = v.goalType === '조회수' ? '회' : '개';
+      textEl.textContent = `${cv.toLocaleString()} / ${gv.toLocaleString()}${unit} `;
+      const pctSpan = document.createElement('span');
+      pctSpan.className = 'card-progress-pct' + (gv > 0 && cv > gv ? ' over' : '');
+      pctSpan.textContent = `(${gv > 0 && cv > gv ? Math.round(cv / gv * 100) : pct}%)`;
+      textEl.appendChild(pctSpan);
+    }
+  }
+  window.applyCardValues = applyCardValues;
+
+  // 카드의 data-edit-* 값 → v (서버 저장·다른 카드에 적용할 때 쓴다)
+  window.cardValuesFromCard = function (card) {
+    const d = card.dataset;
+    return {
+      title: d.editTitle || (card.querySelector('.card-title')?.textContent || '').trim(),
+      client: d.editClient || '', product: d.editProduct || '조회수당', status: d.editStatus || 'recruiting',
+      goalType: d.editGoalType || '조회수', goalValue: d.editGoalValue || '', current: d.editCurrent || '',
+      start: d.editStart || '', end: d.editEnd || '', thumb: d.editThumb || '',
+      platforms: (d.editPlatforms || '').split(',').filter(Boolean),
+    };
+  };
+
   function savePanel() {
     if (!_card) return;
     const title     = document.getElementById('ce-title').value.trim();
@@ -1721,22 +1832,6 @@ function p0CcToggle(mode) {
     const thumb     = document.getElementById('ce-thumb').value.trim();
     const plats     = [...document.querySelectorAll('.ce-plat-cb:checked')].map(c => c.value);
 
-    // update data attrs
-    Object.assign(_card.dataset, {
-      editTitle:     title,
-      editClient:    client,
-      editProduct:   product,
-      editStatus:    status,
-      editGoalType:  goalType,
-      editGoalValue: goalValue,
-      editCurrent:   current,
-      editStart:     start,
-      editEnd:       end,
-      editThumb:     thumb,
-      editPlatforms: plats.join(','),
-      campaignStatus: status,
-    });
-
     // 서버에 저장된 캠페인이면 서버에도 반영한다(실패하면 알려준다)
     if (_card.dataset.serverId && Api.isLoggedIn()) {
       Api.req('/api/campaigns/' + _card.dataset.serverId, {
@@ -1749,61 +1844,20 @@ function p0CcToggle(mode) {
       }).then(r => { if (!r.ok) alert(r.error || '서버 저장에 실패했습니다. 화면에만 반영되었습니다.'); });
     }
 
-    // title
-    const titleEl = _card.querySelector('.card-title');
-    if (titleEl) titleEl.textContent = title;
-
-    // product tag
-    const tagEl = _card.querySelector('.card-product-tag');
-    if (tagEl) tagEl.textContent = product;
-
-    // status badge
-    const badgeEl = _card.querySelector('.status-badge');
-    if (badgeEl) {
-      const s = STATUS_MAP[status] || { cls: status, text: status };
-      badgeEl.className = `status-badge ${s.cls}`;
-      badgeEl.textContent = s.text;
+    const vals = { title, client, product, status, goalType, goalValue, current, start, end, thumb, platforms: plats };
+    applyCardValues(_card, vals);
+    // 등록해서 만든 카드는 상품 유형에 맞는 상세 화면으로 연결을 다시 맞춘다(프리미엄 ↔ 일반)
+    if (_card.dataset.built === '1') {
+      const prem = product === '프리미엄';
+      if (prem && !_card.dataset.pmKey) _card.dataset.pmKey = _card.dataset.serverId || ('local-' + Date.now().toString(36));
+      const fn = prem ? 'openPremiumCampaign' : 'goTo', arg = prem ? _card.dataset.pmKey : 'p-detail-empty';
+      _card.setAttribute('data-fn', fn); _card.setAttribute('data-args', arg);
+      const btn = _card.querySelector('.card-btn.primary');
+      if (btn) { btn.setAttribute('data-fn', fn); btn.setAttribute('data-args', arg); }
+      _card.dataset.campaignType = prem ? 'connect' : (product === '업로드당' ? 'upload' : 'view');
     }
-
-    // platform badges
-    // 플랫폼 배지 + 광고주 계정(우측)을 함께 다시 그린다.
-    // 배지만 덮어쓰면 같은 행에 있던 계정 칩이 지워진다.
-    const platEl = _card.querySelector('.card-platform-badges');
-    if (platEl) {
-      platEl.innerHTML =
-        plats.map(p => `<span class="platform-badge ${p}">${PLAT_SVG[p] || p}</span>`).join('') +
-        (client ? `<span class="card-agency" title="광고주 계정">${client}</span>` : '');
-    }
-
-    // thumbnail
-    const thumbDiv = _card.querySelector('.card-thumb');
-    if (thumbDiv) {
-      const img = thumbDiv.querySelector('img');
-      if (thumb) {
-        if (img) { img.src = thumb; }
-        else { thumbDiv.style.backgroundImage = `url(${thumb})`; }
-        thumbDiv.style.background = '';
-      }
-    }
-
-    // progress
-    const gv = parseInt(goalValue) || 0;
-    const cv = parseInt(current) || 0;
-    const pct = gv > 0 ? Math.min(Math.round(cv / gv * 100), 100) : 0;
-    _card.dataset.pct = gv > 0 ? Math.round(cv / gv * 100) : 0;
-
-    const fillEl = _card.querySelector('.card-progress-fill');
-    if (fillEl) fillEl.style.width = pct + '%';
-
-    const textEl = _card.querySelector('.card-progress-text');
-    if (textEl) {
-      const unit = goalType === '조회수' ? '회' : '개';
-      const pctSpan = cv > gv
-        ? `<span class="card-progress-pct over">(${Math.round(cv/gv*100)}%)</span>`
-        : `<span class="card-progress-pct">(${pct}%)</span>`;
-      textEl.innerHTML = `${Number(cv).toLocaleString()} / ${Number(gv).toLocaleString()}${unit} ${pctSpan}`;
-    }
-
+    // 기본(정적) 카드면 서버에 정보를 저장한다 — 광고주 화면에는 [연동]을 누르면 반영된다
+    if (!_card.dataset.serverId && typeof metaSaveCard === 'function') metaSaveCard(_card, vals);
     closePanel();
   }
 
@@ -1885,13 +1939,104 @@ function openEditRoundModal(btn) {
   document.getElementById('addRoundModal').classList.add('active');
 }
 
+// ── 회차 타임라인 행 만들기·읽기 (서버 저장/적용에 같은 구조를 쓴다) ──
+const TL_ACT_HTML = `
+      <button class="cd-tl-act-btn" data-tl-act="edit" title="수정" aria-label="회차 수정"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+      <button class="cd-tl-act-btn cd-tl-act-btn--del" data-tl-act="delete" title="삭제" aria-label="회차 삭제"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>`;
+
+// d: { final, num, title(예: "2차 · 355,305회"), pct(예: "(71%)"), metas:[{text, memo}] } → 행 요소. 글은 모두 textContent 로 넣는다.
+function tlRowEl(d) {
+  const row = document.createElement('div');
+  row.className = d.final ? 'cd-tl-row cd-tl-row--final' : 'cd-tl-row';
+  const num = document.createElement('div');
+  num.className = 'cd-tl-num' + (d.final ? ' cd-tl-num--final' : '');
+  num.textContent = d.num || (d.final ? '🏆' : '');
+  const info = document.createElement('div'); info.className = 'cd-tl-info';
+  const title = document.createElement('div'); title.className = 'cd-tl-title';
+  title.textContent = d.title || '';
+  if (d.pct) {
+    title.appendChild(document.createTextNode(' '));
+    const p = document.createElement('span'); p.className = 'cd-tl-pct'; p.textContent = d.pct; title.appendChild(p);
+  }
+  info.appendChild(title);
+  (d.metas || []).forEach(mt => {
+    if (!mt.text) return;
+    const el = document.createElement('div'); el.className = 'cd-tl-meta'; el.textContent = mt.text;
+    if (mt.memo) el.style.color = 'var(--orange)';
+    info.appendChild(el);
+  });
+  const act = document.createElement('div'); act.className = 'cd-tl-act admin-only'; act.innerHTML = TL_ACT_HTML;
+  row.append(num, info, act);
+  return row;
+}
+
+// 행 → 데이터(위의 d). 정적 HTML 로 들어 있던 행도 같은 방식으로 읽는다.
+function tlRowData(row) {
+  const titleEl = row.querySelector('.cd-tl-title');
+  const pctEl = titleEl && titleEl.querySelector('.cd-tl-pct');
+  const pct = pctEl ? pctEl.textContent.trim() : '';
+  let title = '';
+  if (titleEl) { const c = titleEl.cloneNode(true); c.querySelector('.cd-tl-pct')?.remove(); title = c.textContent.trim().replace(/\s+/g, ' '); }
+  return {
+    final: row.classList.contains('cd-tl-row--final'),
+    num: (row.querySelector('.cd-tl-num')?.textContent || '').trim(),
+    title, pct,
+    metas: [...row.querySelectorAll('.cd-tl-meta')].map(e => ({ text: e.textContent.trim().replace(/\s+/g, ' '), memo: /orange/.test(e.getAttribute('style') || '') })),
+  };
+}
+
+// 타임라인 목록 전체를 서버에 저장한다(서버가 없으면 아무것도 안 한다). 광고주에게는 [연동] 후 보인다.
+function metaSaveTimeline(list) {
+  const page = list && list.closest('.page-wrapper');
+  if (!page || !Api.enabled || !Api.isLoggedIn() || !Api.isAdmin() || !['p-detail', 'p-detail-upload'].includes(page.id)) return;
+  const rows = [...list.querySelectorAll('.cd-tl-row')].map(tlRowData);
+  Api.req('/api/campaign-meta?campaign=' + encodeURIComponent(page.id), { method: 'POST', body: { timeline: rows } }).then(r => {
+    if (!r.ok) { alert(r.error || '회차 변경을 서버에 저장하지 못했습니다. 화면에만 반영되었습니다.'); return; }
+    ruNotePub(page.id, r.data.pub);
+  });
+}
+
+// 정적 캠페인 카드 정보를 서버에 저장한다
+function metaSaveCard(card, vals) {
+  const key = card.dataset.args;
+  if (!key || !Api.enabled || !Api.isLoggedIn() || !Api.isAdmin()) return;
+  Api.req('/api/campaign-meta?campaign=' + encodeURIComponent(key), { method: 'POST', body: { card: vals } }).then(r => {
+    if (!r.ok) { alert(r.error || '캠페인 정보를 서버에 저장하지 못했습니다. 화면에만 반영되었습니다.'); return; }
+    ruNotePub(key, r.data.pub);
+    if (typeof showToast === 'function') showToast('저장했습니다. 광고주 화면에는 해당 캠페인의 [연동]을 누르면 반영됩니다.');
+  });
+}
+
+// 서버의 캠페인 카드·타임라인 정보를 화면에 적용한다(관리자는 작업본, 광고주는 연동된 내용)
+async function metaLoad() {
+  if (!Api.enabled || !Api.isLoggedIn()) return;
+  const r = await Api.req('/api/campaign-meta');
+  if (!r.ok || !r.data) return;
+  if (r.data.pub) { window._pubByKey = r.data.pub; ruRefreshPubButton(); }
+  const meta = r.data.meta || {};
+  Object.keys(meta).forEach(key => {
+    const m = meta[key] || {};
+    if (m.card) {
+      document.querySelectorAll('.campaign-card:not([data-server-id])').forEach(card => {
+        if (card.dataset.args === key && typeof window.applyCardValues === 'function') window.applyCardValues(card, m.card);
+      });
+    }
+    if (m.timeline) {
+      const list = document.querySelector('#' + CSS.escape(key) + ' .cd-tl-list');
+      if (list) { list.innerHTML = ''; m.timeline.forEach(d => list.appendChild(tlRowEl(d))); }
+    }
+  });
+}
+
 function deleteRound(btn) {
   if (!isAdminViewer()) return;
   const row = btn?.closest('.cd-tl-row');
   if (!row) return;
   const label = row.querySelector('.cd-tl-title')?.textContent.trim().split('·')[0].trim() || '이 회차';
   if (!confirm(`${label} 리포트를 삭제할까요?`)) return;
+  const list = row.closest('.cd-tl-list');
   row.remove();
+  metaSaveTimeline(list);
 }
 
 // 카카오톡으로 보낼 문구 미리보기 — 입력값이 비면 자리표시자로 두고 NaN 이 나오지 않게 한다
@@ -1978,23 +2123,13 @@ function submitAddRound() {
 
   const label = isFinal ? '최종' : `${round}차`;
   // 기존 정적 행과 같은 형식: "2차 · 355,305회 (71%)" — 조회수와 퍼센트 사이는 공백
-  const viewsPart = [viewsFmt, pct ? `<span class="cd-tl-pct">(${pct}%)</span>` : ''].filter(Boolean).join(' ');
-  const titleText = [label, viewsPart].filter(Boolean).join(' · ');
   const metaText  = [date ? `${date} 기준` : '', vidsFmt].filter(Boolean).join(' · ');
-
-  const row = document.createElement('div');
-  row.className = isFinal ? 'cd-tl-row cd-tl-row--final' : 'cd-tl-row';
-  row.innerHTML = `
-    <div class="cd-tl-num${isFinal ? ' cd-tl-num--final' : ''}">${isFinal ? '🏆' : round}</div>
-    <div class="cd-tl-info">
-      <div class="cd-tl-title">${titleText}</div>
-      ${metaText ? `<div class="cd-tl-meta">${metaText}</div>` : ''}
-      ${memo ? `<div class="cd-tl-meta" style="color:var(--orange)">${memo}</div>` : ''}
-    </div>
-    <div class="cd-tl-act admin-only">
-      <button class="cd-tl-act-btn" data-tl-act="edit" title="수정" aria-label="회차 수정"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
-      <button class="cd-tl-act-btn cd-tl-act-btn--del" data-tl-act="delete" title="삭제" aria-label="회차 삭제"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
-    </div>`;
+  const row = tlRowEl({
+    final: isFinal, num: isFinal ? '🏆' : round,
+    title: [label, viewsFmt].filter(Boolean).join(' · '),
+    pct: pct ? `(${pct}%)` : '',
+    metas: [{ text: metaText, memo: false }, { text: memo || '', memo: true }],
+  });
 
   if (_editRoundRow) {
     // 수정 — 자리를 유지한 채 내용만 바꾼다
@@ -2008,6 +2143,7 @@ function submitAddRound() {
   }
 
   closeAddRoundModal();
+  metaSaveTimeline(list);
 }
 
 // ── 캠페인 등록 모달 ─────────────────────────────────────────────────
@@ -2147,7 +2283,11 @@ function buildCampaignCard(c, opts) {
   const goalUnit = goalViews ? '회' : '개';
   const progressText = goalNum ? `0 / ${Number(goalNum).toLocaleString()}${goalUnit} <span class="card-progress-pct">(0%)</span>` : '집계 예정';
   // 신규 캠페인은 아직 집계 데이터가 없다 → 데모 상세가 아니라 빈 상세로.
-  const detailTarget = 'p-detail-empty';
+  // 프리미엄은 채널 선정 → 검토 현황 → 결과 3단계 화면(#p-channels)으로 연다. 일반(조회수당·업로드당) 상세와 구조가 다르다.
+  const isPremium = product === '프리미엄';
+  const pmKey = isPremium ? (c.id || ('local-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6))) : '';
+  const detailFn = isPremium ? 'openPremiumCampaign' : 'goTo';
+  const detailTarget = isPremium ? pmKey : 'p-detail-empty';
 
   const card = document.createElement('div');
   card.className = 'campaign-card';
@@ -2155,12 +2295,14 @@ function buildCampaignCard(c, opts) {
   card.dataset.campaignType = product === '프리미엄' ? 'connect' : (product === '업로드당' ? 'upload' : 'view');
   card.dataset.pct = '0';
   if (c.id) card.dataset.serverId = c.id;
-  card.setAttribute('data-fn', 'goTo');
+  card.setAttribute('data-fn', detailFn);
   card.setAttribute('data-args', detailTarget);
+  card.dataset.built = '1';
+  if (isPremium) card.dataset.pmKey = pmKey;
   // 수정 사이드패널이 읽는 값들 — 없으면 등록한 카드를 편집할 수 없다
   Object.assign(card.dataset, {
     editTitle: c.title, editClient: acct, editProduct: product, editStatus: status,
-    editGoalType: goalViews ? '조회수' : '영상수', editGoalValue: goalNum || '', editCurrent: '0',
+    editGoalType: goalViews ? '조회수' : '영상', editGoalValue: goalNum || '', editCurrent: '0',
     editStart: c.start || '', editEnd: c.end || '', editThumb: thumbUrl, editPlatforms: plats.join(','),
     // 캠페인 생성에서 불러온 경우 출처 링크 (name|platform|start). 캘린더 조인·추적용.
     sourceId: c.sourceId || '',
@@ -2183,7 +2325,7 @@ function buildCampaignCard(c, opts) {
         <div class="card-progress-track"><div class="card-progress-fill" style="width:0%"></div></div>
         <div class="card-progress-text">${progressText}</div>
       </div>
-      <button class="card-btn primary" data-fn="goTo" data-args="${detailTarget}" data-stop="1">상세 보기 →</button>
+      <button class="card-btn primary" data-fn="${detailFn}" data-args="${escHtml(detailTarget)}" data-stop="1">상세 보기 →</button>
     </div>`;
   return card;
 }
@@ -2258,7 +2400,7 @@ async function submitCampaignReg() {
     openStatModal, closeStatModal,
     openChSelectModal, closeSingleModal, confirmChSelect,
     closeChSelectModal, confirmChSelectMulti,
-    toggleChCheck, selectChecked, clearChecked,
+    toggleChCheck, selectChecked, viewCheckedChannels, clearChecked, openPremiumCampaign, chRefreshStats,
     rejectCh, undoCh,
     chSortBy, chSetStatus, chSetReviewStatus, chSwitchTab,
     advanceReviewState, creatorRejectCh,
@@ -2705,9 +2847,26 @@ document.addEventListener('click', function(e) {
   }
 
 
+  // 국가 필터 선택지 — 목록에 있는 국가만, 많은 순으로(선택해 둔 국가는 목록에서 빠져도 유지)
+  function scSyncCountryOptions() {
+    var sel = g('sc-fCountry');
+    if (!sel) return;
+    var cur = sel.value;
+    var counts = {};
+    scItems.forEach(function (it) { var c = (it.country || '').trim(); if (c) counts[c] = (counts[c] || 0) + 1; });
+    if (cur && !counts[cur]) counts[cur] = 0;
+    var names = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a] || a.localeCompare(b, 'ko'); });
+    var sig = names.join('|');
+    if (sel.dataset.sig === sig) return;      // 바뀐 게 없으면 다시 그리지 않는다
+    sel.dataset.sig = sig;
+    sel.innerHTML = '<option value="">전체</option>' + names.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
+    sel.value = cur;
+  }
+
   function scFiltered() {
     var type = (g('sc-fType') || {}).value || '';
     var filmCat = (g('sc-fFilmCat') || {}).value || '';
+    var country = (g('sc-fCountry') || {}).value || '';
     // '전체'는 value="" 이므로 || 'open' 을 쓰면 안 됨 (전체가 미완료로 되돌아감)
     var statusEl = g('sc-fStatus');
     var status = statusEl ? statusEl.value : 'open';
@@ -2716,6 +2875,7 @@ document.addEventListener('click', function(e) {
       if (it.date && dday(it.date) < -7) return false;
       if (type && it.type !== type) return false;
       if (filmCat && it.filmCat !== filmCat) return false;
+      if (country && (it.country || '') !== country) return false;
       if (status === 'open') { if (CLOSED.indexOf(it.status) !== -1) return false; }
       else if (status && it.status !== status) return false;
       if (q && (it.title + ' ' + (it.company || '')).toLowerCase().indexOf(q) === -1) return false;
@@ -2920,7 +3080,7 @@ document.addEventListener('click', function(e) {
     if (grid) grid.innerHTML = html;
   }
 
-  function scRender() { scRenderTop(); if (scView === 'list') scRenderList(); else scRenderMonth(); }
+  function scRender() { scSyncCountryOptions(); scRenderTop(); if (scView === 'list') scRenderList(); else scRenderMonth(); }
 
   // 시트 열기/닫기
   function scToggleCancelReason(status) {
@@ -3015,8 +3175,8 @@ document.addEventListener('click', function(e) {
     if (e.target.id === 'sc-btn-delete') { scDeleteItem(); return; }
     if (e.target.id === 'sc-sheet-scrim') { scCloseSheet(); return; }
     if (e.target.id === 'sc-reset-filters') {
-      var ft = g('sc-fType'), fs = g('sc-fStatus'), fq = g('sc-fQuery');
-      if (ft) ft.value = ''; if (fs) fs.value = 'open'; if (fq) fq.value = '';
+      var ft = g('sc-fType'), fs = g('sc-fStatus'), fq = g('sc-fQuery'), fcn = g('sc-fCountry');
+      if (ft) ft.value = ''; if (fs) fs.value = 'open'; if (fq) fq.value = ''; if (fcn) fcn.value = '';
       scRender(); return;
     }
     var segBtn = e.target.closest('[data-sc-view]');
@@ -3054,7 +3214,7 @@ document.addEventListener('click', function(e) {
   });
 
   document.addEventListener('input', function (e) {
-    if (['sc-fType','sc-fFilmCat','sc-fStatus','sc-fQuery'].indexOf(e.target.id) !== -1) scRender();
+    if (['sc-fType','sc-fFilmCat','sc-fCountry','sc-fStatus','sc-fQuery'].indexOf(e.target.id) !== -1) scRender();
     if (e.target.id === 'sc-iTitle') scAcDebounce(e.target.value);
   });
 

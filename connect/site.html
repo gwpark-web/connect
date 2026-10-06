@@ -7,7 +7,7 @@
 <title>커넥트 스튜디오 — 광고주 플랫폼</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/bebas-neue@5/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
-<link href="style.css?v=20261006b" rel="stylesheet">
+<link href="style.css?v=20261006h" rel="stylesheet">
 <script>
   // 이모지 세로 보정값이 폰트마다 달라 Windows(Segoe UI Emoji)만 따로 표시한다
   if (/Win/i.test(navigator.userAgentData?.platform || navigator.platform || '')) {
@@ -640,6 +640,10 @@
       <div class="cd-name-row">
         <span class="cd-name">시리즈 〈다 이루어질지니〉</span>
         <span class="cd-badge running" id="chCampaignBadge">채널 선정 중</span>
+        <button class="cd-btn cd-btn-edit vid-publish-btn admin-only" data-fn="publishToAdvertiser" title="관리자가 고친 캠페인 정보를 광고주 사이트에 반영합니다">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <span class="vid-publish-label">광고주 연동</span>
+        </button>
       </div>
       <div class="cd-meta">프리미엄 채널 · 영상 목표 30개</div>
     </div>
@@ -733,6 +737,10 @@
       <button class="ch-chip" data-fn="chSetStatus" data-args="selected">선정됨</button>
       <button class="ch-chip" data-fn="chSetStatus" data-args="rejected">반려됨</button>
       <span class="result-count" id="chResultCount" style="margin-left:auto">12개 채널</span>
+      <button class="chu-open-btn admin-only" id="chRefreshBtn" data-fn="chRefreshStats" title="CID가 있는 유튜브 채널의 구독자·최근 쇼츠 5개 평균 조회수를 YouTube에서 다시 가져옵니다">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        구독자·조회수 갱신
+      </button>
       <button class="chu-open-btn admin-only" data-fn="openChUploadModal">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
         채널 업로드
@@ -742,6 +750,7 @@
     <!-- 벌크 선정 액션 바 -->
     <div class="ch-bulk-bar" id="chBulkBar" style="display:none">
       <span class="ch-bulk-label" id="chBulkLabel">0개 선택됨</span>
+      <button class="ch-bulk-view-btn" data-fn="viewCheckedChannels">채널 보기</button>
       <button class="ch-bulk-confirm-btn" data-fn="selectChecked">선택 채널 선정하기</button>
       <button class="ch-bulk-clear-btn" data-fn="clearChecked">선택 해제</button>
     </div>
@@ -750,17 +759,15 @@
       <table>
         <thead>
           <tr>
-            <th style="width:32px;padding:0 8px"></th>
-            <th class="ch-th-plat" style="width:30px;text-align:center;padding:0 4px">플랫폼</th>
-            <th style="width:126px">채널명</th>
-            <th style="width:150px">CID</th>
-            <th class="c" style="width:84px">카테고리</th>
-            <th class="ch-sort-th" style="width:76px;text-align:center" data-fn="chSortBy" data-args="subs">구독자<span class="ch-sort-arrow" id="chSortArr-subs">↕</span></th>
-            <th class="ch-sort-th" style="width:84px;text-align:center" data-fn="chSortBy" data-args="views">평균 조회수<br><small class="th-sub">최근 5개</small><span class="ch-sort-arrow" id="chSortArr-views">↕</span></th>
-            <th class="ch-sort-th" style="width:138px" data-fn="chSortBy" data-args="rate">평균 참여율<span class="ch-sort-arrow" id="chSortArr-rate">↕</span></th>
-            <th class="ch-sort-th" style="width:60px;text-align:center" data-fn="chSortBy" data-args="repeat">참여 이력<span class="ch-sort-arrow" id="chSortArr-repeat">↕</span></th>
-            <th class="zeal-col" style="width:52px;text-align:center">짤</th>
-            <th style="width:148px;text-align:center">액션</th>
+            <th style="width:44px"></th>
+            <th class="ch-th-plat" style="width:72px">플랫폼</th>
+            <th style="width:auto">채널명</th>
+            <th class="c" style="width:120px">카테고리</th>
+            <th class="ch-sort-th" style="width:96px" data-fn="chSortBy" data-args="subs">구독자<span class="ch-sort-arrow" id="chSortArr-subs">↕</span></th>
+            <th class="ch-sort-th" style="width:116px" data-fn="chSortBy" data-args="views">평균 조회수<br><small class="th-sub">최근 5개</small><span class="ch-sort-arrow" id="chSortArr-views">↕</span></th>
+            <th class="ch-sort-th" style="width:96px" data-fn="chSortBy" data-args="repeat">참여 이력<span class="ch-sort-arrow" id="chSortArr-repeat">↕</span></th>
+            <th class="zeal-col" style="width:72px">짤</th>
+            <th style="width:190px">액션</th>
           </tr>
         </thead>
         <tbody id="chTable"></tbody>
@@ -2298,6 +2305,12 @@
           </select>
         </label>
         <label class="sc-field">
+          <span>국가</span>
+          <select id="sc-fCountry">
+            <option value="">전체</option>
+          </select>
+        </label>
+        <label class="sc-field">
           <span>상태</span>
           <select id="sc-fStatus">
             <option value="open">미완료</option>
@@ -2821,9 +2834,9 @@
 </div>
 
 <script src="emailjs.min.js"></script>
-<script src="api.js?v=20261006b"></script>
-<script src="xlsx.js?v=20261006b"></script>
-<script src="channels.js?v=20261006b"></script>
+<script src="api.js?v=20261006h"></script>
+<script src="xlsx.js?v=20261006h"></script>
+<script src="channels.js?v=20261006h"></script>
 <!-- ── 짤 회원 사이드패널 ── -->
 <!-- ── 수정 요청 로그 (관리자) ── -->
 <div class="sc-sheet" id="chRevSheet" hidden>
@@ -2856,6 +2869,7 @@
         <span class="zeal-info-label">짤ID</span><span class="zeal-info-value" id="zealPanelId">-</span>
         <span class="zeal-info-label">연락처</span><span class="zeal-info-value" id="zealPanelPhone">-</span>
         <span class="zeal-info-label">보유채널</span><span class="zeal-info-value" id="zealPanelChannels">-</span>
+        <span class="zeal-info-label">채널 ID(CID)</span><span class="zeal-info-value" id="zealPanelCid">-</span>
         <span class="zeal-info-label">비고</span><span class="zeal-info-value" id="zealPanelNote">-</span>
       </div>
 
@@ -3154,6 +3168,6 @@
   </div>
 </div>
 
-<script src="site.js?v=20261006b"></script>
+<script src="site.js?v=20261006h"></script>
 </body>
 </html>

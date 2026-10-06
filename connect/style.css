@@ -4763,3 +4763,15 @@ body[data-viewer-role="admin"] span.admin-only { display: inline !important; }
 .stat-empty { padding:32px 8px; text-align:center; color:var(--gray-light); font-size:13px; }
 .stat-cmt-bar { display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
 .stat-cmt-hint { font-size:12px; color:var(--gray-light); }
+
+/* 채널 선정 — 체크한 채널 보기 버튼(선택 해제 버튼과 같은 모양) */
+.ch-bulk-view-btn { padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; border:1px solid var(--border); background:var(--white); color:var(--gray-dark); }
+.ch-bulk-view-btn:hover { border-color:var(--gray-mid); color:var(--black); }
+.ch-name { font-weight:600; }
+
+/* 채널 선정 리스트 — 열 폭을 고르게 잡고 모든 칸을 가운데 정렬 */
+#chPanel0 table { table-layout: fixed; }
+#chPanel0 th, #chPanel0 td { text-align: center; padding-left: 8px; padding-right: 8px; }
+#chPanel0 .ch-name { text-align: center; margin-bottom: 0; }
+#chPanel0 .ch-check-cell { padding-left: 0; padding-right: 0; }
+#chPanel0 .ch-action-cell { white-space: nowrap; }

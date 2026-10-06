@@ -25,7 +25,7 @@ const channels = [
   { emoji:'🎧', name:'플리마스터', handle:'@plimaster', cid:'',        cat:'음악',         platform:'ig', subsNum:110000,  subs:'11만',   views:'16만',  rate:13.1, repeat:0 },
 ];
 
-const GOAL = 30;
+let GOAL = 30;   // 캠페인마다 다르다(새 프리미엄 캠페인은 등록한 영상 목표 수)
 let _chActiveTab = 0;
 
 // ── 짤 회원 데이터 ──────────────────────────────────────────────────
@@ -117,6 +117,10 @@ function openZealPanel(keyEnc) {
   document.getElementById('zealPanelPhone').textContent    = m.phone;
   document.getElementById('zealPanelChannels').textContent = m.channels.join(', ');
   document.getElementById('zealPanelNote').textContent     = m.note || '-';
+  // CID 는 내부 기록용이라 표에는 두지 않고, 짤 회원을 열었을 때만 보여 준다
+  const chRow = (typeof channels !== 'undefined' ? channels : []).find(c => zealKey(c) === handle);
+  const cidTxt = (chRow && chRow.cid) || (/^UC[0-9A-Za-z_-]{22}$/.test(handle) ? handle : '');
+  document.getElementById('zealPanelCid').textContent      = cidTxt || '-';
   document.getElementById('zealPanelHandle').value         = handle;
   _renderZealMemoHistory(handle);
   document.getElementById('zealSheet').removeAttribute('hidden');
@@ -261,6 +265,105 @@ let _chReviewFilter = '';
 let _chSort         = 'subs';
 let _chSortDir      = 'desc';
 
+
+// ── 프리미엄 캠페인별 상태 ────────────────────────────────────────────
+// 채널 선정·검토·결과 3단계 화면(#p-channels)은 한 장짜리라, 캠페인을 바꿔 열 때 이 화면이 쓰는 상태를 통째로 바꿔 끼운다.
+//  · 'demo' : 기본 예시 캠페인(원래 데이터)
+//  · 그 외  : 관리자가 보고서로 등록한 새 프리미엄 캠페인 — 채널 0개로 시작해서 [채널 업로드]로 채운다
+// 상태는 이 브라우저 탭 안에서만 유지된다(서버 저장은 아직 없다 — 선정·검토 상태 저장은 별도 작업).
+const PM = { current: 'demo', store: new Map(), demoHeader: null };
+const _pmObjs = () => ({ chState, chReviewState, CH_VIDEO, CH_POST, chRevisions, CH_PREMIUM });
+
+function _pmCapture() {
+  const snap = {
+    channels: channels.slice(), goal: GOAL, simPosted: new Set(_simPosted), checked: new Set(_chChecked),
+    filter: _chFilterStatus, rvFilter: _chReviewFilter, sort: _chSort, sortDir: _chSortDir,
+    tab: _chActiveTab, platFilter: _pmPlatformFilter, subTab: _pmActiveSubTab, videoLink: _chVideoLink,
+  };
+  const o = _pmObjs();
+  Object.keys(o).forEach(k => { snap[k] = Object.assign({}, o[k]); });
+  return snap;
+}
+
+function _pmApply(s) {
+  channels.length = 0; channels.push(...s.channels);
+  const o = _pmObjs();
+  Object.keys(o).forEach(k => { Object.keys(o[k]).forEach(key => { delete o[k][key]; }); Object.assign(o[k], s[k]); });
+  GOAL = s.goal; _simPosted = new Set(s.simPosted); _chChecked = new Set(s.checked);
+  _chFilterStatus = s.filter; _chReviewFilter = s.rvFilter; _chSort = s.sort; _chSortDir = s.sortDir;
+  _chActiveTab = s.tab; _pmPlatformFilter = s.platFilter; _pmActiveSubTab = s.subTab; _chVideoLink = s.videoLink;
+}
+
+const _pmEmpty = goal => ({
+  channels: [], goal, simPosted: new Set(), checked: new Set(), filter: '', rvFilter: '', sort: 'subs', sortDir: 'desc',
+  tab: 0, platFilter: 'all', subTab: 'videos', videoLink: '',
+  chState: {}, chReviewState: {}, CH_VIDEO: {}, CH_POST: {}, chRevisions: {}, CH_PREMIUM: {},
+});
+
+// 헤더(이름·상태·목표·플랫폼)와 "/ 30" 같은 정적 문구를 현재 캠페인에 맞춘다. vals 가 없으면 데모 원래 문구로 되돌린다.
+function _pmApplyHeader(vals) {
+  const root = document.getElementById('p-channels');
+  if (!root) return;
+  const q = s => root.querySelector(s);
+  if (!PM.demoHeader) {
+    PM.demoHeader = {
+      name: q('.cd-name')?.textContent, badge: q('#chCampaignBadge')?.textContent, badgeCls: q('#chCampaignBadge')?.className,
+      meta: q('.cd-meta')?.textContent, plats: q('[data-platforms]')?.dataset.platforms,
+      tax: q('#taxBtnPremium')?.dataset.args,
+    };
+  }
+  const d = PM.demoHeader;
+  const BADGE = { recruiting: ['모집 중', 'running'], 'channel-select': ['채널 선정 중', 'running'], progress: ['진행 중', 'running'], done: ['완료', 'done'] };
+  const nameEl = q('.cd-name'), badge = q('#chCampaignBadge'), meta = q('.cd-meta'), hd = q('[data-platforms]'), tax = q('#taxBtnPremium');
+  if (vals) {
+    const [bt, bc] = BADGE[vals.status] || BADGE['channel-select'];
+    if (nameEl) nameEl.textContent = vals.title;
+    if (badge) { badge.textContent = bt; badge.className = 'cd-badge ' + bc; }
+    if (meta) meta.textContent = `프리미엄 채널 · 영상 목표 ${GOAL}개`;
+    if (hd) hd.dataset.platforms = (vals.platforms || []).join(',');
+    if (tax) tax.dataset.args = '집계 예정|taxBtnPremium';
+  } else {
+    if (nameEl) nameEl.textContent = d.name;
+    if (badge) { badge.textContent = d.badge; badge.className = d.badgeCls; }
+    if (meta) meta.textContent = d.meta;
+    if (hd) hd.dataset.platforms = d.plats || '';
+    if (tax && d.tax) tax.dataset.args = d.tax;
+  }
+  root.querySelectorAll('.ch-tab-hero-div').forEach(el => { el.textContent = ' / ' + GOAL; });
+  const banner = document.getElementById('chCompleteBanner');
+  if (banner) banner.textContent = `✅ ${GOAL}개 선정이 완료되었습니다. 선정된 채널부터 순차적으로 제작이 진행됩니다.`;
+}
+
+// 보여 줄 캠페인으로 전환한다. key='demo' 또는 새 캠페인 키, vals={title,status,goalVids,platforms}
+function pmEnsureContext(key, vals) {
+  const sameKey = PM.current === key;
+  if (!sameKey) {
+    PM.store.set(PM.current, _pmCapture());
+    _pmApply(PM.store.get(key) || _pmEmpty(vals ? vals.goalVids : 30));
+    PM.current = key;
+  }
+  if (key !== 'demo' && vals) GOAL = vals.goalVids || 30;     // 카드에서 목표를 고쳤다면 반영
+  if (!sameKey || vals) {
+    _pmApplyHeader(key === 'demo' ? null : vals);
+    if (!sameKey && typeof chSwitchTab === 'function') chSwitchTab(_chActiveTab);
+  }
+}
+
+// 로그아웃·계정 전환 때: 새 캠페인에서 만든 채널·선정 상태를 버리고 데모로 돌아간다
+function pmReset() {
+  PM.store.forEach((_, k) => { if (k !== 'demo') PM.store.delete(k); });
+  if (PM.current !== 'demo') { pmEnsureContext('demo'); }
+}
+
+// 카드(data-pm-key)에서 열기 — 등록한 프리미엄 캠페인의 3단계 화면
+function openPremiumCampaign(key) {
+  const card = document.querySelector(`.campaign-card[data-pm-key="${CSS.escape(key)}"]`);
+  const v = card && typeof window.cardValuesFromCard === 'function' ? window.cardValuesFromCard(card) : null;
+  const goal = v ? (parseInt(v.goalValue, 10) || 0) : 0;
+  window._pmNextCtx = { key, vals: { title: (v && v.title) || '프리미엄 캠페인', status: (v && v.status) || 'channel-select', goalVids: goal || 30, platforms: (v && v.platforms) || [] } };
+  goTo('p-channels');
+}
+
 // ── 유틸 ──────────────────────────────────────────────────────────────
 function fmtSubs(n) {
   if (n >= 1000000) { const v = n / 1000000; return parseFloat(v.toFixed(1)) + 'M'; }
@@ -309,6 +412,21 @@ function erBar(rate) {
   </div>`;
 }
 
+// 평균 조회수의 숫자값 — 실제 조회로 채운 채널은 viewsNum, 예시 데이터는 "85만"·"1.2억" 표기를 읽는다
+function chViewsNum(ch) {
+  if (typeof ch.viewsNum === 'number') return ch.viewsNum;
+  const m = String(ch.views || '').replace(/,/g, '').match(/([\d.]+)\s*(억|만)?/);
+  if (!m) return 0;
+  return parseFloat(m[1]) * (m[2] === '억' ? 1e8 : m[2] === '만' ? 1e4 : 1);
+}
+// 평균 조회수 표기: 1만 미만은 그대로(3,744), 이상은 만·억 단위
+function fmtViewsAvg(n) {
+  n = Number(n) || 0;
+  if (n >= 100000000) return parseFloat((n / 100000000).toFixed(1)) + '억';
+  if (n >= 10000)     return parseFloat((n / 10000).toFixed(1)) + '만';
+  return n.toLocaleString();
+}
+
 // ── 정렬·필터된 인덱스 ───────────────────────────────────────────────
 function filteredIndices() {
   let list = channels.map((ch, i) => ({ ch, i }));
@@ -318,7 +436,7 @@ function filteredIndices() {
   list.sort((a, b) => {
     let diff = 0;
     if      (_chSort === 'repeat') diff = (a.ch.repeat || 0) - (b.ch.repeat || 0);
-    else if (_chSort === 'views')  diff = parseFloat(a.ch.views) - parseFloat(b.ch.views);
+    else if (_chSort === 'views')  diff = chViewsNum(a.ch) - chViewsNum(b.ch);
     else if (_chSort === 'rate')   diff = a.ch.rate - b.ch.rate;
     else                           diff = a.ch.subsNum - b.ch.subsNum;
     return diff * d;
@@ -339,7 +457,10 @@ function renderChannels() {
   const isMaxed  = selCount >= GOAL;
 
   if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:32px;color:var(--gray-light)">검색 결과가 없습니다.</td></tr>`;
+    const noneYet = !channels.length;
+    const msg = !noneYet ? '검색 결과가 없습니다.'
+      : (isAdminViewer() ? '아직 등록된 채널이 없습니다. 위의 [채널 업로드]로 후보 채널을 추가해 주세요.' : '관리자가 후보 채널을 등록하면 이곳에서 선정할 수 있습니다.');
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--gray-light)">${msg}</td></tr>`;
     return;
   }
 
@@ -368,20 +489,10 @@ function renderChannels() {
       <tr class="${rowCls}" id="chtr${i}">
         ${checkCell}
         <td style="text-align:center;padding:0 4px">${platBadge(ch.platform)}</td>
-        <td>
-          <div class="ch-cell">
-            <div class="ch-thumb">${ch.emoji}</div>
-            <div>
-              <div class="ch-name">${ch.name}</div>
-              <div class="ch-handle">${ch.handle}</div>
-            </div>
-          </div>
-        </td>
-        <td class="ch-cid-cell">${ch.cid ? `<span class="ch-cid">${ch.cid}</span>` : '<span class="ch-cid-none">-</span>'}</td>
+        <td><div class="ch-name">${escHtml(ch.name)}</div></td>
         <td style="text-align:center"><span class="cat-tag">${ch.cat}</span></td>
         <td class="n-cell">${fmtSubs(ch.subsNum)}</td>
-        <td class="n-cell">${ch.views}<div class="n-sub">평균</div></td>
-        <td>${erBar(ch.rate)}</td>
+        <td class="n-cell"${ch.shortsCounted ? ` title="최근 쇼츠 ${ch.shortsCounted}개의 평균 조회수"` : ''}>${ch.views}<div class="n-sub">평균</div></td>
         <td style="text-align:center">${ch.repeat ? `<span class="ch-hist-val ch-hist-val--on">${ch.repeat}</span>` : `<span class="ch-hist-val ch-hist-val--off">-</span>`}</td>
         <td class="zeal-col" style="text-align:center">${zealBadgeHtml(ch)}</td>
         <td class="ch-action-cell">${actionHtml}</td>
@@ -428,7 +539,8 @@ async function chUploadFetchYouTube(cids) {
         name: v.name, handle: h,
         subsNum: v.subscribers || 0,
         subs: v.subscribers == null ? '비공개' : fmtKoUnit(v.subscribers),
-        views: v.avgShortsViews == null ? '-' : fmtKoUnit(v.avgShortsViews),
+        views: v.avgShortsViews == null ? '-' : fmtViewsAvg(v.avgShortsViews),
+        viewsNum: v.avgShortsViews || 0, shortsCounted: v.shortsCounted || 0,
       };
     });
     return out;
@@ -443,7 +555,7 @@ async function chUploadFetchYouTube(cids) {
       handle:  '@' + cid.slice(2, 10).toLowerCase(),
       subsNum,
       subs:    fmtKoUnit(subsNum),
-      views:   fmtKoUnit(views),
+      views:   fmtKoUnit(views), viewsNum: views,
     };
   });
   return out;
@@ -557,7 +669,7 @@ async function chUploadRun() {
     if (d.hit) dbHit++;
     channels.push({
       emoji: '🎬', name: y.name, handle: y.handle, cid, cat: d.cat || '미분류',
-      platform: 'yt', subsNum: y.subsNum, subs: y.subs, views: y.views,
+      platform: 'yt', subsNum: y.subsNum, subs: y.subs, views: y.views, viewsNum: y.viewsNum, shortsCounted: y.shortsCounted,
       rate: d.rate || 0, repeat: d.repeat || 0,
     });
     chState[channels.length - 1] = 'pending';
@@ -568,6 +680,46 @@ async function chUploadRun() {
   updateChSummary();
   closeChUploadModal();
   showToast(`${added}개 채널 추가 · DB 이력 ${dbHit}개` + (missing ? ` · 조회 실패 ${missing}개` : ''));
+}
+
+
+// ── 구독자·평균 조회수 갱신 (관리자) ──────────────────────────────────
+// 목록에 있는 유튜브 채널 중 CID 가 있는 채널을 YouTube 에서 다시 조회해 구독자와 "최근 쇼츠 5개 평균 조회수"를 채운다.
+// 채널마다 API 를 여러 번 부르므로(채널 + 업로드 목록 + 영상 통계) 자동으로 돌리지 않고 버튼을 눌렀을 때만 한다.
+let _chStatsBusy = false;
+async function chRefreshStats() {
+  if (_chStatsBusy) return;
+  if (!(Api.enabled && Api.isLoggedIn() && Api.isAdmin() && (Api.isUp() || await Api.ping()))) {
+    alert('서버에 연결된 관리자 계정으로 로그인해야 YouTube에서 가져올 수 있습니다.'); return;
+  }
+  const targets = channels.map((ch, i) => ({ ch, i })).filter(({ ch }) => (ch.platform || 'yt') === 'yt' && /^UC[0-9A-Za-z_-]{22}$/.test(ch.cid || ''));
+  if (!targets.length) { showToast('CID가 있는 유튜브 채널이 없어 갱신할 수 없습니다. (채널 업로드로 추가한 채널만 가능)'); return; }
+  const btn = document.getElementById('chRefreshBtn');
+  const orig = btn ? btn.innerHTML : '';
+  _chStatsBusy = true;
+  if (btn) { btn.disabled = true; btn.textContent = '가져오는 중…'; }
+  let ok = 0, fail = 0;
+  try {
+    for (let k = 0; k < targets.length; k += 20) {
+      const chunk = targets.slice(k, k + 20);
+      const r = await Api.req('/api/youtube/channels', { method: 'POST', body: { cids: chunk.map(t => t.ch.cid) } });
+      if (!r.ok) { alert(r.error || 'YouTube 조회에 실패했습니다.'); break; }
+      chunk.forEach(({ ch }) => {
+        const v = (r.data.results || {})[ch.cid];
+        if (!v || !v.ok) { fail++; return; }
+        if (v.subscribers != null) { ch.subsNum = v.subscribers; ch.subs = fmtKoUnit(v.subscribers); }
+        ch.viewsNum = v.avgShortsViews || 0;
+        ch.views = v.avgShortsViews == null ? '-' : fmtViewsAvg(v.avgShortsViews);
+        ch.shortsCounted = v.shortsCounted || 0;
+        ok++;
+      });
+    }
+  } finally {
+    _chStatsBusy = false;
+    if (btn) { btn.disabled = false; btn.innerHTML = orig; }
+  }
+  renderChannels();
+  showToast(`${ok}개 채널을 갱신했습니다` + (fail ? ` · 조회 실패 ${fail}개` : '') + (channels.length > targets.length ? ` · CID가 없는 ${channels.length - targets.length}개는 그대로` : ''));
 }
 
 (function initChUpload() {
@@ -1063,6 +1215,8 @@ function renderResultPanel() {
 
       <div class="pm-pane${_pmActiveSubTab === 'metrics' ? ' active' : ''}" id="pmPaneMetrics">${renderPremiumMetrics(filteredItems)}</div>
     </div>`;
+  // 패널을 다시 그리면 연동 버튼 문구가 처음 값으로 돌아가므로 현재 연동 상태를 다시 표시한다
+  try { if (typeof ruRefreshPubButton === 'function') ruRefreshPubButton(); } catch (e) {}
 }
 
 // 참여 영상 ↔ 프리미엄 지표 전환. 결과 패널은 매번 새로 그려지므로 위임으로 처리한다.
@@ -1339,7 +1493,7 @@ function saveChVideoLink() {
   const input = document.getElementById('chVideoLink');
   if (!input) return;
   _chVideoLink = input.value.trim();
-  try { localStorage.setItem(CH_VIDEO_LINK_KEY, _chVideoLink); } catch (e) {}
+  if (PM.current === 'demo') { try { localStorage.setItem(CH_VIDEO_LINK_KEY, _chVideoLink); } catch (e) {} }
   const status = document.getElementById('chVideoLinkStatus');
   if (status) {
     status.textContent = _chVideoLink ? '✓ 저장됨 · 검토 시 이 링크가 열립니다' : '링크를 비웠습니다';
@@ -1525,6 +1679,31 @@ function toggleChCheck(idx) {
   renderChannels();
 }
 
+// 채널 주소: 유튜브는 CID(없으면 @핸들), 인스타그램·틱톡은 @핸들
+function chChannelUrl(ch) {
+  if (!ch) return '';
+  const h = String(ch.handle || '').trim();
+  if (ch.platform === 'yt' || !ch.platform) {
+    if (/^UC[0-9A-Za-z_-]{22}$/.test(ch.cid || '')) return 'https://www.youtube.com/channel/' + ch.cid;
+    if (h) return 'https://www.youtube.com/' + (h.startsWith('@') ? '@' + encodeURIComponent(h.slice(1)) : encodeURIComponent(h));
+  }
+  if (ch.platform === 'ig' && h) return 'https://www.instagram.com/' + encodeURIComponent(h.replace(/^@/, '')) + '/';
+  if (ch.platform === 'tt' && h) return 'https://www.tiktok.com/@' + encodeURIComponent(h.replace(/^@/, ''));
+  return '';
+}
+
+// 체크한 채널을 각 플랫폼의 채널 페이지로 연다(새 탭)
+function viewCheckedChannels() {
+  const idx = [..._chChecked].sort((a, b) => a - b);
+  if (!idx.length) return;
+  const urls = idx.map(i => chChannelUrl(channels[i])).filter(Boolean);
+  if (!urls.length) { showToast('이동할 수 있는 채널 주소가 없습니다.'); return; }
+  let blocked = false;
+  urls.forEach(u => { const w = window.open(u, '_blank', 'noopener'); if (!w) blocked = true; });
+  if (blocked) showToast('팝업이 차단되어 일부 채널을 열지 못했습니다. 주소창 오른쪽에서 팝업을 허용한 뒤 다시 눌러주세요.');
+  else if (urls.length < idx.length) showToast(`${idx.length - urls.length}개 채널은 주소가 없어 열지 못했습니다.`);
+}
+
 function updateChActionBar() {
   const bar   = document.getElementById('chBulkBar');
   const label = document.getElementById('chBulkLabel');
@@ -1651,6 +1830,7 @@ function chSetReviewStatus(val) {
 
 // ── 프리미엄 카드 진행률 갱신 (광고주 p-list + 관리자 p-admin 공통) ───────
 function updateListCardPremium() {
+  if (PM.current !== 'demo') return;   // 기본(데모) 카드는 데모 상태로만 계산한다 — 새 캠페인을 보는 중이면 건드리지 않는다
   const doneCount = channels.reduce((n, _, i) =>
     n + (chState[i] === 'selected' && chReviewState[i] === '승인 완료' ? 1 : 0), 0);
   const pct     = Math.round(doneCount / GOAL * 100);

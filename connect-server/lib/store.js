@@ -6,7 +6,7 @@ const path = require('path');
 
 const DIR = path.join(__dirname, '..', 'data');
 const FILE = path.join(DIR, 'db.json');
-const EMPTY = () => ({ campaigns: [], videos: {}, videosPub: {}, hidden: {}, comments: {}, zealMemos: {}, refreshLog: {} });
+const EMPTY = () => ({ campaigns: [], videos: {}, videosPub: {}, hidden: {}, meta: {}, comments: {}, zealMemos: {}, refreshLog: {} });
 
 let db = null;
 let timer = null;

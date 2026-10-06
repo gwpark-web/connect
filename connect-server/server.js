@@ -102,6 +102,37 @@ function cleanCampaign(b, partial) {
   if (!partial || has('status')) out.status = ['recruiting', 'channel-select', 'progress', 'done'].includes(b.status) ? b.status : 'recruiting';
   return { value: out };
 }
+/* ── 정적 캠페인 카드 정보·회차 타임라인(관리자가 고치면 [연동] 때 광고주에게 반영) ── */
+const CARD_STATUSES = ['recruiting', 'channel-select', 'progress', 'done'];
+function cleanCard(b) {
+  if (!b || typeof b !== 'object') return null;
+  const title = str(b.title, 100); if (!title) return null;
+  const thumb = str(b.thumb, 500);
+  const plats = [...new Set((Array.isArray(b.platforms) ? b.platforms : []).map(p => str(p, 4)).filter(p => PLATFORMS.includes(p)))];
+  const date = v => { const t = str(v, 10); return /^\d{4}-\d{2}-\d{2}$/.test(t) ? t : ''; };
+  const digits = v => str(v, 15).replace(/[^0-9]/g, '');
+  return {
+    title, client: str(b.client, 60),
+    product: PRODUCTS.includes(b.product) ? b.product : '조회수당',
+    status: CARD_STATUSES.includes(b.status) ? b.status : 'recruiting',
+    goalType: b.goalType === '영상' ? '영상' : '조회수',
+    goalValue: digits(b.goalValue), current: digits(b.current),
+    start: date(b.start), end: date(b.end),
+    thumb: /^(https?:\/\/[^\s"'()<>\\]+|img\/[A-Za-z0-9_./-]+)$/.test(thumb) ? thumb : '',
+    platforms: plats,
+  };
+}
+function cleanTimeline(b) {
+  if (!Array.isArray(b) || b.length > 60) return null;
+  return b.map(r => ({
+    final: !!(r && r.final),
+    num: str(r && r.num, 8),
+    title: str(r && r.title, 120),
+    pct: str(r && r.pct, 12),
+    metas: (Array.isArray(r && r.metas) ? r.metas : []).slice(0, 4).map(m => ({ text: str(m && m.text, 200), memo: !!(m && m.memo) })),
+  })).filter(r => r.title || r.num);
+}
+
 const visibleTo = (user, c) => user.role === 'admin' ||
   (!!user.brand && [c.client, c.agency].some(v => v && v.toLowerCase() === user.brand.toLowerCase()));
 
@@ -177,6 +208,30 @@ async function route(req, res) {
     if (user.role !== 'admin') return send(req, res, 200, { rows: (db.videosPub[key] || {}).rows || [], hidden: (db.videosPub[key] || {}).hidden || [] });
     return send(req, res, 200, { rows: db.videos[key] || [], hidden: db.hidden[key] || [], pub: pubState(db, key) });
   }
+  /* 캠페인 카드 정보·회차 타임라인 저장/조회 — 관리자는 작업본, 광고주는 [연동]으로 내보낸 공개본을 본다 */
+  if (p === '/api/campaign-meta' && m === 'GET') {
+    const user = need(req, res); if (!user) return;
+    const db = store.get();
+    if (user.role !== 'admin') {
+      const meta = {}; Object.keys(db.videosPub).forEach(k => { if (db.videosPub[k].meta && Object.keys(db.videosPub[k].meta).length) meta[k] = db.videosPub[k].meta; });
+      return send(req, res, 200, { meta });
+    }
+    const pub = {}; const keys = new Set([...Object.keys(db.meta), ...Object.keys(db.videosPub), ...Object.keys(db.videos)]);
+    keys.forEach(k => { pub[k] = pubState(db, k); });
+    return send(req, res, 200, { meta: db.meta, pub });
+  }
+  if (p === '/api/campaign-meta' && m === 'POST') {
+    const user = need(req, res, 'admin'); if (!user) return;
+    const key = url.searchParams.get('campaign') || '';
+    if (!CAMPAIGN_KEY.test(key)) return send(req, res, 400, { error: 'campaign 값이 올바르지 않습니다.' });
+    const b = await readJson(req);
+    const db = store.get();
+    const cur = db.meta[key] || (db.meta[key] = {});
+    if (b.card !== undefined) { const c = cleanCard(b.card); if (!c) return send(req, res, 400, { error: '캠페인명이 필요합니다.' }); cur.card = c; }
+    if (b.timeline !== undefined) { const t = cleanTimeline(b.timeline); if (!t) return send(req, res, 400, { error: '타임라인 형식이 올바르지 않습니다.' }); cur.timeline = t; }
+    store.save();
+    return send(req, res, 200, { meta: cur, pub: pubState(db, key) });
+  }
   /* 참여 영상 행 삭제 — 서버에 올린 행이면 지우고, 예시(화면에만 있는) 행이면 '삭제됨' 표시를 남긴다. 광고주에게는 [연동] 후 반영된다 */
   if (p === '/api/videos/delete' && m === 'POST') {
     const user = need(req, res, 'admin'); if (!user) return;
@@ -199,8 +254,8 @@ async function route(req, res) {
     if (!CAMPAIGN_KEY.test(key)) return send(req, res, 400, { error: 'campaign 값이 올바르지 않습니다.' });
     const db = store.get();
     const rows = db.videos[key] || [];
-    if (!rows.length && !(db.hidden[key] || []).length) return send(req, res, 400, { error: '연동할 리포트 데이터가 없습니다. 먼저 리포트를 업로드해주세요.' });
-    db.videosPub[key] = { rows: JSON.parse(JSON.stringify(rows)), comments: JSON.parse(JSON.stringify(db.comments[key] || { items: [] })), hidden: JSON.parse(JSON.stringify(db.hidden[key] || [])), at: new Date().toISOString() };
+    if (!rows.length && !(db.hidden[key] || []).length && !Object.keys(db.meta[key] || {}).length) return send(req, res, 400, { error: '연동할 내용이 없습니다. 리포트를 올리거나 캠페인 정보·회차를 수정한 뒤 눌러주세요.' });
+    db.videosPub[key] = { rows: JSON.parse(JSON.stringify(rows)), comments: JSON.parse(JSON.stringify(db.comments[key] || { items: [] })), hidden: JSON.parse(JSON.stringify(db.hidden[key] || [])), meta: JSON.parse(JSON.stringify(db.meta[key] || {})), at: new Date().toISOString() };
     store.save();
     return send(req, res, 200, { count: rows.length, pub: pubState(db, key) });
   }
@@ -440,7 +495,8 @@ function pubState(db, key) {
   if (!pub) return { state: 'never', at: null };
   const same = JSON.stringify(pub.rows) === JSON.stringify(db.videos[key] || [])
     && JSON.stringify((pub.comments || {}).items || []) === JSON.stringify((db.comments[key] || {}).items || [])
-    && JSON.stringify(pub.hidden || []) === JSON.stringify(db.hidden[key] || []);
+    && JSON.stringify(pub.hidden || []) === JSON.stringify(db.hidden[key] || [])
+    && JSON.stringify(pub.meta || {}) === JSON.stringify(db.meta[key] || {});
   return { state: same ? 'synced' : 'pending', at: pub.at, count: pub.rows.length };
 }
 

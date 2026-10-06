@@ -58,3 +58,20 @@ node server.js           # http://localhost:4000
 3. 어드민 로그인이 만료되면 YouTube 정보는 그대로 반영하고 "짤 어드민 로그인 만료" 경고만 표시합니다.
 
 연락처 같은 개인정보는 관리자 로그인에서만 내려가고, 로그에는 남기지 않으며, 리포트 저장 데이터에는 섞이지 않습니다.
+
+## 다른 사람과 공유하기 (내 컴퓨터 서버 + 무료 임시 터널)
+
+내 컴퓨터에서 켠 서버를 GitHub Pages 사이트에 연결해 다른 사람이 쓰게 하는 방법입니다(시연·검토용).
+
+1. `.env` 의 `ADMIN_PASSWORD`, `ADVERTISERS` 비밀번호를 **8자 이상 긴 값**으로 바꾸고 `TOKEN_SECRET` 에 긴 임의 문자열을 넣습니다.
+   (터널로 들어오는 로그인은 비밀번호가 8자 미만이면 서버가 막습니다.)
+2. `.env` 의 `ALLOWED_ORIGINS` 에 `https://gwpark-web.github.io` 를 추가합니다.
+3. 처음 한 번 `node gen-identity.js` 를 실행합니다. `.env` 에 신원 키가 생기고 공개키가 출력됩니다.
+   공개키가 `connect/api.js` 의 `SERVER_PUBKEY` 와 같아야 합니다(다르면 사이트가 서버를 거부합니다).
+4. 서버를 켭니다: `node server.js`
+5. 다른 터미널에서 터널을 켭니다: `cloudflared tunnel --url http://localhost:4000` → `https://….trycloudflare.com` 주소가 나옵니다.
+6. 공유할 주소: `https://gwpark-web.github.io/connect/connect/site.html?api=https://….trycloudflare.com`
+   - 터널을 다시 켜면 주소가 바뀌므로 새 주소를 공유합니다.
+   - 연결은 그 탭에서만 유지됩니다. 끊으려면 `?api=off` 를 붙여 엽니다.
+   - 사이트는 서버가 개인키로 서명한 신원 증명을 공개키로 검증한 뒤에만 연결합니다(남의 서버로 로그인 정보가 가는 것을 막기 위함).
+7. 끝나면 두 터미널에서 Ctrl+C. 컴퓨터가 잠들면 서버도 멈추니 시연 중에는 `caffeinate -i` 를 켜 두세요.

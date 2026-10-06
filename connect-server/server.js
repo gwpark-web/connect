@@ -14,6 +14,7 @@ const store = require('./lib/store');
 const auth = require('./lib/auth');
 const yt = require('./lib/youtube');
 const zeal = require('./lib/zeal');
+const identity = require('./lib/identity');
 
 const PORT = +process.env.PORT || 4000;
 // 기본은 이 컴퓨터(127.0.0.1)에서만 접속된다. 같은 네트워크의 다른 기기에서도 쓰려면 .env 에 HOST=0.0.0.0 (강한 비밀번호 필수)
@@ -65,6 +66,13 @@ function need(req, res, role) {
   return user;
 }
 
+/* ── 접속자 구분 ──
+   Cloudflare 터널을 거치면 서버에는 모든 요청이 이 컴퓨터(127.0.0.1)에서 온 것처럼 보인다.
+   그래서 요청이 이 컴퓨터에서 왔을 때만 터널이 붙여 주는 CF-Connecting-IP(실제 접속자 주소)를 믿는다. */
+const isLoopback = a => a === '127.0.0.1' || a === '::1' || a === '::ffff:127.0.0.1';
+const viaTunnel = req => isLoopback(req.socket.remoteAddress) && !!req.headers['cf-connecting-ip'];
+const clientIp = req => viaTunnel(req) ? String(req.headers['cf-connecting-ip']).slice(0, 64) : req.socket.remoteAddress;
+
 /* ── 로그인 시도 제한(IP당 1분 10회, LOGIN_RATE_LIMIT 로 조정) ── */
 const attempts = new Map();
 function tooManyLogins(ip) {
@@ -106,10 +114,19 @@ async function route(req, res) {
   if (p === '/api/health' && m === 'GET') return send(req, res, 200, { ok: true, auth: auth.configured(), youtube: yt.configured(), zealLive: zeal.liveConfigured() });
 
   /* 로그인 */
+  /* 서버 신원 증명 — 사이트가 ?api= 주소가 진짜 서버인지 확인한다(로그인 정보를 보내기 전에) */
+  if (p === '/api/identity' && m === 'GET') {
+    const nonce = url.searchParams.get('nonce') || '';
+    if (!/^[A-Za-z0-9_-]{8,128}$/.test(nonce)) return send(req, res, 400, { error: 'nonce 값이 올바르지 않습니다.' });
+    if (!identity.configured()) return send(req, res, 503, { error: '서버 신원 키가 없습니다(node gen-identity.js).' });
+    return send(req, res, 200, { sig: identity.sign(nonce) });
+  }
   if (p === '/api/login' && m === 'POST') {
-    if (tooManyLogins(req.socket.remoteAddress)) return send(req, res, 429, { error: '로그인 시도가 너무 많습니다. 잠시 후 다시 시도하세요.' });
+    if (tooManyLogins(clientIp(req))) return send(req, res, 429, { error: '로그인 시도가 너무 많습니다. 잠시 후 다시 시도하세요.' });
     const b = await readJson(req);
     if (!auth.configured()) return send(req, res, 503, { error: '서버에 계정이 설정되어 있지 않습니다(.env 의 ADMIN_EMAIL/ADMIN_PASSWORD).' });
+    // 터널(인터넷)을 통한 로그인은 비밀번호가 약하면 막는다 — 이 컴퓨터에서 직접 접속하는 것만 허용
+    if (viaTunnel(req) && auth.weakAccounts().length) return send(req, res, 503, { error: '서버 비밀번호가 약해서(8자 미만) 외부 접속 로그인을 막아 두었습니다. 서버 .env 의 비밀번호를 바꾼 뒤 서버를 다시 켜주세요.' });
     const user = auth.login(b.email, b.password);
     if (!user) return send(req, res, 401, { error: '아이디(이메일) 또는 비밀번호를 확인해주세요.' });
     return send(req, res, 200, { token: auth.sign(user), user });
@@ -418,6 +435,7 @@ server.listen(PORT, HOST, () => {
   const weak = auth.weakAccounts();
   if (weak.length) console.log(`  ⚠ 짧은 비밀번호 계정이 있습니다(${weak.join(', ')}) — 로컬 테스트용으로만 쓰고, 서버를 공개하기 전에 바꾸세요.`);
   console.log(`  로그인 계정: ${auth.configured() ? '설정됨' : '없음(.env 필요)'}  ·  YouTube API: ${yt.configured() ? '설정됨' : '키 없음'}  ·  짤 어드민: ${zeal.liveConfigured() ? '직접 조회' : '연결 안 됨(저장된 목록만)'}`);
+  console.log(`  서버 신원 키: ${identity.configured() ? '있음(?api= 연결 가능)' : '없음 — node gen-identity.js 로 만드세요(?api= 연결 불가)'}`);
   if (migrated) console.log(`  짤 회원 ${migrated}명을 data-zeal.json 에서 가져왔습니다.`);
   console.log(`  허용 출처: ${ORIGINS.join(', ')}`);
 });

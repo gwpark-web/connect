@@ -1877,7 +1877,7 @@ async function refreshViewCounts() {
 
   // ── 서버 모드: 관리자 로그인 + 참여 영상 표 화면 → 서버가 하루 1회 한도를 관리하고 YouTube API로 실제 수치를 가져온다 ──
   const pageId = ruCampaignKey();
-  if (Api.enabled && Api.isLoggedIn() && Api.isAdmin() && ['p-detail', 'p-detail-upload'].includes(pageId) && (Api.isUp() || await Api.ping())) {
+  if (Api.enabled && Api.isLoggedIn() && Api.isAdmin() && ruReportKey(pageId) && (Api.isUp() || await Api.ping())) {
     const orig0 = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = select ? `갱신 중… (${platLabel})` : '갱신 중…';

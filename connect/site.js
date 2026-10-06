@@ -128,6 +128,8 @@ function goTo(id) {
   window.scrollTo(0,0);
   document.getElementById('p1').scrollTop = 0;
 
+  // 등록한 조회수당·업로드당 캠페인 상세는 캠페인 정보를 화면에 채운다(카드에서 연 경우). 직접 열면 처음 상태.
+  if (id === 'p-detail-empty') { const n = window._detailNextCtx; window._detailNextCtx = null; detailUseCampaign(n || null); }
   // 프리미엄 3단계 화면은 캠페인마다 상태가 다르다 — 카드에서 열었으면 그 캠페인으로, 아니면 기본(데모)으로 맞춘다
   if (typeof pmEnsureContext === 'function') {
     if (id === 'p-channels' && window._pmNextCtx) { const n = window._pmNextCtx; window._pmNextCtx = null; pmEnsureContext(n.key, n.vals); }
@@ -138,8 +140,9 @@ function goTo(id) {
   if (id === 'p1') { setTimeout(runStatCountUp, 200); }
   // 검토용 백엔드에 저장된 참여 영상 데이터가 있으면 복원(서버 미실행 시 조용히 무시)
   if (id === 'p-detail' || id === 'p-detail-upload') { ruLoadFromServer(id); }
+  if (id === 'p-detail-empty' && window._detailCtx) { ruLoadFromServer(window._detailCtx.key); }
   // 캠페인 카드 정보·회차 타임라인(관리자는 작업본, 광고주는 연동된 내용)
-  if (['p-list', 'p-admin', 'p-detail', 'p-detail-upload', 'p-channels'].includes(id)) { metaLoad(); }
+  if (['p-list', 'p-admin', 'p-detail', 'p-detail-upload', 'p-detail-empty', 'p-channels'].includes(id)) { metaLoad(); }
 }
 
 function goToAuth(id) {
@@ -226,7 +229,129 @@ function ruResetVidTables() {
     c.innerHTML = b.html;
   });
   window._pubByKey = {};
-  if (typeof pmReset === 'function') pmReset();   // 새 프리미엄 캠페인에서 만든 채널·선정 상태는 계정이 바뀌면 버린다
+  if (typeof pmReset === 'function') pmReset();
+  window._detailCtx = null; window._detailNextCtx = null; if (typeof detailApplyHeader === 'function') detailApplyHeader(null);   // 새 프리미엄 캠페인에서 만든 채널·선정 상태는 계정이 바뀌면 버린다
+}
+
+// ── 등록한 조회수당·업로드당 캠페인의 상세 화면(#p-detail-empty) ──────────────
+// 이 화면은 한 장짜리라, 카드에서 열 때 그 캠페인의 정보(이름·상태·플랫폼·기간·목표·썸네일)를 채우고
+// 표·타임라인은 비운 뒤 서버에 저장된 그 캠페인(id)의 데이터를 불러온다.
+window._detailCtx = null;      // { key, vals } — key 는 서버 캠페인 id(등록 서버 없이 만든 것은 local-…)
+const DETAIL_STATUS = { recruiting: ['모집 중', ''], 'channel-select': ['채널 선정 중', 'running'], progress: ['진행 중', 'running'], done: ['완료', 'done'] };
+let _detailBase = null;
+
+function openCampaignDetail(key) {
+  const card = document.querySelector(`.campaign-card[data-detail-key="${CSS.escape(key)}"]`);
+  const v = card && typeof window.cardValuesFromCard === 'function' ? window.cardValuesFromCard(card) : null;
+  window._detailNextCtx = { key, vals: v || { title: '새 캠페인', client: '', product: '조회수당', status: 'recruiting', goalType: '조회수', goalValue: '', current: '', start: '', end: '', thumb: '', platforms: [] } };
+  goTo('p-detail-empty');
+}
+
+const _detailThumbOk = u => /^(https?:\/\/[^\s"'()<>\\]+|img\/[A-Za-z0-9_./-]+)$/.test(u || '');
+
+function detailSyncTlEmpty() {
+  const root = document.getElementById('p-detail-empty'); if (!root) return;
+  const list = root.querySelector('.cd-tl-list'), emp = root.querySelector('.cd-tl-empty');
+  if (emp && list) emp.style.display = list.children.length ? 'none' : '';
+}
+
+// 결과 카드(3열): 목표 유형(조회수/업로드 수)에 맞는 라벨로 그린다. sums 가 있으면 표에서 계산한 달성값.
+function detailRenderResult(v, sums) {
+  const root = document.getElementById('p-detail-empty'); const card = root && root.querySelector('.cd-result-card');
+  if (!card) return;
+  const isVids = v.goalType === '영상';
+  const goal = parseInt(v.goalValue, 10) || 0, unit = isVids ? '개' : '회';
+  const got = sums ? (isVids ? sums.vids : sums.views) : null;
+  const pct = sums && goal > 0 ? Math.round(got / goal * 100) + '%' : '—';
+  const items = [
+    [isVids ? '목표 업로드' : '목표 조회수', goal ? goal.toLocaleString() + unit : '집계 예정', false],
+    [isVids ? '달성 업로드' : '달성 조회수', sums ? got.toLocaleString() + unit : '집계 예정', !!sums],
+    isVids ? ['총 조회수', sums ? sums.views.toLocaleString() + '회' : '—', false] : ['참여 영상', sums ? sums.vids.toLocaleString() + '개' : '—', false],
+    ['집행 금액', '—', false],
+  ];
+  card.classList.toggle('cd-result-card--empty', !sums);
+  card.textContent = '';
+  const hero = document.createElement('div'); hero.className = 'cd-result-hero'; hero.textContent = pct; card.appendChild(hero);
+  const list = document.createElement('div'); list.className = 'cd-result-list';
+  items.forEach(([lbl, val, acc]) => {
+    const it = document.createElement('div'); it.className = 'cd-result-item';
+    const a = document.createElement('span'); a.className = 'cd-result-lbl'; a.textContent = lbl;
+    const b = document.createElement('span'); b.className = 'cd-result-val' + (acc ? ' cd-result-val--accent' : ''); b.textContent = val;
+    it.append(a, b); list.appendChild(it);
+  });
+  card.appendChild(list);
+}
+
+function detailApplyHeader(v) {
+  const root = document.getElementById('p-detail-empty'); if (!root) return;
+  const q = sel => root.querySelector(sel);
+  if (!_detailBase) {
+    _detailBase = {
+      thumb: q('.cd-thumb')?.innerHTML, name: q('.cd-name')?.textContent, badge: q('.cd-badge')?.textContent, badgeCls: q('.cd-badge')?.className,
+      meta: q('.cd-meta')?.innerHTML, poster: q('.cd-poster-placeholder')?.innerHTML, result: q('.cd-result-card')?.innerHTML, resultCls: q('.cd-result-card')?.className,
+    };
+  }
+  const b = _detailBase;
+  if (!v) {
+    q('.cd-thumb').innerHTML = b.thumb; q('.cd-name').textContent = b.name;
+    const bd = q('.cd-badge'); bd.textContent = b.badge; bd.className = b.badgeCls;
+    q('.cd-meta').innerHTML = b.meta; q('.cd-poster-placeholder').innerHTML = b.poster;
+    const rc = q('.cd-result-card'); rc.innerHTML = b.result; rc.className = b.resultCls;
+    detailRenderPlatChips([]);
+    return;
+  }
+  const thumb = _detailThumbOk(v.thumb) ? v.thumb : '';
+  const th = q('.cd-thumb'); th.textContent = '';
+  if (thumb) { const img = document.createElement('img'); img.src = thumb; img.alt = ''; th.appendChild(img); } else th.textContent = '🎬';
+  q('.cd-name').textContent = v.title;
+  const [bt, bc] = DETAIL_STATUS[v.status] || DETAIL_STATUS.recruiting;
+  const bd = q('.cd-badge'); bd.textContent = bt; bd.className = 'cd-badge' + (bc ? ' ' + bc : '');
+  const meta = q('.cd-meta'); meta.textContent = '';
+  (v.platforms || []).filter(p => CREG_PLAT[p]).forEach(p => { const w = document.createElement('span'); w.innerHTML = CREG_PLAT[p]; meta.appendChild(w.firstElementChild); });
+  const f = d => String(d || '').replace(/-/g, '. ');
+  const period = (v.start || v.end) ? `${f(v.start)} ~ ${f(v.end)}`.trim() : '';
+  const info = [v.product, period, v.client].filter(Boolean).join(' · ');
+  if (info) { const s = document.createElement('span'); s.style.cssText = 'font-size:12px;color:var(--gray-light);margin-left:8px'; s.textContent = info; meta.appendChild(s); }
+  const ph = q('.cd-poster-placeholder');
+  if (ph) {
+    if (thumb) { ph.textContent = ''; const img = document.createElement('img'); img.src = thumb; img.alt = v.title; img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:inherit'; ph.appendChild(img); }
+    else ph.innerHTML = b.poster;
+  }
+  detailRenderResult(v, null);
+  detailRenderPlatChips(v.platforms || []);
+}
+
+// 플랫폼이 둘 이상인 캠페인이면 참여 영상 표를 플랫폼별로 걸러볼 수 있게 칩을 만든다(1개면 숨김)
+function detailRenderPlatChips(plats) {
+  const bar = document.querySelector('#p-detail-empty .vid-plat-filter'); if (!bar) return;
+  const list = (plats || []).filter(p => ['yt', 'ig', 'tt'].includes(p));
+  bar.textContent = '';
+  bar.hidden = list.length < 2;
+  if (list.length < 2) return;
+  const NAME = { yt: '유튜브', ig: '인스타그램', tt: '틱톡' };
+  const mk = (val, label, icon, active) => {
+    const b = document.createElement('button'); b.className = 'vid-plat-chip' + (active ? ' active' : ''); b.dataset.vidPlat = val;
+    if (icon) { const w = document.createElement('span'); w.innerHTML = icon; if (w.firstElementChild) b.appendChild(w.firstElementChild); }
+    b.appendChild(document.createTextNode(label)); bar.appendChild(b);
+  };
+  mk('all', '전체', '', true);
+  list.forEach(p => mk(p, NAME[p], typeof PLAT_ICON !== 'undefined' ? PLAT_ICON[p] : '', false));
+}
+
+// 카드에서 열 때(ctx 있음)·직접 열 때(null) 호출 — 이전 캠페인의 표·타임라인·통계를 비우고 헤더를 맞춘다
+function detailUseCampaign(ctx) {
+  window._detailCtx = ctx;
+  const root = document.getElementById('p-detail-empty'); if (!root) return;
+  _vidTableBaseline.forEach((html, tb) => { if (root.contains(tb)) tb.innerHTML = html; });
+  _vidStatBaseline.forEach((texts, st) => {
+    if (!root.contains(st)) return;
+    st.querySelectorAll('.vid-stat-num').forEach((n, i) => { n.textContent = texts[i]; });
+    const card = st.closest('.vid-card'); if (card) delete card.dataset.statLive;
+  });
+  _tlBaseline.forEach((html, l) => { if (root.contains(l)) l.innerHTML = html; });
+  detailApplyHeader(ctx ? ctx.vals : null);
+  detailSyncTlEmpty();
+  if (typeof ruRefreshPubButton === 'function') { const b = document.querySelector('#p-detail-empty .vid-publish-btn'); if (b) ruShowPubState((window._pubByKey || {})[ruCampaignKey()] || null); }
 }
 
 // ── 참여 영상 요약(총 업로드수·조회수·좋아요·댓글) — 리포트가 반영되면 표의 행에서 다시 계산한다 ──
@@ -249,6 +374,7 @@ function vidRecomputeStats(card) {
   const vals = [trs.length, sum.views, sum.likes, sum.comments];
   nums.forEach((n, i) => { if (i < vals.length) n.textContent = vals[i].toLocaleString(); });
   card.dataset.statLive = '1';
+  if (card.closest('#p-detail-empty') && window._detailCtx) detailRenderResult(window._detailCtx.vals, { views: sum.views, vids: trs.length });
 }
 
 function doLogout() {
@@ -478,6 +604,8 @@ function vidApplyLimit(card) {
   const rows = [...card.querySelectorAll('.vid-table tbody tr')].filter(tr => tr.style.display !== 'none');
   const expanded = card.dataset.vidExpanded === '1';
   rows.forEach((tr, i) => tr.classList.toggle('vid-row-extra', !expanded && i >= VID_PAGE_LIMIT));
+  const emptyMsg = card.querySelector('.vid-empty');
+  if (emptyMsg) emptyMsg.style.display = card.querySelectorAll('.vid-table tbody tr').length ? 'none' : '';
   const btn = card.querySelector('.vid-expand-btn');
   if (!btn) return;
   btn.hidden = rows.length <= VID_PAGE_LIMIT;
@@ -670,24 +798,28 @@ async function openStatModal(type) {
   const bodyEl  = document.getElementById('statModalBody');
   const live = _liveStatCard();
   const empty = msg => `<p class="stat-empty">${msg}</p>`;
+  const onNewCampaign = !live && !!document.querySelector('#p-detail-empty.active');   // 등록한 캠페인 — 예시(데모) TOP10 을 보여 주지 않는다
   if (type === 'views') {
     titleEl.textContent = '조회수 TOP 10 채널';
     subEl.textContent   = '참여 영상 기준 조회수 상위 채널';
-    if (live) {
+    if (onNewCampaign) bodyEl.innerHTML = empty('아직 집계된 조회수 데이터가 없습니다. 리포트를 올리면 표시됩니다.');
+    else if (live) {
       const items = _statItemsFromTable(live.table, '조회수');
       bodyEl.innerHTML = items.length ? _statRankHTML(items, v => v.toLocaleString() + '회', _campaignTotalViews()) : empty('조회수 데이터가 아직 없습니다.');
     } else bodyEl.innerHTML = _statRankHTML(_STAT_DATA.views, v => v.toLocaleString() + '회', _campaignTotalViews());
   } else if (type === 'likes') {
     titleEl.textContent = '좋아요 TOP 10 채널';
     subEl.textContent   = '참여 영상 기준 좋아요 상위 채널';
-    if (live) {
+    if (onNewCampaign) bodyEl.innerHTML = empty('아직 집계된 좋아요 데이터가 없습니다. 리포트를 올리면 표시됩니다.');
+    else if (live) {
       const items = _statItemsFromTable(live.table, '좋아요');
       bodyEl.innerHTML = items.length ? _statRankHTML(items, v => v.toLocaleString() + '개') : empty('좋아요 데이터가 아직 없습니다.');
     } else bodyEl.innerHTML = _statRankHTML(_STAT_DATA.likes, v => v.toLocaleString() + '개');
   } else if (type === 'comments') {
     titleEl.textContent = '베스트 댓글';
     subEl.textContent   = '주요 반응 · 좋아요 많은 순';
-    if (live) await _renderLiveComments(bodyEl);
+    if (onNewCampaign) bodyEl.innerHTML = empty('아직 집계된 댓글 데이터가 없습니다. 리포트를 올리면 표시됩니다.');
+    else if (live) await _renderLiveComments(bodyEl);
     else bodyEl.innerHTML = _statCmtHTML(_STAT_DATA.comments);
   }
   document.getElementById('statModal').classList.add('open');
@@ -1190,12 +1322,19 @@ function ruApplyRowsToTable(table, rows, opts) {
 // ── 참여 영상 리포트 서버 연동 ──
 // 서버(connect-server)가 있고 로그인한 상태면 서버에 저장·복원하고, 없으면 화면에만 반영한다.
 function ruCampaignKey() {
-  return pages.find(p => document.getElementById(p)?.classList.contains('active')) || 'default';
+  const act = pages.find(p => document.getElementById(p)?.classList.contains('active'));
+  // 등록한 캠페인의 상세 화면은 한 장짜리 페이지를 같이 쓰므로, 화면 이름 대신 캠페인 id 로 데이터를 구분한다
+  if (act === 'p-detail-empty' && window._detailCtx) return window._detailCtx.key;
+  return act || 'default';
+}
+// 리포트(참여 영상·타임라인·삭제·갱신)를 서버에 저장하는 화면 key 인지 — 기본 예시 2종 + 지금 열어 둔 등록 캠페인
+function ruReportKey(key) {
+  return ['p-detail', 'p-detail-upload'].includes(key) || !!(window._detailCtx && key === window._detailCtx.key);
 }
 
 // 페이지 진입 시 서버에 저장된 값이 있으면 표에 복원한다(새로고침해도 유지)
 function ruLoadFromServer(pageId) {
-  if (!['p-detail', 'p-detail-upload'].includes(pageId)) return;
+  if (!ruReportKey(pageId)) return;
   if (!Api.enabled || !Api.isLoggedIn()) return;
   Api.req(`/api/videos?campaign=${encodeURIComponent(pageId)}`).then(async r => {
     if (r.ok && r.data && r.data.pub) ruNotePub(pageId, r.data.pub);
@@ -1849,8 +1988,9 @@ function p0CcToggle(mode) {
     // 등록해서 만든 카드는 상품 유형에 맞는 상세 화면으로 연결을 다시 맞춘다(프리미엄 ↔ 일반)
     if (_card.dataset.built === '1') {
       const prem = product === '프리미엄';
-      if (prem && !_card.dataset.pmKey) _card.dataset.pmKey = _card.dataset.serverId || ('local-' + Date.now().toString(36));
-      const fn = prem ? 'openPremiumCampaign' : 'goTo', arg = prem ? _card.dataset.pmKey : 'p-detail-empty';
+      const baseKey = _card.dataset.serverId || _card.dataset.pmKey || _card.dataset.detailKey || ('local-' + Date.now().toString(36));
+      if (prem) { _card.dataset.pmKey = baseKey; delete _card.dataset.detailKey; } else { _card.dataset.detailKey = baseKey; delete _card.dataset.pmKey; }
+      const fn = prem ? 'openPremiumCampaign' : 'openCampaignDetail', arg = baseKey;
       _card.setAttribute('data-fn', fn); _card.setAttribute('data-args', arg);
       const btn = _card.querySelector('.card-btn.primary');
       if (btn) { btn.setAttribute('data-fn', fn); btn.setAttribute('data-args', arg); }
@@ -1988,11 +2128,13 @@ function tlRowData(row) {
 // 타임라인 목록 전체를 서버에 저장한다(서버가 없으면 아무것도 안 한다). 광고주에게는 [연동] 후 보인다.
 function metaSaveTimeline(list) {
   const page = list && list.closest('.page-wrapper');
-  if (!page || !Api.enabled || !Api.isLoggedIn() || !Api.isAdmin() || !['p-detail', 'p-detail-upload'].includes(page.id)) return;
+  if (page && page.id === 'p-detail-empty') detailSyncTlEmpty();
+  const key = page ? (page.id === 'p-detail-empty' ? (window._detailCtx && window._detailCtx.key) : page.id) : '';
+  if (!key || !Api.enabled || !Api.isLoggedIn() || !Api.isAdmin() || !ruReportKey(key)) return;
   const rows = [...list.querySelectorAll('.cd-tl-row')].map(tlRowData);
-  Api.req('/api/campaign-meta?campaign=' + encodeURIComponent(page.id), { method: 'POST', body: { timeline: rows } }).then(r => {
+  Api.req('/api/campaign-meta?campaign=' + encodeURIComponent(key), { method: 'POST', body: { timeline: rows } }).then(r => {
     if (!r.ok) { alert(r.error || '회차 변경을 서버에 저장하지 못했습니다. 화면에만 반영되었습니다.'); return; }
-    ruNotePub(page.id, r.data.pub);
+    ruNotePub(key, r.data.pub);
   });
 }
 
@@ -2022,8 +2164,11 @@ async function metaLoad() {
       });
     }
     if (m.timeline) {
-      const list = document.querySelector('#' + CSS.escape(key) + ' .cd-tl-list');
-      if (list) { list.innerHTML = ''; m.timeline.forEach(d => list.appendChild(tlRowEl(d))); }
+      // 기본 예시 화면은 화면 이름이 key, 등록한 캠페인은 지금 열어 둔 상세 화면(#p-detail-empty)에 적용한다
+      const list = document.getElementById(key)
+        ? document.querySelector('#' + CSS.escape(key) + ' .cd-tl-list')
+        : (window._detailCtx && window._detailCtx.key === key ? document.querySelector('#p-detail-empty .cd-tl-list') : null);
+      if (list) { list.innerHTML = ''; m.timeline.forEach(d => list.appendChild(tlRowEl(d))); if (list.closest('#p-detail-empty')) detailSyncTlEmpty(); }
     }
   });
 }
@@ -2210,7 +2355,7 @@ function applyCampaignSource(idxStr) {
   if (!c) return;
   set('creg-title', c.name);
   set('creg-client', c.brand);
-  set('creg-platform', c.platform);
+  document.querySelectorAll('.creg-plat-cb').forEach(cb => { cb.checked = cb.value === c.platform; });   // 생성 정보의 플랫폼을 체크(더 고를 수 있다)
   set('creg-goal-views', (c.goal || '').replace(/[^0-9,]/g, ''));
   set('creg-start', c.start);
   set('creg-end', c.end);   // 예비 종료 — 실제 종료일로 수정 가능
@@ -2286,8 +2431,9 @@ function buildCampaignCard(c, opts) {
   // 프리미엄은 채널 선정 → 검토 현황 → 결과 3단계 화면(#p-channels)으로 연다. 일반(조회수당·업로드당) 상세와 구조가 다르다.
   const isPremium = product === '프리미엄';
   const pmKey = isPremium ? (c.id || ('local-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6))) : '';
-  const detailFn = isPremium ? 'openPremiumCampaign' : 'goTo';
-  const detailTarget = isPremium ? pmKey : 'p-detail-empty';
+  const detKey = isPremium ? pmKey : (c.id || ('local-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)));
+  const detailFn = isPremium ? 'openPremiumCampaign' : 'openCampaignDetail';
+  const detailTarget = detKey;
 
   const card = document.createElement('div');
   card.className = 'campaign-card';
@@ -2298,7 +2444,7 @@ function buildCampaignCard(c, opts) {
   card.setAttribute('data-fn', detailFn);
   card.setAttribute('data-args', detailTarget);
   card.dataset.built = '1';
-  if (isPremium) card.dataset.pmKey = pmKey;
+  if (isPremium) card.dataset.pmKey = pmKey; else card.dataset.detailKey = detKey;
   // 수정 사이드패널이 읽는 값들 — 없으면 등록한 카드를 편집할 수 없다
   Object.assign(card.dataset, {
     editTitle: c.title, editClient: acct, editProduct: product, editStatus: status,
@@ -2351,9 +2497,9 @@ function renderServerCampaigns(list) {
 
 async function submitCampaignReg() {
   const title    = document.getElementById('creg-title')?.value.trim();
-  const platform = document.getElementById('creg-platform')?.value;
+  const platforms = [...document.querySelectorAll('.creg-plat-cb:checked')].map(c => c.value);
   if (!title)    { alert('캠페인명을 입력해주세요.'); return; }
-  if (!platform) { alert('플랫폼을 선택해주세요.'); return; }
+  if (!platforms.length) { alert('플랫폼을 하나 이상 선택해주세요.'); return; }
 
   const isPremium = document.getElementById('cregPremiumToggle')?.dataset.on === 'true';
   const client    = document.getElementById('creg-client')?.value.trim() || '';
@@ -2361,7 +2507,7 @@ async function submitCampaignReg() {
   const goalViews = (document.getElementById('creg-goal-views')?.value || '').replace(/,/g, '');
   const goalVids  = (document.getElementById('creg-goal-vids')?.value  || '').replace(/,/g, '');
   const data = {
-    title, platforms: [platform],
+    title, platforms,
     product: isPremium ? '프리미엄' : (goalViews ? '조회수당' : '업로드당'),
     client: client === '-' ? '' : client, agency,
     goalViews, goalVids,
@@ -2400,7 +2546,7 @@ async function submitCampaignReg() {
     openStatModal, closeStatModal,
     openChSelectModal, closeSingleModal, confirmChSelect,
     closeChSelectModal, confirmChSelectMulti,
-    toggleChCheck, selectChecked, viewCheckedChannels, clearChecked, openPremiumCampaign, chRefreshStats,
+    toggleChCheck, selectChecked, viewCheckedChannels, clearChecked, openPremiumCampaign, openCampaignDetail, chRefreshStats,
     rejectCh, undoCh,
     chSortBy, chSetStatus, chSetReviewStatus, chSwitchTab,
     advanceReviewState, creatorRejectCh,
@@ -3427,7 +3573,7 @@ document.addEventListener('click', function(e) {
   // 서버에 연결된 관리자 화면(조회수당·업로드당)이면 서버에도 반영한다 — 광고주에게는 [연동] 후 보인다
   var table = row.closest('table');
   var pageId = ruCampaignKey();
-  if (Api.enabled && Api.isLoggedIn() && Api.isAdmin() && table && ['p-detail', 'p-detail-upload'].indexOf(pageId) !== -1) {
+  if (Api.enabled && Api.isLoggedIn() && Api.isAdmin() && table && ruReportKey(pageId)) {
     var ni = ruTableColIndex(table, '채널명');
     var cell = row.children[ni];
     var chName = ruNormalizeName((cell && (cell.getAttribute('title') || cell.textContent)) || '');

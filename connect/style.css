@@ -4775,3 +4775,6 @@ body[data-viewer-role="admin"] span.admin-only { display: inline !important; }
 #chPanel0 .ch-name { text-align: center; margin-bottom: 0; }
 #chPanel0 .ch-check-cell { padding-left: 0; padding-right: 0; }
 #chPanel0 .ch-action-cell { white-space: nowrap; }
+
+/* 헤더 썸네일에 이미지가 들어갈 때 */
+.cd-thumb img { width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block; }

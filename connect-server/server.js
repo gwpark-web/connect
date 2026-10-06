@@ -136,6 +136,14 @@ function cleanTimeline(b) {
 const visibleTo = (user, c) => user.role === 'admin' ||
   (!!user.brand && [c.client, c.agency].some(v => v && v.toLowerCase() === user.brand.toLowerCase()));
 
+// 등록한 캠페인(id 가 key)의 리포트·댓글·정보는 그 캠페인을 볼 수 있는 광고주(브랜드 일치)와 관리자만 읽는다.
+// (기본 예시 화면 key — p-detail 등 — 은 캠페인 소유자가 없어 기존처럼 로그인한 모든 사용자가 읽는다)
+function canReadKey(user, db, key) {
+  if (user.role === 'admin') return true;
+  const c = (db.campaigns || []).find(x => x.id === key);
+  return !c || visibleTo(user, c);
+}
+
 /* ── 라우터 ── */
 async function route(req, res) {
   const url = new URL(req.url, 'http://x');
@@ -204,6 +212,7 @@ async function route(req, res) {
     const key = url.searchParams.get('campaign') || 'default';
     if (!CAMPAIGN_KEY.test(key)) return send(req, res, 400, { error: 'campaign 값이 올바르지 않습니다.' });
     const db = store.get();
+    if (!canReadKey(user, db, key)) return send(req, res, 403, { error: '이 캠페인을 볼 권한이 없습니다.' });
     // 관리자는 작업본, 광고주는 [광고주 연동]으로 내보낸 공개본만 본다
     if (user.role !== 'admin') return send(req, res, 200, { rows: (db.videosPub[key] || {}).rows || [], hidden: (db.videosPub[key] || {}).hidden || [] });
     return send(req, res, 200, { rows: db.videos[key] || [], hidden: db.hidden[key] || [], pub: pubState(db, key) });
@@ -213,10 +222,10 @@ async function route(req, res) {
     const user = need(req, res); if (!user) return;
     const db = store.get();
     if (user.role !== 'admin') {
-      const meta = {}; Object.keys(db.videosPub).forEach(k => { if (db.videosPub[k].meta && Object.keys(db.videosPub[k].meta).length) meta[k] = db.videosPub[k].meta; });
+      const meta = {}; Object.keys(db.videosPub).forEach(k => { if (canReadKey(user, db, k) && db.videosPub[k].meta && Object.keys(db.videosPub[k].meta).length) meta[k] = db.videosPub[k].meta; });
       return send(req, res, 200, { meta });
     }
-    const pub = {}; const keys = new Set([...Object.keys(db.meta), ...Object.keys(db.videosPub), ...Object.keys(db.videos)]);
+    const pub = {}; const keys = new Set(['p-detail', 'p-detail-upload', 'p-channels', ...Object.keys(db.meta), ...Object.keys(db.videosPub), ...Object.keys(db.videos)]);
     keys.forEach(k => { pub[k] = pubState(db, k); });
     return send(req, res, 200, { meta: db.meta, pub });
   }
@@ -299,6 +308,7 @@ async function route(req, res) {
     const key = url.searchParams.get('campaign') || 'default';
     if (!CAMPAIGN_KEY.test(key)) return send(req, res, 400, { error: 'campaign 값이 올바르지 않습니다.' });
     const db = store.get();
+    if (!canReadKey(user, db, key)) return send(req, res, 403, { error: '이 캠페인을 볼 권한이 없습니다.' });
     // 광고주는 [연동]으로 내보낸 공개본의 댓글만 본다
     const c = user.role === 'admin' ? (db.comments[key] || null) : ((db.videosPub[key] || {}).comments || null);
     return send(req, res, 200, { items: (c && c.items) || [], at: (c && c.at) || null, videos: (c && c.videos) || 0 });

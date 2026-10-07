@@ -1398,18 +1398,24 @@ function vidApplyColumns(table) {
   table.dataset.hidePaid = c.paid === false ? '1' : '0';
   table.dataset.hideAdtag = c.adTag === false ? '1' : '0';
 }
-function vidApplyAllColumns() { document.querySelectorAll('.vid-table').forEach(vidApplyColumns); }
+function vidApplyAllColumns() {
+  document.querySelectorAll('.vid-table').forEach(vidApplyColumns);
+  if (typeof pmSyncMetricsTab === 'function') pmSyncMetricsTab();      // 프리미엄 지표 탭을 보일지도 같은 설정을 따른다
+}
 
 function openVidColsModal() {
   const c = window._colsByKey[ruCampaignKey()] || {};
   document.getElementById('vcPaid').checked = c.paid !== false;
   document.getElementById('vcAdTag').checked = c.adTag !== false;
+  // 프리미엄 지표 묶음은 프리미엄 캠페인(3단계 화면)에서만 고른다
+  const pmRow = document.getElementById('vcPremiumRow');
+  if (pmRow) { pmRow.style.display = document.getElementById('p-channels').classList.contains('active') ? '' : 'none'; document.getElementById('vcPremium').checked = c.premium !== false; }
   document.getElementById('vidColsModal').classList.add('open');
 }
 function closeVidColsModal() { document.getElementById('vidColsModal').classList.remove('open'); }
 async function saveVidCols() {
   const key = ruCampaignKey();     // 지금 열어 둔 화면(캠페인)의 설정 — 표가 비어 있어도 저장된다
-  const cols = { paid: document.getElementById('vcPaid').checked, adTag: document.getElementById('vcAdTag').checked };
+  const cols = { paid: document.getElementById('vcPaid').checked, adTag: document.getElementById('vcAdTag').checked, premium: document.getElementById('vcPremium').checked };
   if (Api.enabled && Api.isLoggedIn() && Api.isAdmin() && key && ruReportKey(key)) {
     const r = await Api.req('/api/campaign-meta?campaign=' + encodeURIComponent(key), { method: 'POST', body: { columns: cols } });
     if (!r.ok) { alert(r.error || '표시 설정을 서버에 저장하지 못했습니다.'); return; }

@@ -959,6 +959,12 @@ function renderReviewPanel() {
 const _pmSrv = new Map();                  // 캠페인 key → { rows: 서버 게시물 행, metrics: { CID: 지표 } }
 const _pmSrvOn = () => _logServer() && _pmSrv.has(_logKey());
 const _pmSrvGet = () => _pmSrv.get(_logKey()) || null;
+let _pmShownMetrics = null;     // 마지막으로 그린 화면이 프리미엄 지표 탭을 보였는지(null=아직 그린 적 없음)
+function pmSyncMetricsTab() {
+  if (_pmShownMetrics === null || !document.getElementById('chResultContent')) return;
+  const want = ((window._colsByKey || {})[_logKey()] || {}).premium !== false;
+  if (want !== _pmShownMetrics) renderResultPanel();
+}
 const _pmNm = v => String(v == null ? '' : v).trim().replace(/\s+/g, ' ');
 
 function _pmApplyMetrics() {
@@ -1202,6 +1208,10 @@ function renderResultPanel() {
 
   const isAdmin = document.body.dataset.viewerRole === 'admin';
 
+  // [표시 설정]에서 프리미엄 지표를 껐으면 지표 탭을 그리지 않는다
+  const showMetrics = ((window._colsByKey || {})[_logKey()] || {}).premium !== false;
+  _pmShownMetrics = showMetrics;
+  if (!showMetrics) _pmActiveSubTab = 'videos';
   _pmApplyMetrics();     // 서버에 올라온 프리미엄 지표(CID 기준)를 채널에 맞춘다
   const doneItems = channels
     .map((ch, i) => ({ ch, i }))
@@ -1414,10 +1424,10 @@ function renderResultPanel() {
       </div>
       ${isAdmin && !_pmSrvOn() ? `<div class="ch-sim-notice"><span class="ch-sim-notice-icon">🔧</span>서버에 연결되지 않아 게시물 링크는 이 화면에만 임시로 반영됩니다(새로고침하면 사라집니다)</div>` : ''}
       ${platFilterHtml}
-      <div class="pm-tabs">
+      ${showMetrics ? `<div class="pm-tabs">
         <button class="pm-tab${_pmActiveSubTab === 'videos' ? ' active' : ''}" data-pm-tab="videos">참여 영상</button>
         <button class="pm-tab${_pmActiveSubTab === 'metrics' ? ' active' : ''}" data-pm-tab="metrics">프리미엄 지표</button>
-      </div>
+      </div>` : ''}
 
       <div class="pm-pane${_pmActiveSubTab === 'videos' ? ' active' : ''}" id="pmPaneVideos">
         <div class="vid-table-wrap">
@@ -1430,7 +1440,7 @@ function renderResultPanel() {
         <div class="vid-expand-row"><button class="vid-expand-btn" data-fn="toggleVidList" data-stop="1" hidden>전체 보기 ↓</button></div>
       </div>
 
-      <div class="pm-pane${_pmActiveSubTab === 'metrics' ? ' active' : ''}" id="pmPaneMetrics">${renderPremiumMetrics(filteredItems)}</div>
+      ${showMetrics ? `<div class="pm-pane${_pmActiveSubTab === 'metrics' ? ' active' : ''}" id="pmPaneMetrics">${renderPremiumMetrics(filteredItems)}</div>` : ''}
     </div>`;
   _pmFillResultTable(container.querySelector('#pmResultTable'), postedShown, pendingShown, doneCount, isAdmin);
   // 패널을 다시 그리면 연동 버튼 문구가 처음 값으로 돌아가므로 현재 연동 상태를 다시 표시한다

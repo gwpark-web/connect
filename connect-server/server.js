@@ -238,7 +238,7 @@ async function route(req, res) {
     const cur = db.meta[key] || (db.meta[key] = {});
     if (b.card !== undefined) { const c = cleanCard(b.card); if (!c) return send(req, res, 400, { error: '캠페인명이 필요합니다.' }); cur.card = c; }
     if (b.timeline !== undefined) { const t = cleanTimeline(b.timeline); if (!t) return send(req, res, 400, { error: '타임라인 형식이 올바르지 않습니다.' }); cur.timeline = t; }
-    if (b.columns !== undefined) cur.columns = { paid: !(b.columns && b.columns.paid === false), adTag: !(b.columns && b.columns.adTag === false) };
+    if (b.columns !== undefined) cur.columns = { paid: !(b.columns && b.columns.paid === false), adTag: !(b.columns && b.columns.adTag === false), premium: !(b.columns && b.columns.premium === false) };
     store.save();
     return send(req, res, 200, { meta: cur, pub: pubState(db, key) });
   }

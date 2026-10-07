@@ -832,7 +832,7 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
 .vid-table td { padding:8px 5px; border-bottom:1px solid var(--border); vertical-align:middle; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--gray-dark); }
 .vid-table tr:last-child td { border-bottom:none; }
 .vid-table tr:hover td { background:var(--gray-bg); }
-.vid-cb-th { width:36px !important; padding:0 !important; text-align:center !important; }
+.vid-cb-th { width:32px !important; padding:0 !important; text-align:center !important; }
 .vid-cb-td { padding:0 !important; text-align:center; }
 .vid-cb-th input, .vid-cb-td input { cursor:pointer; width:16px; height:16px; accent-color:var(--orange); }
 .vid-table tr:has(.vid-row-cb:checked) td { background:rgba(255,130,0,.06); }
@@ -867,8 +867,8 @@ tr:hover:not(.sel-row) { background: #FAFAFA; }
   background:var(--white); color:var(--gray-light); cursor:pointer; transition:all .15s;
 }
 .vid-del-btn:hover { border-color:#DC2626; color:#DC2626; background:#FEF2F2; }
-.vid-vis-col { width:74px; text-align:center; }
-.vid-del-col { width:48px; }
+.vid-vis-col { width:56px; text-align:center; }
+.vid-del-col { width:36px; }
 /* 버튼·뱃지가 셀보다 넓어 말줄임표가 찍히지 않도록 */
 .vid-table td.vid-del-col { padding-left:4px; padding-right:4px; overflow:visible; text-overflow:clip; }
 
@@ -4833,3 +4833,10 @@ body[data-viewer-role="admin"] span.admin-only { display: inline !important; }
 .vid-mark { font-size: 13px; font-weight: 800; }
 .vid-mark--yes { color: #1E8E4E; }
 .vid-mark--no, .vid-mark--unk { color: var(--gray-light); font-weight: 600; }
+
+/* 표가 옆으로 튀어나가지 않게: 고정 폭 열은 좁게 잡고 남는 폭은 모두 영상 제목이 받는다(열을 숨기면 제목이 그만큼 넓어진다).
+   그래도 화면이 좁으면 표 상자 안에서만 가로로 움직이고 페이지는 밀리지 않는다 */
+.vid-card { min-width: 0; }
+.vid-table-wrap { max-width: 100%; overscroll-behavior-x: contain; }
+.vid-table th, .vid-table td { padding-left: 4px; padding-right: 4px; }
+.vid-table td .ch-plat-icon { vertical-align: middle; }

@@ -986,6 +986,9 @@ function ruSwitchTab(idx) {
 // 화면에 보이는 .vid-table 하나를 대상으로 한다. 페이지 wrapper가 전부 DOM에
 // 동시 존재해 같은 클래스 테이블이 여럿일 수 있어 실제로 보이는 것만 고른다.
 function findVisibleVidTable() {
+  // 프리미엄 3.결과는 [프리미엄 지표] 탭을 보고 있어도 참여 영상 표가 대상이다(갱신·리포트 업로드·다운로드)
+  const pg = document.getElementById('p-channels');
+  if (pg && pg.classList.contains('active')) { const pt = document.getElementById('pmResultTable'); if (pt) return pt; }
   return [...document.querySelectorAll('.vid-table')].find(t => t.offsetParent !== null) || null;
 }
 
@@ -1055,17 +1058,24 @@ function downloadReport() {
     headers.push(label);
   });
 
+  // 영상 링크(제목 칸의 링크 주소)가 있으면 '영상 URL' 열로 함께 내려받는다 — 다시 올려도 링크가 유지되어 조회수 갱신이 계속 된다
+  const linkOf = tr => { const a = tr.querySelector('.vid-table-link'); const h = a ? (a.getAttribute('href') || '') : ''; return /^https?:\/\//i.test(h) ? h : ''; };
+  const trsAll = [...table.querySelectorAll('tbody tr')];
+  const withUrl = trsAll.some(tr => linkOf(tr));
+  if (withUrl) headers.push('영상 URL');
   const rows = [headers];
-  table.querySelectorAll('tbody tr').forEach(tr => {
+  trsAll.forEach(tr => {
     const tds = [...tr.children];
-    rows.push(keepIdx.map(i => {
+    const cells = keepIdx.map(i => {
       const td = tds[i];
       if (!td) return '';
       if (td.querySelector('.ch-plat-icon--yt')) return '유튜브';
       if (td.querySelector('.ch-plat-icon--tt')) return '틱톡';
       if (td.querySelector('.ch-plat-icon--ig')) return '인스타그램';
       return td.textContent.trim().replace(/\s+/g, ' ');
-    }));
+    });
+    if (withUrl) cells.push(linkOf(tr));
+    rows.push(cells);
   });
 
   const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
@@ -3733,6 +3743,45 @@ document.addEventListener('click', function(e) {
   requestAnimationFrame(function() { requestAnimationFrame(sync); });
 })();
 
+// ── 참여 영상 표 열 정렬(머리글의 ↕ 버튼) ─────────────────────────────────────
+// 같은 열을 다시 누르면 오름/내림이 바뀐다. 값이 없는 칸('-')은 항상 맨 아래, 등록 대기 행도 맨 아래.
+(function() {
+  function cellValue(td) {
+    const t = (td ? td.textContent : '').trim();
+    if (!t || t === '-') return { empty: true };
+    const n = ruParseNumber(t.replace('%', ''));
+    if (n !== null && /^[\d.,\s]+(%|[만억천kKmMbB])?$/.test(t)) return { num: t.endsWith('%') ? parseFloat(t) : n };
+    return { text: t };
+  }
+  document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.vid-table .vid-sort-btn');
+    if (!btn) return;
+    const th = btn.closest('th'), table = btn.closest('table'), tbody = table.tBodies[0];
+    if (!th || !tbody) return;
+    const col = [...th.parentElement.children].indexOf(th);
+    const label = btn.textContent.replace(/[↓↕↑]/g, '').trim();
+    const prev = table.dataset.sortCol === String(col) ? table.dataset.sortDir : '';
+    // 처음 누르면 숫자·날짜 열은 큰 값(최신)부터, 글자 열은 가나다순
+    const textual = ['채널명', '영상 제목'].includes(label);
+    const dir = prev ? (prev === 'asc' ? 'desc' : 'asc') : (textual ? 'asc' : 'desc');
+    table.dataset.sortCol = col; table.dataset.sortDir = dir;
+    const rows = [...tbody.children].map((tr, i) => ({ tr, i, v: cellValue(tr.children[col]), pend: tr.classList.contains('pm-row-pending') }));
+    rows.sort((a, b) => {
+      if (a.pend !== b.pend) return a.pend ? 1 : -1;
+      if (a.v.empty !== b.v.empty) return a.v.empty ? 1 : -1;
+      if (a.v.empty) return a.i - b.i;
+      let c;
+      if (a.v.num !== undefined && b.v.num !== undefined) c = a.v.num - b.v.num;
+      else c = String(a.v.text !== undefined ? a.v.text : a.v.num).localeCompare(String(b.v.text !== undefined ? b.v.text : b.v.num), 'ko');
+      return (dir === 'asc' ? c : -c) || (a.i - b.i);
+    });
+    rows.forEach(r => tbody.appendChild(r.tr));
+    table.querySelectorAll('.vid-sort-btn').forEach(b => { b.textContent = b.textContent.replace(/[↓↕↑]/g, '').trim() + ' ↕'; });
+    btn.textContent = label + (dir === 'asc' ? ' ↑' : ' ↓');
+    if (typeof vidApplyLimit === 'function') vidApplyLimit(table.closest('.vid-card'));
+  });
+})();
+
 // ── 영상 테이블 체크박스 액션바 ─────────────────────────────────────────
 (function() {
   function getChecked() {
@@ -3778,13 +3827,21 @@ document.addEventListener('click', function(e) {
     if (e.target.id === 'vidActionChannel') {
       getChecked().forEach(cb => {
         const cid = decodeURIComponent(cb.dataset.cid || '');
-        if (cid) window.open('https://www.youtube.com/' + cid, '_blank');
+        if (!cid) return;
+        // 채널 주소를 알 수 있는 값(@핸들·channel/CID)이면 바로 열고, 채널명만 있으면 검색으로 연다(채널명만으로는 올바른 주소가 되지 않는다)
+        if (/^(@|channel\/|c\/|user\/)/.test(cid)) { window.open('https://www.youtube.com/' + cid, '_blank'); return; }
+        const plat = cb.closest('tr')?.dataset.platform || 'yt';
+        window.open(plat === 'yt'
+          ? 'https://www.youtube.com/results?search_query=' + encodeURIComponent(cid)
+          : 'https://www.google.com/search?q=' + encodeURIComponent(cid + (plat === 'ig' ? ' instagram' : ' tiktok')), '_blank');
       });
       return;
     }
     if (e.target.id === 'vidActionVideo') {
       getChecked().forEach(cb => {
-        const url = cb.dataset.url;
+        // 영상 주소는 선택한 행에 저장된 값, 없으면 제목 칸의 링크(http/https 만)
+        const href = cb.closest('tr')?.querySelector('.vid-table-link')?.getAttribute('href') || '';
+        const url = cb.dataset.url || (/^https?:\/\//i.test(href) ? href : '');
         if (url) window.open(url, '_blank');
       });
       return;

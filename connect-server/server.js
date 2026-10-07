@@ -453,7 +453,9 @@ const fmtDur = s => `${s}초`;
     const key = str(b.campaign, 60), plat = str(b.platform || 'all', 4);
     if (!CAMPAIGN_KEY.test(key) || !(plat === 'all' || PLATFORMS.includes(plat))) return send(req, res, 400, { error: '요청 값이 올바르지 않습니다.' });
     const db = store.get();
-    const targets = plat === 'all' ? PLATFORMS : [plat];
+    // '전체'는 이 캠페인에 영상이 있는 플랫폼만 대상으로 한다(영상이 없는 플랫폼을 '지원 안 함'으로 안내하거나 한도 판정에 섞지 않는다)
+    const targets = plat === 'all' ? PLATFORMS.filter(t => (db.videos[key] || []).some(r => rowPlat(r) === t)) : [plat];
+    if (!targets.length) return send(req, res, 200, { results: {}, rows: db.videos[key] || [], pub: pubState(db, key), nextAt: nextResetKST() });
     const today = todayKST();
     const results = {};
     for (const t of targets) {

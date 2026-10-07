@@ -2286,7 +2286,7 @@ async function refreshViewCounts() {
       if (v.status === 'limited') return `${n}: 오늘 이미 갱신함`;
       return `${n}: ${v.message || v.status}`;
     });
-    showToast(lines.join(' · '));
+    showToast(lines.length ? lines.join(' · ') : '갱신할 영상이 없습니다. 영상 링크를 등록하거나 리포트에 "영상 URL" 열을 넣어 올려주세요.');
     return;
   }
 

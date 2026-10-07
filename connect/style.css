@@ -4828,3 +4828,8 @@ body[data-viewer-role="admin"] span.admin-only { display: inline !important; }
 .vc-opt span { display: flex; flex-direction: column; gap: 2px; }
 .vc-opt b { font-size: 13px; color: var(--gray-dark); }
 .vc-opt em { font-style: normal; font-size: 12px; color: var(--gray-mid); }
+
+/* 유료광고·#광고 표시: 있으면 V, 없으면 - */
+.vid-mark { font-size: 13px; font-weight: 800; }
+.vid-mark--yes { color: #1E8E4E; }
+.vid-mark--no, .vid-mark--unk { color: var(--gray-light); font-weight: 600; }

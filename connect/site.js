@@ -1297,29 +1297,18 @@ function ruApplyRowsToTable(table, rows, opts) {
         if (!tds[colIdx].querySelector('.ch-plat-icon')) tds[colIdx].innerHTML = key ? platBadge(key) : escHtml(val);
         return;
       }
-      if (field === '#광고') {
-        // 제목·설명에 #광고·#협찬 같은 해시태그가 있는지 — 체크 표시(✓ 있음 / 빈 칸 없음 / ? 확인불가)
+      if (field === '유료광고' || field === '#광고') {
+        // 유튜브의 유료광고 표기·제목/설명의 #광고 해시태그 — 있으면 V, 없으면 -, 확인하지 못했으면 ?
+        // (저장·내려받기 값은 같은 글자 V / - 라서 내려받아 다시 올려도 모양이 같다)
         const raw = String(val).trim();
-        const yes = /^(있음|✅|✓|yes|y|true)$/i.test(raw), no = /^(없음|❌|no|n|false)$/i.test(raw), unk = /^(확인불가|❓)$/.test(raw);
+        const yes = /^(있음|✅|✓|v|yes|y|true)$/i.test(raw), no = /^(없음|❌|-|no|n|false)$/i.test(raw), unk = /^(확인불가|❓|\?)$/.test(raw);
         if (yes || no || unk) {
-          const sp = document.createElement('span'); sp.className = 'vid-chk vid-chk--' + (yes ? 'on' : no ? 'off' : 'unk');
-          sp.textContent = yes ? '있음' : no ? '없음' : '확인불가';
+          const sp = document.createElement('span'); sp.className = 'vid-mark vid-mark--' + (yes ? 'yes' : no ? 'no' : 'unk');
+          sp.textContent = yes ? 'V' : no ? '-' : '?';
           tds[colIdx].textContent = ''; tds[colIdx].appendChild(sp);
           return;
         }
-      }
-      if (field === '유료광고') {
-        // 유튜브가 영상에 붙인 유료광고 표기 — 있음/없음/확인불가 배지(값이 '-' 이면 건드리지 않는다)
-        const raw = String(val).trim();
-        // '✓'·'-' 는 예시 행이 쓰는 표기라 그대로 둔다(내려받아 다시 올려도 모양이 바뀌지 않게)
-        const yes = /^(있음|✅|yes|y|true)$/i.test(raw), no = /^(없음|❌|no|n|false)$/i.test(raw), unk = /^(확인불가|❓)$/.test(raw);
-        if (yes || no || unk) {
-          const sp = document.createElement('span'); sp.className = 'vid-paid vid-paid--' + (yes ? 'yes' : no ? 'no' : 'unk');
-          sp.textContent = yes ? '있음' : no ? '없음' : '확인불가';
-          tds[colIdx].textContent = ''; tds[colIdx].appendChild(sp);
-          return;
-        }
-        // 그 밖의 값('✓' 등 예시 표기)은 아래 일반 글자 처리로 넘긴다
+        // 그 밖의 값은 아래 일반 글자 처리로 넘긴다
       }
       if (field === '상태') {
         // 공개/비공개 배지 — 글자와 함께 색 클래스도 맞춘다

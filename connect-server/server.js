@@ -327,6 +327,8 @@ async function route(req, res) {
       Object.keys(raw).slice(0, 30).forEach(k => { const v = raw[k]; if (typeof v === 'string' || typeof v === 'number') row[str(k, 40)] = str(v, 500); });
       const nm = normName(row.name); if (!nm) return;
       row.name = nm;
+      // 내려받은 리포트의 V 표시는 '있음'으로 읽는다(유료광고·#광고)
+      ['유료광고', '#광고'].forEach(f => { if (/^(v|✓|✅|yes|y|true)$/i.test(String(row[f] || '').trim())) row[f] = '있음'; });
       const k = rowPlat(row) + '|' + nm;
       const prev = byName.get(k);
       if (prev) Object.assign(prev, row); else byName.set(k, row);

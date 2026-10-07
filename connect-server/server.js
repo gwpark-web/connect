@@ -214,8 +214,8 @@ async function route(req, res) {
     const db = store.get();
     if (!canReadKey(user, db, key)) return send(req, res, 403, { error: '이 캠페인을 볼 권한이 없습니다.' });
     // 관리자는 작업본, 광고주는 [광고주 연동]으로 내보낸 공개본만 본다
-    if (user.role !== 'admin') return send(req, res, 200, { rows: (db.videosPub[key] || {}).rows || [], hidden: (db.videosPub[key] || {}).hidden || [] });
-    return send(req, res, 200, { rows: db.videos[key] || [], hidden: db.hidden[key] || [], pub: pubState(db, key) });
+    if (user.role !== 'admin') return send(req, res, 200, { rows: (db.videosPub[key] || {}).rows || [], hidden: (db.videosPub[key] || {}).hidden || [], metrics: (db.videosPub[key] || {}).premiumMetrics || {} });
+    return send(req, res, 200, { rows: db.videos[key] || [], hidden: db.hidden[key] || [], metrics: db.premiumMetrics[key] || {}, pub: pubState(db, key) });
   }
   /* 캠페인 카드 정보·회차 타임라인 저장/조회 — 관리자는 작업본, 광고주는 [연동]으로 내보낸 공개본을 본다 */
   if (p === '/api/campaign-meta' && m === 'GET') {
@@ -238,6 +238,7 @@ async function route(req, res) {
     const cur = db.meta[key] || (db.meta[key] = {});
     if (b.card !== undefined) { const c = cleanCard(b.card); if (!c) return send(req, res, 400, { error: '캠페인명이 필요합니다.' }); cur.card = c; }
     if (b.timeline !== undefined) { const t = cleanTimeline(b.timeline); if (!t) return send(req, res, 400, { error: '타임라인 형식이 올바르지 않습니다.' }); cur.timeline = t; }
+    if (b.columns !== undefined) cur.columns = { paid: !(b.columns && b.columns.paid === false), adTag: !(b.columns && b.columns.adTag === false) };
     store.save();
     return send(req, res, 200, { meta: cur, pub: pubState(db, key) });
   }
@@ -304,8 +305,8 @@ async function route(req, res) {
     if (!CAMPAIGN_KEY.test(key)) return send(req, res, 400, { error: 'campaign 값이 올바르지 않습니다.' });
     const db = store.get();
     const rows = db.videos[key] || [];
-    if (!rows.length && !(db.hidden[key] || []).length && !Object.keys(db.meta[key] || {}).length) return send(req, res, 400, { error: '연동할 내용이 없습니다. 리포트를 올리거나 캠페인 정보·회차를 수정한 뒤 눌러주세요.' });
-    db.videosPub[key] = { rows: JSON.parse(JSON.stringify(rows)), comments: JSON.parse(JSON.stringify(db.comments[key] || { items: [] })), hidden: JSON.parse(JSON.stringify(db.hidden[key] || [])), meta: JSON.parse(JSON.stringify(db.meta[key] || {})), at: new Date().toISOString() };
+    if (!rows.length && !(db.hidden[key] || []).length && !Object.keys(db.meta[key] || {}).length && !Object.keys(db.premiumMetrics[key] || {}).length) return send(req, res, 400, { error: '연동할 내용이 없습니다. 리포트를 올리거나 캠페인 정보·회차를 수정한 뒤 눌러주세요.' });
+    db.videosPub[key] = { rows: JSON.parse(JSON.stringify(rows)), comments: JSON.parse(JSON.stringify(db.comments[key] || { items: [] })), hidden: JSON.parse(JSON.stringify(db.hidden[key] || [])), meta: JSON.parse(JSON.stringify(db.meta[key] || {})), premiumMetrics: JSON.parse(JSON.stringify(db.premiumMetrics[key] || {})), at: new Date().toISOString() };
     store.save();
     return send(req, res, 200, { count: rows.length, pub: pubState(db, key) });
   }
@@ -331,14 +332,20 @@ async function route(req, res) {
       if (prev) Object.assign(prev, row); else byName.set(k, row);
     });
     if (!byName.size) return send(req, res, 400, { error: '등록할 수 있는 행(채널명)이 없습니다. 기존 데이터는 그대로 두었습니다.' });
-    // 유튜브 영상 주소가 있는 행은 유료광고 표기를 YouTube 에서 확인해 채운다(파일에 이미 값이 있으면 그대로 둔다)
+    // 유튜브 영상 주소가 있는 행은 유료광고 표기와 #광고 해시태그를 YouTube 에서 확인해 채운다(파일에 이미 값이 있는 칸은 그대로 둔다)
     let paidChecked = 0;
+    const unset = (r, f) => !['있음', '없음', '확인불가'].includes(String(r[f] || '').trim());
     if (yt.configured()) {
-      const need = [...byName.values()].filter(r => rowPlat(r) === 'yt' && !['있음', '없음', '확인불가'].includes(String(r['유료광고'] || '').trim()) && yt.videoId(r['영상 URL'] || r.url || r['URL'] || ''));
+      const need = [...byName.values()].filter(r => rowPlat(r) === 'yt' && (unset(r, '유료광고') || unset(r, '#광고')) && yt.videoId(r['영상 URL'] || r.url || r['URL'] || ''));
       if (need.length) {
         try {
           const st = await yt.videoStats(need.slice(0, 500).map(r => yt.videoId(r['영상 URL'] || r.url || r['URL'])));
-          need.slice(0, 500).forEach(r => { const x = st[yt.videoId(r['영상 URL'] || r.url || r['URL'])]; r['유료광고'] = x ? yt.paidLabel(x.paid) : '확인불가'; if (x) paidChecked++; });
+          need.slice(0, 500).forEach(r => {
+            const x = st[yt.videoId(r['영상 URL'] || r.url || r['URL'])];
+            if (unset(r, '유료광고')) r['유료광고'] = x ? yt.paidLabel(x.paid) : '확인불가';
+            if (unset(r, '#광고')) r['#광고'] = x ? yt.adTagLabel(x.adTag) : '확인불가';
+            if (x) paidChecked++;
+          });
         } catch (e) { /* 키 오류·할당량 초과면 표기 확인만 건너뛴다(리포트 저장은 그대로) */ }
       }
     }
@@ -459,7 +466,8 @@ const fmtDur = s => `${s}초`;
         rows.forEach(r => {
           const s = stats[yt.videoId(r['영상 URL'] || r.url || r['URL'])];
           if (!s) return;
-          r['조회수'] = String(s.views); r['좋아요'] = String(s.likes); r['댓글'] = String(s.comments); r['유료광고'] = yt.paidLabel(s.paid); n++;
+          r['조회수'] = String(s.views); r['좋아요'] = String(s.likes); r['댓글'] = String(s.comments); r['유료광고'] = yt.paidLabel(s.paid); r['#광고'] = yt.adTagLabel(s.adTag);
+          r['참여율'] = (s.views ? (s.likes + s.comments) / s.views * 100 : 0).toFixed(1) + '%'; n++;
         });
         db.refreshLog[logKey] = today; store.save();
         results[t] = { status: 'ok', requested: rows.length, updated: n };
@@ -473,6 +481,81 @@ const fmtDur = s => `${s}초`;
     return send(req, res, 200, { results, rows: db.videos[key] || [], pub: pubState(db, key), nextAt: nextResetKST() });
   }
 
+  /* 프리미엄 캠페인 — 채널별 게시물(영상 링크) 등록. 유튜브 링크면 영상·채널 정보를 YouTube 에서 가져와 조회수당·업로드당과 같은 형태의 행으로 저장한다.
+     (인스타그램·틱톡 링크는 API 가 없어 링크만 저장한다.) 같은 채널(chKey)에 다시 등록하면 그 행을 바꾼다. */
+  if (p === '/api/premium/post' && m === 'POST') {
+    const user = need(req, res, 'admin'); if (!user) return;
+    const key = url.searchParams.get('campaign') || '';
+    if (!CAMPAIGN_KEY.test(key)) return send(req, res, 400, { error: 'campaign 값이 올바르지 않습니다.' });
+    const b = await readJson(req);
+    const chKey = str(b.chKey, 80), name = normName(str(b.name, 100)), cid = str(b.cid, 60), chPlat = PLATFORMS.includes(b.platform) ? b.platform : '';
+    const link = str(b.url, 500);
+    if (!chKey || !name) return send(req, res, 400, { error: '채널 정보가 없습니다.' });
+    if (!/^https?:\/\/[^\s]+$/i.test(link)) return send(req, res, 400, { error: '영상 링크는 http:// 또는 https:// 로 시작하는 주소여야 합니다.' });
+    const vid = yt.videoId(link);
+    const plat = vid ? 'yt' : /(^|\/\/|\.)instagram\.com/i.test(link) ? 'ig' : /(^|\/\/|\.)tiktok\.com/i.test(link) ? 'tt' : '';
+    if (!plat) return send(req, res, 400, { error: '유튜브·인스타그램·틱톡 영상 주소만 등록할 수 있습니다.' });
+    if (chPlat && chPlat !== plat) return send(req, res, 400, { error: `이 채널은 ${{ yt: '유튜브', ig: '인스타그램', tt: '틱톡' }[chPlat]} 채널입니다. 같은 플랫폼의 영상 주소를 넣어주세요.` });
+    const row = { name, chKey, '플랫폼': plat, '영상 URL': link };
+    if (cid) row.cid = cid;
+    let note = '';
+    if (plat === 'yt' && yt.configured()) {
+      try {
+        const det = (await yt.videoDetails([vid]))[vid];
+        if (!det) return send(req, res, 404, { error: 'YouTube에서 이 영상을 찾을 수 없습니다(삭제되었거나 비공개 영상).' });
+        const ch = (await yt.channelStats([det.channelId]))[det.channelId] || {};
+        const eng = det.views ? ((det.likes + det.comments) / det.views * 100) : 0;
+        Object.assign(row, { '업로드일': kstParts(det.publishedAt), '구독자': fmtSubs(ch.subscribers), '영상 제목': det.title, '영상 길이': fmtDur(det.seconds),
+          '조회수': String(det.views), '좋아요': String(det.likes), '댓글': String(det.comments), '참여율': eng.toFixed(1) + '%', '유료광고': yt.paidLabel(det.paid), '#광고': yt.adTagLabel(det.adTag) });
+        if (!row.cid) row.cid = det.channelId;
+      } catch (e) {
+        if (e instanceof yt.YtError) return send(req, res, e.status, { error: e.message, code: e.code });
+        throw e;
+      }
+    } else if (plat === 'yt') note = 'YouTube API 키가 없어 링크만 저장했습니다. [조회수 갱신]은 키를 설정한 뒤 사용할 수 있습니다.';
+    else note = '인스타그램·틱톡은 아직 API가 연결되지 않아 링크만 저장했습니다. 수치는 [리포트 업로드]로 넣어주세요.';
+    const db = store.get();
+    const list = (db.videos[key] || []).filter(r => r.chKey !== chKey);
+    list.push(row);
+    db.videos[key] = list;
+    if (db.hidden[key]) db.hidden[key] = db.hidden[key].filter(h => !(h.platform === plat && h.name === name));
+    store.save();
+    return send(req, res, 200, { row, rows: db.videos[key], note, pub: pubState(db, key) });
+  }
+  if (p === '/api/premium/post/delete' && m === 'POST') {
+    const user = need(req, res, 'admin'); if (!user) return;
+    const key = url.searchParams.get('campaign') || '';
+    if (!CAMPAIGN_KEY.test(key)) return send(req, res, 400, { error: 'campaign 값이 올바르지 않습니다.' });
+    const b = await readJson(req);
+    const chKey = str(b.chKey, 80); if (!chKey) return send(req, res, 400, { error: '채널 정보가 없습니다.' });
+    const db = store.get();
+    const before = (db.videos[key] || []).length;
+    db.videos[key] = (db.videos[key] || []).filter(r => r.chKey !== chKey);
+    store.save();
+    return send(req, res, 200, { removed: before - db.videos[key].length, rows: db.videos[key], pub: pubState(db, key) });
+  }
+  /* 프리미엄 지표 리포트 — 채널 ID(CID)로 채널과 맞춘다. 공유·평균 시청·국가·연령대·성별(·도달). 같은 CID 는 새 값으로 바꾸고, 파일에 없는 CID 는 그대로 둔다 */
+  if (p === '/api/premium/metrics' && m === 'POST') {
+    const user = need(req, res, 'admin'); if (!user) return;
+    const key = url.searchParams.get('campaign') || '';
+    if (!CAMPAIGN_KEY.test(key)) return send(req, res, 400, { error: 'campaign 값이 올바르지 않습니다.' });
+    const body = await readJson(req);
+    if (!Array.isArray(body) || body.length > 5000) return send(req, res, 400, { error: 'rows 는 5000개 이하의 배열이어야 합니다.' });
+    const db = store.get();
+    const cur = db.premiumMetrics[key] || (db.premiumMetrics[key] = {});
+    let saved = 0, skipped = 0;
+    const cids = [];
+    body.forEach(raw => {
+      const cid = str(raw && raw.cid, 60);
+      if (!cid) { skipped++; return; }
+      const mt = cleanMetric(raw);
+      if (!Object.keys(mt).length) { skipped++; return; }
+      cur[cid] = mt; cids.push(cid); saved++;
+    });
+    if (!saved) { if (!Object.keys(cur).length) delete db.premiumMetrics[key]; return send(req, res, 400, { error: '저장할 수 있는 행이 없습니다. CID 열과 지표 열(공유·평균 시청·국가·연령대·성별)이 있는지 확인해주세요.' }); }
+    store.save();
+    return send(req, res, 200, { saved, skipped, cids, metrics: cur, pub: pubState(db, key) });
+  }
   /* 리포트 자동 조회: { campaign, urls:[...] } → 영상·채널(YouTube) + 짤 회원(CID) */
   if (p === '/api/report/lookup' && m === 'POST') {
     const user = need(req, res, 'admin'); if (!user) return;
@@ -511,7 +594,7 @@ const fmtDur = s => `${s}초`;
       rows.push({
         name: d.channelTitle || ch.name || '', '업로드일': kstParts(d.publishedAt), '구독자': fmtSubs(ch.subscribers),
         '영상 제목': d.title, '영상 길이': fmtDur(d.seconds), '조회수': String(d.views), '좋아요': String(d.likes), '댓글': String(d.comments),
-        '참여율': eng.toFixed(1) + '%', '유료광고': yt.paidLabel(d.paid), '플랫폼': 'yt', '영상 URL': url, cid: d.channelId, handle: ch.handle || '',
+        '참여율': eng.toFixed(1) + '%', '유료광고': yt.paidLabel(d.paid), '#광고': yt.adTagLabel(d.adTag), '플랫폼': 'yt', '영상 URL': url, cid: d.channelId, handle: ch.handle || '',
         zeal: !!zres.members[d.channelId],
       });
     });
@@ -551,6 +634,23 @@ const COMMENT_COOLDOWN_MS = Number(process.env.COMMENT_COOLDOWN_MS || 60000), CO
 const PLAT_ALIAS = { '유튜브': 'yt', youtube: 'yt', yt: 'yt', '인스타그램': 'ig', '인스타': 'ig', instagram: 'ig', ig: 'ig', '틱톡': 'tt', tiktok: 'tt', tt: 'tt' };
 const rowPlat = r => PLAT_ALIAS[String((r && (r['플랫폼'] || r.platform)) || '').trim().toLowerCase()] || 'yt';
 
+// 프리미엄 지표 한 줄 정리 — 공유(정수)·평균 시청(초)·도달(정수)·국가(2글자 코드)·연령대(25-34 형태)·성별(F/M). 읽을 수 없는 칸은 건너뛴다.
+const COUNTRY_ALIAS = { '한국': 'KR', '대한민국': 'KR', korea: 'KR', 'south korea': 'KR', '미국': 'US', usa: 'US', 'united states': 'US', '일본': 'JP', japan: 'JP', '중국': 'CN', china: 'CN', '대만': 'TW', taiwan: 'TW', '태국': 'TH', thailand: 'TH', '베트남': 'VN', vietnam: 'VN', '인도네시아': 'ID', indonesia: 'ID', '필리핀': 'PH', philippines: 'PH', '영국': 'GB', uk: 'GB', '독일': 'DE', germany: 'DE', '프랑스': 'FR', france: 'FR', '캐나다': 'CA', canada: 'CA', '호주': 'AU', australia: 'AU', '브라질': 'BR', brazil: 'BR', '인도': 'IN', india: 'IN', '멕시코': 'MX', mexico: 'MX' };
+function metricNum(v) { const s = String(v == null ? '' : v).replace(/[,\s]/g, ''); if (!/^\d+(\.\d+)?$/.test(s)) return null; return Math.round(+s); }
+function cleanMetric(raw) {
+  const o = {};
+  const sh = metricNum(raw.shares); if (sh !== null) o.shares = sh;
+  const w = metricNum(raw.watch); if (w !== null) o.watch = w;
+  const rc = metricNum(raw.reach); if (rc !== null) o.reach = rc;
+  const c = str(raw.country, 30).toLowerCase();
+  if (c) { const k = COUNTRY_ALIAS[c] || (/^[a-z]{2}$/.test(c) ? c.toUpperCase() : ''); if (k) o.country = k; }
+  const a = String(raw.age == null ? '' : raw.age).match(/\d+/);
+  if (a) { const n = +a[0]; o.age = n < 25 ? '18-24' : n < 35 ? '25-34' : n < 45 ? '35-44' : n < 55 ? '45-54' : '55+'; }
+  const g = str(raw.gender, 20).toLowerCase();
+  if (g) { if (/^(f|female|여|여성|여자)$/.test(g)) o.gender = 'F'; else if (/^(m|male|남|남성|남자)$/.test(g)) o.gender = 'M'; }
+  return o;
+}
+
 // 공개본 상태: never(연동한 적 없음) / synced(작업본과 같음) / pending(연동 후 작업본이 바뀜)
 function pubState(db, key) {
   const pub = db.videosPub[key];
@@ -558,7 +658,8 @@ function pubState(db, key) {
   const same = JSON.stringify(pub.rows) === JSON.stringify(db.videos[key] || [])
     && JSON.stringify((pub.comments || {}).items || []) === JSON.stringify((db.comments[key] || {}).items || [])
     && JSON.stringify(pub.hidden || []) === JSON.stringify(db.hidden[key] || [])
-    && JSON.stringify(pub.meta || {}) === JSON.stringify(db.meta[key] || {});
+    && JSON.stringify(pub.meta || {}) === JSON.stringify(db.meta[key] || {})
+    && JSON.stringify(pub.premiumMetrics || {}) === JSON.stringify(db.premiumMetrics[key] || {});
   return { state: same ? 'synced' : 'pending', at: pub.at, count: pub.rows.length };
 }
 

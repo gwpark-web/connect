@@ -62,16 +62,21 @@ const paidFlag = v => (v && v.paidProductPlacementDetails && typeof v.paidProduc
   ? v.paidProductPlacementDetails.hasPaidProductPlacement : null;
 const paidLabel = p => p === true ? '있음' : p === false ? '없음' : '확인불가';
 
+// 제목·설명에 광고 표기 해시태그(#광고, #협찬 …)가 있는지. 한글 표기는 글자가 이어져도 잡고(#광고협찬), 영문(#ad, #sponsored, #ppl)은 단어 끝에서만 잡는다(#addict 제외).
+const AD_TAG_RE = /#(?:광고|유료광고|협찬|유료협찬|광고협찬|ppl광고)|#(?:ad|sponsored|ppl)(?![A-Za-z0-9_])/i;
+const adTagFlag = sn => sn ? AD_TAG_RE.test(String(sn.title || '') + ' ' + String(sn.description || '')) : null;
+const adTagLabel = p => p === true ? '있음' : p === false ? '없음' : '확인불가';
+
 // 영상 ID 목록 → { id: {views, likes, comments, paid} } (50개씩 묶어서 호출)
 async function videoStats(ids) {
   const out = {};
   const uniq = [...new Set(ids.filter(Boolean))];
   for (let i = 0; i < uniq.length; i += 50) {
     const chunk = uniq.slice(i, i + 50);
-    const data = await call('videos', { part: 'statistics,paidProductPlacementDetails', id: chunk.join(','), maxResults: 50 });
+    const data = await call('videos', { part: 'snippet,statistics,paidProductPlacementDetails', id: chunk.join(','), maxResults: 50 });
     (data.items || []).forEach(v => {
       const s = v.statistics || {};
-      out[v.id] = { views: +s.viewCount || 0, likes: +s.likeCount || 0, comments: +s.commentCount || 0, paid: paidFlag(v) };
+      out[v.id] = { views: +s.viewCount || 0, likes: +s.likeCount || 0, comments: +s.commentCount || 0, paid: paidFlag(v), adTag: adTagFlag(v.snippet) };
     });
   }
   return out;
@@ -134,7 +139,7 @@ async function videoDetails(ids) {
         title: sn.title || '', channelId: sn.channelId || '', channelTitle: sn.channelTitle || '',
         publishedAt: sn.publishedAt || '', seconds: seconds(v.contentDetails && v.contentDetails.duration),
         views: +st.viewCount || 0, likes: +st.likeCount || 0, comments: +st.commentCount || 0,
-        paid: paidFlag(v),
+        paid: paidFlag(v), adTag: adTagFlag(sn),
       };
     });
   }
@@ -173,4 +178,4 @@ async function topComments(vid, max = 5) {
   }
 }
 
-module.exports = { paidLabel, topComments, configured, YtError, videoId, videoStats, channelInfo, videoDetails, channelStats };
+module.exports = { paidLabel, adTagLabel, adTagFlag, topComments, configured, YtError, videoId, videoStats, channelInfo, videoDetails, channelStats };

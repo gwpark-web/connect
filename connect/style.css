@@ -4802,3 +4802,29 @@ body[data-viewer-role="admin"] span.admin-only { display: inline !important; }
 .vid-paid--yes { background:#E7F6EC; color:#1E8E4E; }
 .vid-paid--no  { background:#FDECEC; color:#C0392B; }
 .vid-paid--unk { background:var(--gray-bg); color:var(--gray-light); }
+
+/* ── 프리미엄 3.결과: 게시물 등록 팝업 · 지표 업로드 · 지표 표 ── */
+.pm-modal-hint { margin: 0; font-size: 12px; line-height: 1.55; color: var(--gray-mid); }
+.pm-modal-status { margin-top: 10px; padding: 9px 12px; border-radius: 8px; font-size: 12px; line-height: 1.5; color: var(--gray-dark); background: var(--gray-bg); border: 1px solid var(--border); }
+.pm-modal-status--bad { color: #b42318; background: rgba(217, 45, 32, 0.06); border-color: rgba(217, 45, 32, 0.25); }
+.pm-metrics-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 14px; flex-wrap: wrap; }
+.pm-metrics-hint { font-size: 12px; color: var(--gray-mid); }
+.pm-metric-wrap { margin-top: 16px; }
+.pm-metric-table th, .pm-metric-table td { text-align: left; }
+.pm-metric-table th.pm-cell--num, .pm-metric-table td.pm-cell--num { text-align: right; }
+.pm-row-pending td { color: var(--gray-light); }
+.pm-row-pending td:nth-child(4) { color: var(--gray-dark); }
+
+/* ── 유료광고·#광고 열 표시 설정 / #광고 체크 표시 ── */
+.vid-table[data-hide-paid="1"] .col-paid,
+.vid-table[data-hide-adtag="1"] .col-adtag { display: none; }
+.vid-chk { display: inline-block; width: 16px; height: 16px; border: 1.5px solid var(--border); border-radius: 4px; vertical-align: middle; font-size: 0; line-height: 13px; text-align: center; box-sizing: border-box; }
+.vid-chk--on { background: #1ea03c; border-color: #1ea03c; }
+.vid-chk--on::after { content: '✓'; font-size: 11px; font-weight: 800; color: #fff; }
+.vid-chk--unk { border-style: dashed; }
+.vid-chk--unk::after { content: '?'; font-size: 10px; color: var(--gray-light); }
+.vc-opt { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; cursor: pointer; }
+.vc-opt input { margin-top: 3px; accent-color: var(--orange); }
+.vc-opt span { display: flex; flex-direction: column; gap: 2px; }
+.vc-opt b { font-size: 13px; color: var(--gray-dark); }
+.vc-opt em { font-style: normal; font-size: 12px; color: var(--gray-mid); }

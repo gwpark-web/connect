@@ -135,7 +135,7 @@ function goTo(id) {
     if (id === 'p-channels' && window._pmNextCtx) { const n = window._pmNextCtx; window._pmNextCtx = null; pmEnsureContext(n.key, n.vals); }
     else pmEnsureContext('demo');
   }
-  if (id === 'p-channels') { updateSortArrows(); renderChannels(); updateChSummary(); if (typeof pmLogLoad === 'function') pmLogLoad(); }
+  if (id === 'p-channels') { updateSortArrows(); renderChannels(); updateChSummary(); if (typeof pmLogLoad === 'function') pmLogLoad(); if (typeof pmLoadServer === 'function') pmLoadServer(); }
   if (id === 'p-list' || id === 'p-admin') { if (typeof updateListCardPremium === 'function') updateListCardPremium(); }
   if (id === 'p1') { setTimeout(runStatCountUp, 200); }
   // 검토용 백엔드에 저장된 참여 영상 데이터가 있으면 복원(서버 미실행 시 조용히 무시)
@@ -143,6 +143,7 @@ function goTo(id) {
   if (id === 'p-detail-empty' && window._detailCtx) { ruLoadFromServer(window._detailCtx.key); }
   // 캠페인 카드 정보·회차 타임라인(관리자는 작업본, 광고주는 연동된 내용)
   if (['p-list', 'p-admin', 'p-detail', 'p-detail-upload', 'p-detail-empty', 'p-channels'].includes(id)) { metaLoad(); }
+  vidApplyAllColumns();
 }
 
 function goToAuth(id) {
@@ -1047,6 +1048,7 @@ function downloadReport() {
   const headers = [];
   ths.forEach((th, i) => {
     if (SKIP_CLASSES.some(c => th.classList.contains(c))) return;
+    if (getComputedStyle(th).display === 'none') return;      // [표시 설정]으로 숨긴 열은 내려받지 않는다
     const label = (th.querySelector('.vid-sort-btn')?.textContent || th.textContent || '').replace(/[↓↕↑]/g, '').trim();
     if (!label) return; // 아바타 등 라벨 없는 열은 제외
     keepIdx.push(i);
@@ -1198,6 +1200,8 @@ function ruBuildPlaceholderCell(th, name) {
   } else {
     td.textContent = '-';
   }
+  // 유료광고·#광고처럼 [표시 설정]으로 숨길 수 있는 열은 머리글의 col-* 표시를 셀에도 붙인다
+  th.classList.forEach(c => { if (/^col-/.test(c)) td.classList.add(c); });
   return td;
 }
 
@@ -1293,6 +1297,17 @@ function ruApplyRowsToTable(table, rows, opts) {
         if (!tds[colIdx].querySelector('.ch-plat-icon')) tds[colIdx].innerHTML = key ? platBadge(key) : escHtml(val);
         return;
       }
+      if (field === '#광고') {
+        // 제목·설명에 #광고·#협찬 같은 해시태그가 있는지 — 체크 표시(✓ 있음 / 빈 칸 없음 / ? 확인불가)
+        const raw = String(val).trim();
+        const yes = /^(있음|✅|✓|yes|y|true)$/i.test(raw), no = /^(없음|❌|no|n|false)$/i.test(raw), unk = /^(확인불가|❓)$/.test(raw);
+        if (yes || no || unk) {
+          const sp = document.createElement('span'); sp.className = 'vid-chk vid-chk--' + (yes ? 'on' : no ? 'off' : 'unk');
+          sp.textContent = yes ? '있음' : no ? '없음' : '확인불가';
+          tds[colIdx].textContent = ''; tds[colIdx].appendChild(sp);
+          return;
+        }
+      }
       if (field === '유료광고') {
         // 유튜브가 영상에 붙인 유료광고 표기 — 있음/없음/확인불가 배지(값이 '-' 이면 건드리지 않는다)
         const raw = String(val).trim();
@@ -1341,11 +1356,13 @@ function ruCampaignKey() {
   const act = pages.find(p => document.getElementById(p)?.classList.contains('active'));
   // 등록한 캠페인의 상세 화면은 한 장짜리 페이지를 같이 쓰므로, 화면 이름 대신 캠페인 id 로 데이터를 구분한다
   if (act === 'p-detail-empty' && window._detailCtx) return window._detailCtx.key;
+  // 프리미엄 3단계 화면(p-channels)도 등록한 캠페인이면 캠페인 id 로 구분한다(기본 예시는 화면 이름 그대로)
+  if (act === 'p-channels' && typeof PM !== 'undefined' && PM.current !== 'demo') return PM.current;
   return act || 'default';
 }
 // 리포트(참여 영상·타임라인·삭제·갱신)를 서버에 저장하는 화면 key 인지 — 기본 예시 2종 + 지금 열어 둔 등록 캠페인
 function ruReportKey(key) {
-  return ['p-detail', 'p-detail-upload'].includes(key) || !!(window._detailCtx && key === window._detailCtx.key);
+  return ['p-detail', 'p-detail-upload', 'p-channels'].includes(key) || !!(window._detailCtx && key === window._detailCtx.key) || (typeof PM !== 'undefined' && PM.current !== 'demo' && key === PM.current);
 }
 
 // 페이지 진입 시 서버에 저장된 값이 있으면 표에 복원한다(새로고침해도 유지)
@@ -1376,6 +1393,45 @@ function ruApplyHidden(table, hidden) {
     if (gone.has((tr.dataset.platform || 'yt') + '|' + nm)) tr.remove();
   });
 }
+
+// ── 표시 설정: 유료광고·#광고 열을 캠페인(화면)마다 보일지 정한다 ──
+// 설정은 캠페인 정보와 같이 서버에 저장되고, 광고주 화면에는 [광고주 연동] 후 반영된다. 값은 그대로 남아 있어 다시 켜면 보인다.
+window._colsByKey = window._colsByKey || {};
+function vidColsKey(table) {
+  const pg = table.closest('.page-wrapper');
+  if (!pg) return '';
+  if (pg.id === 'p-detail-empty') return (window._detailCtx && window._detailCtx.key) || '';
+  if (pg.id === 'p-channels') return (typeof PM !== 'undefined' && PM.current !== 'demo') ? PM.current : 'p-channels';
+  return pg.id;
+}
+function vidApplyColumns(table) {
+  const c = window._colsByKey[vidColsKey(table)] || {};
+  table.dataset.hidePaid = c.paid === false ? '1' : '0';
+  table.dataset.hideAdtag = c.adTag === false ? '1' : '0';
+}
+function vidApplyAllColumns() { document.querySelectorAll('.vid-table').forEach(vidApplyColumns); }
+
+function openVidColsModal() {
+  const c = window._colsByKey[ruCampaignKey()] || {};
+  document.getElementById('vcPaid').checked = c.paid !== false;
+  document.getElementById('vcAdTag').checked = c.adTag !== false;
+  document.getElementById('vidColsModal').classList.add('open');
+}
+function closeVidColsModal() { document.getElementById('vidColsModal').classList.remove('open'); }
+async function saveVidCols() {
+  const key = ruCampaignKey();     // 지금 열어 둔 화면(캠페인)의 설정 — 표가 비어 있어도 저장된다
+  const cols = { paid: document.getElementById('vcPaid').checked, adTag: document.getElementById('vcAdTag').checked };
+  if (Api.enabled && Api.isLoggedIn() && Api.isAdmin() && key && ruReportKey(key)) {
+    const r = await Api.req('/api/campaign-meta?campaign=' + encodeURIComponent(key), { method: 'POST', body: { columns: cols } });
+    if (!r.ok) { alert(r.error || '표시 설정을 서버에 저장하지 못했습니다.'); return; }
+    ruNotePub(key, r.data.pub);
+  }
+  window._colsByKey[key] = cols;
+  vidApplyAllColumns();
+  closeVidColsModal();
+  if (typeof showToast === 'function') showToast('표시 설정을 저장했습니다. 광고주 화면에는 [광고주 연동]을 누르면 반영됩니다.');
+}
+vidApplyAllColumns();
 
 // ── 광고주 연동: 관리자가 올린 리포트(작업본)는 [광고주 연동]을 눌러야 광고주 사이트에 보인다 ──
 const RU_PUB_LABEL = { never: '연동 전', pending: '연동 필요', synced: '연동 완료', busy: '연동 중…' };
@@ -1511,10 +1567,17 @@ async function saveAutoLookup() {
   if (!table) { alert('반영할 참여 영상 표를 찾을 수 없습니다.'); return; }
   const r = await Api.req(`/api/videos?campaign=${encodeURIComponent(ruCampaignKey())}`, { method: 'POST', body: _ruAutoRows });
   if (!r.ok) { alert(r.error || '서버 저장에 실패했습니다.'); return; }
+  const kept = ruKeptRows(table, r.data.platforms);
+  ruShowSaved(table, r);
+  closeReportUploadModal();
+  alert(ruSaveSummary(r.data.added, r.data.platforms, r.data.replaced, kept, '서버에', r.data.paidChecked));
+}
+
+// 서버에 저장한 행을 화면에 반영한다 — 프리미엄 3.결과 표는 등록 대기 채널 행이 섞여 있어 표를 다시 그린다
+function ruShowSaved(table, r) {
+  if (typeof pmIsResultTable === 'function' && pmIsResultTable(table)) { pmSetServerRows(r.data.rows, r.data.pub); return; }
   ruApplyRowsToTable(table, r.data.rows, { replace: true });
   ruShowPubState(r.data.pub);
-  closeReportUploadModal();
-  alert(ruSaveSummary(r.data.added, r.data.platforms, r.data.replaced, ruKeptRows(table, r.data.platforms), '서버에', r.data.paidChecked));
 }
 
 async function applyReportCsv() {
@@ -1526,10 +1589,10 @@ async function applyReportCsv() {
     if (!Api.isAdmin()) { alert('관리자 계정으로 로그인해야 리포트를 업로드할 수 있습니다.'); return; }
     const r = await Api.req(`/api/videos?campaign=${encodeURIComponent(ruCampaignKey())}`, { method: 'POST', body: _ruParsedRows });
     if (!r.ok) { alert(r.error || '서버 저장에 실패했습니다.'); return; }
-    ruApplyRowsToTable(table, r.data.rows, { replace: true });
-    ruShowPubState(r.data.pub);
+    const kept = ruKeptRows(table, r.data.platforms);
+    ruShowSaved(table, r);
     closeReportUploadModal();
-    alert(ruSaveSummary(r.data.added, r.data.platforms, r.data.replaced, ruKeptRows(table, r.data.platforms), '서버에', r.data.paidChecked));
+    alert(ruSaveSummary(r.data.added, r.data.platforms, r.data.replaced, kept, '서버에', r.data.paidChecked));
     return;
   }
   // 서버가 없으면 화면에만 반영(새로고침하면 초기화)
@@ -2175,6 +2238,7 @@ async function metaLoad() {
   const meta = r.data.meta || {};
   Object.keys(meta).forEach(key => {
     const m = meta[key] || {};
+    window._colsByKey[key] = m.columns || {};
     if (m.card) {
       document.querySelectorAll('.campaign-card:not([data-server-id])').forEach(card => {
         if (card.dataset.args === key && typeof window.applyCardValues === 'function') window.applyCardValues(card, m.card);
@@ -2188,6 +2252,7 @@ async function metaLoad() {
       if (list) { list.innerHTML = ''; m.timeline.forEach(d => list.appendChild(tlRowEl(d))); if (list.closest('#p-detail-empty')) detailSyncTlEmpty(); }
     }
   });
+  vidApplyAllColumns();
 }
 
 function deleteRound(btn) {
@@ -2569,7 +2634,7 @@ async function submitCampaignReg() {
     advanceReviewState, creatorRejectCh,
     openRevisionModal, closeReviewModal, approveReview, submitRevision, saveChVideoLink,
     openRevLogPanel, closeRevLogPanel, toggleRevCheck, postRevLogComment,
-    toggleSimPost,
+    toggleSimPost, openVidColsModal, closeVidColsModal, saveVidCols, openPmPostModal, closePmPostModal, submitPmPost, openPmMetricsModal, closePmMetricsModal, runPmMetrics, downloadPmMetricsSample,
     pmSetPlatformFilter,
     refreshViewCounts,
     closeRefreshLimitModal,
@@ -3589,6 +3654,7 @@ document.addEventListener('click', function(e) {
   if (!confirm('"' + name + '"\n\n이 영상을 캠페인에서 삭제할까요?')) return;
   // 서버에 연결된 관리자 화면(조회수당·업로드당)이면 서버에도 반영한다 — 광고주에게는 [연동] 후 보인다
   var table = row.closest('table');
+  if (typeof pmIsResultTable === 'function' && pmIsResultTable(table)) { pmDeletePost(row); return; }   // 프리미엄 3.결과: 등록한 게시물 링크를 지운다
   var pageId = ruCampaignKey();
   if (Api.enabled && Api.isLoggedIn() && Api.isAdmin() && table && ruReportKey(pageId)) {
     var ni = ruTableColIndex(table, '채널명');

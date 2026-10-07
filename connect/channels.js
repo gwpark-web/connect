@@ -353,7 +353,7 @@ function pmEnsureContext(key, vals) {
 
 // 로그아웃·계정 전환 때: 새 캠페인에서 만든 채널·선정 상태를 버리고 데모로 돌아간다
 function pmReset() {
-  _pmSrv.clear();
+  _pmSrv.clear(); _pmZealAsked.clear();
   PM.store.forEach((_, k) => { if (k !== 'demo') PM.store.delete(k); });
   if (PM.current !== 'demo') { pmEnsureContext('demo'); }
 }
@@ -967,18 +967,23 @@ function pmSyncMetricsTab() {
 }
 const _pmNm = v => String(v == null ? '' : v).trim().replace(/\s+/g, ' ');
 
-function _pmApplyMetrics() {
-  const m = (_pmSrvOn() && _pmSrvGet().metrics) || {};
-  Object.keys(CH_PREMIUM).forEach(k => { delete CH_PREMIUM[k]; });
-  if (!Object.keys(m).length) {
-    // 서버에 올라온 지표가 없으면 예시 캠페인은 예시 값, 새 캠페인은 비어 있다
-    if (PM.current === 'demo' && !_pmSrvOn()) Object.assign(CH_PREMIUM, JSON.parse(JSON.stringify(CH_PREMIUM_DEMO)));
-    return;
-  }
-  channels.forEach((ch, i) => {
-    const d = ch.cid && m[ch.cid];            // 매칭 기준은 CID
-    if (d) CH_PREMIUM[i] = Object.assign({ watch: null, reach: null, shares: null, age: null, country: null, gender: null }, d);
-  });
+// 한 채널(또는 게시물)의 프리미엄 지표. 서버에 연결되어 있으면 서버에 올라온 리포트에서 CID 로 찾고, 아니면 예시 값(이 화면 전용)을 쓴다
+const _PM_EMPTY = { watch: null, reach: null, shares: null, age: null, country: null, gender: null };
+function _pmMetricOf(cid, i) {
+  if (_pmSrvOn()) { const m = _pmSrvGet().metrics; return cid && m[cid] ? Object.assign({}, _PM_EMPTY, m[cid]) : null; }
+  return i >= 0 && CH_PREMIUM[i] ? CH_PREMIUM[i] : null;
+}
+
+// 등록된 게시물의 채널 ID(CID)로 짤 회원 여부를 조회한다(관리자만). 채널 목록에 CID 가 없어도 영상에서 알아낸 채널 ID 로 확인한다.
+const _pmZealAsked = new Set();
+async function pmZealSync(rows, force) {
+  if (!(Api.enabled && Api.isLoggedIn() && Api.isAdmin())) return;
+  const cids = [...new Set((rows || []).map(r => r.cid).filter(c => /^UC[0-9A-Za-z_-]{22}$/.test(c || '') && (force || (!ZEAL_MEMBERS[c] && !_pmZealAsked.has(c)))))];
+  if (!cids.length) return;
+  cids.forEach(c => _pmZealAsked.add(c));
+  await chZealLookup(cids);
+  if (_chZealWarning) showToast(_chZealWarning);
+  if (document.getElementById('chResultContent')) renderResultPanel();
 }
 
 async function pmLoadServer() {
@@ -989,6 +994,7 @@ async function pmLoadServer() {
   _pmSrv.set(key, { rows: r.data.rows || [], metrics: r.data.metrics || {} });
   if (r.data.pub && typeof ruNotePub === 'function') ruNotePub(key, r.data.pub);
   if (document.getElementById('chResultContent')) renderResultPanel();
+  pmZealSync(r.data.rows);
 }
 function pmSetServerRows(rows, pub) {
   const key = _logKey();
@@ -1013,7 +1019,7 @@ function _pmLocalRow(ch, i) {
 // 표에 넣을 행: 등록된 게시물 + 아직 등록 전인 승인 채널
 function _pmResultRows(doneItems) {
   const posted = [], used = new Set();
-  const match = r => doneItems.find(({ ch }) => (r.chKey && r.chKey === chKey(ch)) || (!r.chKey && ruRowPlat(r) === ch.platform && _pmNm(r.name) === _pmNm(ch.name)));
+  const match = r => doneItems.find(({ ch }) => (r.chKey && r.chKey === chKey(ch)) || (ruRowPlat(r) === ch.platform && _pmNm(r.name) === _pmNm(ch.name)));
   if (_pmSrvOn()) {
     _pmSrvGet().rows.forEach(r => { const hit = match(r); posted.push({ row: r, i: hit ? hit.i : -1 }); if (hit) used.add(hit.i); });
   } else {
@@ -1022,13 +1028,27 @@ function _pmResultRows(doneItems) {
   return { posted, pending: doneItems.filter(({ i }) => !used.has(i)) };
 }
 
-// 열 구성은 업로드당 표의 머리글을 그대로 쓴다(두 화면이 항상 같은 열이 되도록)
+// 열 구성은 업로드당 표의 머리글을 그대로 쓰고, 유료광고·#광고 오른쪽에 프리미엄 지표 5개 열(공유·평균 시청·국가·연령대·성별)을 더한다.
+// 열이 늘어도 표가 넘치지 않도록 이 표는 고정 폭 열을 더 좁게 잡고, 남는 폭은 영상 제목(2줄까지)이 받는다.
+const PM_COLS = [['공유', 42], ['평균 시청', 50], ['국가', 48], ['연령대', 52], ['성별', 42]];
+const PM_TIGHT = { '플랫폼': 36, '업로드일': 62, '채널명': 76, '구독자': 46, '영상 길이': 44, '조회수': 62, '참여율': 46, '좋아요': 48, '댓글': 40, '유료광고': 44, '#광고': 36, '짤': 40 };
 function _pmTheadHtml() {
-  const th = document.querySelector('#p-detail-upload .vid-table thead');
-  return th ? th.outerHTML : '';
+  const src = document.querySelector('#p-detail-upload .vid-table thead');
+  if (!src) return '';
+  const th = src.cloneNode(true);
+  const ths = [...th.querySelectorAll('th')];
+  const label = h => h.textContent.replace(/[↓↕↑]/g, '').trim();
+  ths.forEach(h => { const w = PM_TIGHT[label(h)]; if (w) h.style.width = w + 'px'; });
+  const after = ths.find(h => label(h) === '#광고');
+  PM_COLS.slice().reverse().forEach(([t, w]) => {
+    const n = document.createElement('th');
+    n.className = 'col-premium'; n.style.cssText = `width:${w}px;text-align:center`; n.textContent = t;
+    if (after) after.after(n);
+  });
+  return th.outerHTML;
 }
 
-function _pmPendingRow(table, ch, i, isAdmin) {
+function _pmPendingRow(table, ch, i, isAdmin, d) {
   const tr = document.createElement('tr');
   [...table.querySelectorAll('thead th')].forEach(th => tr.appendChild(ruBuildPlaceholderCell(th, ch.name)));
   const td = label => tr.children[ruTableColIndex(table, label)];
@@ -1042,9 +1062,18 @@ function _pmPendingRow(table, ch, i, isAdmin) {
     ? `<button class="ch-sim-btn ch-sim-btn--off" data-fn="openPmPostModal" data-args="${i}">+ 등록</button>`
     : '<span class="ch-result-wait">등록 대기</span>';
   const zc = td('짤'); if (zc) zc.innerHTML = zealBadgeHtml(ch);
+  _pmFillMetricCells(table, tr, d);
   const st = td('상태'); if (st) st.innerHTML = '<span class="vid-vis vid-vis--none">-</span>';
   const dc = tr.querySelector('.vid-del-col'); if (dc) dc.innerHTML = '';   // 지울 게시물이 아직 없다
   return tr;
+}
+
+// 프리미엄 지표 5개 열을 채운다(값이 없으면 -)
+function _pmFillMetricCells(table, tr, d) {
+  _pmMetricParts(d).forEach((html, k) => {
+    const c = tr.children[ruTableColIndex(table, PM_COLS[k][0])];
+    if (c) c.innerHTML = html;
+  });
 }
 
 function _pmFillResultTable(table, posted, pending, doneCount, isAdmin) {
@@ -1054,16 +1083,17 @@ function _pmFillResultTable(table, posted, pending, doneCount, isAdmin) {
     ruApplyRowsToTable(table, posted.map(x => x.row), { replaceAll: true });    // 표 아래의 요약(총 조회수 등)도 여기서 다시 계산된다
     [...tbody.children].forEach((tr, k) => {
       const x = posted[k]; if (!x) return;
-      if (x.i >= 0) {
-        tr.dataset.chIdx = x.i;
-        const zc = tr.children[ruTableColIndex(table, '짤')]; if (zc) zc.innerHTML = zealBadgeHtml(channels[x.i]);
-      }
+      if (x.i >= 0) tr.dataset.chIdx = x.i;
+      // 짤 회원 여부 — 채널 목록의 CID 가 없어도 영상의 채널 ID 로 확인한다
+      const zc = tr.children[ruTableColIndex(table, '짤')];
+      if (zc) zc.innerHTML = zealBadgeHtml({ cid: x.cid, handle: x.i >= 0 ? channels[x.i].handle : '' });
+      _pmFillMetricCells(table, tr, x.d);
       // 제목이 없는 영상(링크만 저장한 인스타그램·틱톡)은 '영상 보기'로 링크가 보이게 한다
       const a = tr.querySelector('.vid-table-link');
       if (a && a.textContent.trim() === '-') a.textContent = '영상 보기';
     });
   }
-  pending.forEach(({ ch, i }) => tbody.appendChild(_pmPendingRow(table, ch, i, isAdmin)));
+  pending.forEach(({ ch, i, d }) => tbody.appendChild(_pmPendingRow(table, ch, i, isAdmin, d)));
   const card = table.closest('.vid-card');
   const first = card && card.querySelector('.vid-stat-strip .vid-stat-num');
   if (first) first.textContent = doneCount;      // '완료 영상'은 승인 완료된 채널 수(게시물 등록 수가 아니다)
@@ -1103,6 +1133,7 @@ async function submitPmPost() {
     closePmPostModal();
     pmSetServerRows(r.data.rows, r.data.pub);
     showToast(r.data.note || '게시물을 등록했습니다. 광고주 화면에는 [연동]을 누르면 반영됩니다.');
+    pmZealSync([r.data.row], true);       // 짤 회원 여부 조회(영상의 채널 ID 기준)
     return;
   }
   // 서버가 없으면 이 화면에만 남긴다
@@ -1120,7 +1151,7 @@ async function pmDeletePost(row) {
     const key = i >= 0 ? chKey(channels[i]) : '';
     // 채널 목록에 없는 행(리포트로 올린 행)은 이름·플랫폼으로 지운다
     const r = i >= 0
-      ? await Api.req('/api/premium/post/delete?campaign=' + encodeURIComponent(_logKey()), { method: 'POST', body: { chKey: key } })
+      ? await Api.req('/api/premium/post/delete?campaign=' + encodeURIComponent(_logKey()), { method: 'POST', body: { chKey: key, name: channels[i].name, platform: channels[i].platform } })
       : await Api.req('/api/videos/delete?campaign=' + encodeURIComponent(_logKey()), { method: 'POST', body: { name: _pmNm(nameCell && (nameCell.title || nameCell.textContent)), platform: row.dataset.platform || 'yt' } });
     if (!r.ok) { alert(r.error || '서버에 삭제를 반영하지 못했습니다.'); return; }
     const cur = _pmSrvGet(); if (cur && r.data.rows) cur.rows = r.data.rows;
@@ -1135,7 +1166,17 @@ async function pmDeletePost(row) {
 }
 
 // ── 프리미엄 지표 리포트 업로드(CID 기준) ──────────────────────────────
-const PM_METRIC_HEADS = { cid: ['cid', '채널id', '채널 id', '채널아이디'], shares: ['공유', '공유수'], watch: ['평균시청', '평균 시청', '평균 시청 시간', '평균시청시간'], reach: ['도달', '도달수'], country: ['국가'], age: ['연령대', '연령'], gender: ['성별'] };
+// 헤더 이름으로 열을 찾는다 — 열 순서·대소문자·공백·괄호 안 설명((초) 등)은 상관없고, 모르는 열은 무시한다
+const PM_METRIC_HEADS = {
+  cid: ['cid', '채널id', '채널아이디', 'channelid', '채널코드'],
+  shares: ['공유', '공유수', '공유횟수', 'shares', 'share'],
+  watch: ['평균시청', '평균시청시간', '평균시청초', '평균시청시간초', '시청시간', 'avgwatch', 'avgwatchtime', 'watchtime'],
+  reach: ['도달', '도달수', 'reach'],
+  country: ['국가', '국가명', 'country', '지역'],
+  age: ['연령대', '연령', '나이', 'age', 'agegroup'],
+  gender: ['성별', 'gender', 'sex'],
+};
+const _pmHeadKey = h => String(h == null ? '' : h).toLowerCase().replace(/\([^)]*\)|（[^）]*）/g, '').replace(/[\s_\-./]/g, '');
 let _pmMetricRows = null;
 
 function openPmMetricsModal() {
@@ -1165,13 +1206,14 @@ async function pmMetricsFileChosen(input) {
   if (!file) return;
   let rows;
   try { rows = await ruReadFile(file); } catch (e) { if (lb) lb.textContent = e.message || '파일을 읽을 수 없습니다.'; return; }
-  const norm = h => String(h || '').trim().toLowerCase().replace(/\s+/g, ' ');
-  const head = (rows[0] || []).map(norm);
+  // 제목 줄이 먼저 있어도 되도록 위쪽 10줄 안에서 CID 헤더가 있는 줄을 머리글로 본다
+  const hi = rows.slice(0, 10).findIndex(r => r.some(c => PM_METRIC_HEADS.cid.includes(_pmHeadKey(c))));
+  if (hi < 0) { if (lb) lb.textContent = '"CID" 열을 찾을 수 없습니다. 샘플 파일 형식을 확인해주세요.'; return; }
+  const head = rows[hi].map(_pmHeadKey);
   const idx = {};
   Object.keys(PM_METRIC_HEADS).forEach(k => { idx[k] = head.findIndex(h => PM_METRIC_HEADS[k].includes(h)); });
-  if (idx.cid < 0) { if (lb) lb.textContent = '"CID" 열을 찾을 수 없습니다. 샘플 파일 형식을 확인해주세요.'; return; }
   if (!['shares', 'watch', 'country', 'age', 'gender'].some(k => idx[k] >= 0)) { if (lb) lb.textContent = '지표 열(공유·평균 시청·국가·연령대·성별)이 하나도 없습니다.'; return; }
-  _pmMetricRows = rows.slice(1).map(r => {
+  _pmMetricRows = rows.slice(hi + 1).map(r => {
     const o = { cid: String(r[idx.cid] || '').trim() };
     Object.keys(idx).forEach(k => { if (k !== 'cid' && idx[k] >= 0) o[k] = r[idx[k]]; });
     return o;
@@ -1191,13 +1233,14 @@ async function runPmMetrics() {
   if (!r.ok) { say(r.error || '올리지 못했습니다.', true); return; }
   const cur = _pmSrvGet(); cur.metrics = r.data.metrics || {};
   if (r.data.pub && typeof ruNotePub === 'function') ruNotePub(_logKey(), r.data.pub);
-  // 이 캠페인의 채널과 CID 가 맞은 수 — 맞지 않은 CID 는 알려 준다
-  const mine = new Set(channels.map(c => c.cid).filter(Boolean));
+  // 이 캠페인의 채널·게시물과 CID 가 맞은 수 — 맞지 않은 CID 는 알려 준다
+  const mine = new Set([...channels.map(c => c.cid), ...(cur.rows || []).map(r => r.cid)].filter(Boolean));
   const matched = r.data.cids.filter(c => mine.has(c)).length, miss = r.data.cids.filter(c => !mine.has(c));
   closePmMetricsModal();
   _pmActiveSubTab = 'metrics';
   renderResultPanel();
   showToast(`지표 ${r.data.saved}건 저장 · 이 캠페인 채널과 맞은 CID ${matched}건` + (miss.length ? ` · 맞지 않은 CID ${miss.length}건(${miss.slice(0, 2).join(', ')}${miss.length > 2 ? ' …' : ''})` : '') + ' · 광고주 화면에는 [연동] 후 반영됩니다.');
+  if (!matched) alert('지표는 저장했지만, 이 캠페인의 채널·게시물과 CID가 하나도 맞지 않아 표에 보이지 않습니다.\n리포트의 CID(UC로 시작하는 채널 ID)가 이 캠페인 채널의 CID와 같은지 확인해주세요.\n(영상 링크를 등록한 채널은 영상의 채널 ID로도 맞춥니다)');
 }
 document.addEventListener('change', function(e) { if (e.target && e.target.id === 'pmMetricsFile') pmMetricsFileChosen(e.target); });
 
@@ -1212,7 +1255,6 @@ function renderResultPanel() {
   const showMetrics = ((window._colsByKey || {})[_logKey()] || {}).premium !== false;
   _pmShownMetrics = showMetrics;
   if (!showMetrics) _pmActiveSubTab = 'videos';
-  _pmApplyMetrics();     // 서버에 올라온 프리미엄 지표(CID 기준)를 채널에 맞춘다
   const doneItems = channels
     .map((ch, i) => ({ ch, i }))
     .filter(({ i }) => chState[i] === 'selected' && chReviewState[i] === '승인 완료');
@@ -1231,8 +1273,15 @@ function renderResultPanel() {
   const filteredItems = _pmPlatformFilter === 'all'
     ? doneItems
     : doneItems.filter(({ i }) => channels[i].platform === _pmPlatformFilter);
-  const postedShown = res.posted.filter(x => _pmPlatformFilter === 'all' || ruRowPlat(x.row) === _pmPlatformFilter);
-  const pendingShown = res.pending.filter(({ ch }) => _pmPlatformFilter === 'all' || ch.platform === _pmPlatformFilter);
+  // 프리미엄 지표는 CID 로 찾는다 — 게시물 행은 영상의 채널 ID(없으면 채널 목록의 CID), 등록 전 채널은 채널 목록의 CID
+  const postedShown = res.posted.filter(x => _pmPlatformFilter === 'all' || ruRowPlat(x.row) === _pmPlatformFilter)
+    .map(x => { const cid = x.row.cid || (x.i >= 0 && channels[x.i].cid) || ''; return { ...x, cid, d: _pmMetricOf(cid, x.i) }; });
+  const pendingShown = res.pending.filter(({ ch }) => _pmPlatformFilter === 'all' || ch.platform === _pmPlatformFilter)
+    .map(it => ({ ...it, d: _pmMetricOf(it.ch.cid, it.i) }));
+  const metricEntries = [
+    ...postedShown.map(x => ({ name: x.row.name, platform: ruRowPlat(x.row), cid: x.cid, d: x.d })),
+    ...pendingShown.map(({ ch, d }) => ({ name: ch.name, platform: ch.platform, cid: ch.cid || '', d })),
+  ];
   const platFilterHtml = donePlatforms.length > 1 ? `
     <div class="vid-plat-filter" role="tablist" aria-label="플랫폼 필터">
       <button class="vid-plat-chip${_pmPlatformFilter === 'all' ? ' active' : ''}" data-fn="pmSetPlatformFilter" data-args="all">전체</button>
@@ -1440,7 +1489,7 @@ function renderResultPanel() {
         <div class="vid-expand-row"><button class="vid-expand-btn" data-fn="toggleVidList" data-stop="1" hidden>전체 보기 ↓</button></div>
       </div>
 
-      ${showMetrics ? `<div class="pm-pane${_pmActiveSubTab === 'metrics' ? ' active' : ''}" id="pmPaneMetrics">${renderPremiumMetrics(filteredItems)}</div>` : ''}
+      ${showMetrics ? `<div class="pm-pane${_pmActiveSubTab === 'metrics' ? ' active' : ''}" id="pmPaneMetrics">${renderPremiumMetrics(metricEntries)}</div>` : ''}
     </div>`;
   _pmFillResultTable(container.querySelector('#pmResultTable'), postedShown, pendingShown, doneCount, isAdmin);
   // 패널을 다시 그리면 연동 버튼 문구가 처음 값으로 돌아가므로 현재 연동 상태를 다시 표시한다
@@ -1606,37 +1655,36 @@ function fmtNum(n) { return n.toLocaleString('ko-KR'); }
 
 // 프리미엄 캠페인 전용 열. 프리미엄 지표 탭이 바로 이 값들을 집계한다.
 // 조회수당(p-detail)·업로드당(p-detail-upload) 표에는 넣지 않는다.
-function premiumCells(i) {
-  const d = CH_PREMIUM[i];
-  const none = '<span class="pm-cell-none">–</span>';
-  if (!d) return `<td class="pm-cell">${none}</td>`.repeat(5);
-  const age = d.age
-    ? `<span class="pm-chip" style="--c:${AGE_COLOR[d.age] || NO_DATA_COLOR}">${d.age}</span>` : none;
-  const cty = d.country
-    ? `<span class="pm-chip pm-chip--plain">${COUNTRY_FLAG[d.country] || '🌐'} ${d.country}</span>` : none;
-  const gen = d.gender
-    ? `<span class="pm-chip" style="--c:${GENDER_COLOR[d.gender] || NO_DATA_COLOR}">${GENDER_LABEL[d.gender] || d.gender}</span>` : none;
-  return `
-      <td class="pm-cell pm-cell--num">${d.shares != null ? fmtNum(d.shares) : none}</td>
-      <td class="pm-cell pm-cell--num">${d.watch != null ? d.watch + '초' : none}</td>
-      <td class="pm-cell">${cty}</td>
-      <td class="pm-cell">${age}</td>
-      <td class="pm-cell">${gen}</td>`;
+function _pmMetricParts(d) {
+  const none = '<span class="pm-cell-none">-</span>';
+  if (!d) return [none, none, none, none, none];
+  return [
+    d.shares != null ? fmtNum(d.shares) : none,
+    d.watch != null ? d.watch + '초' : none,
+    d.country ? `<span class="pm-chip pm-chip--plain">${COUNTRY_FLAG[d.country] || '🌐'} ${escHtml(d.country)}</span>` : none,
+    d.age ? `<span class="pm-chip" style="--c:${AGE_COLOR[d.age] || NO_DATA_COLOR}">${escHtml(d.age)}</span>` : none,
+    d.gender ? `<span class="pm-chip" style="--c:${GENDER_COLOR[d.gender] || NO_DATA_COLOR}">${GENDER_LABEL[d.gender] || escHtml(d.gender)}</span>` : none,
+  ];
+}
+function premiumCells(d) {
+  const cls = ['pm-cell pm-cell--num', 'pm-cell pm-cell--num', 'pm-cell', 'pm-cell', 'pm-cell'];
+  return _pmMetricParts(d).map((h, k) => `<td class="${cls[k]}">${h}</td>`).join('');
 }
 
-function renderPremiumMetrics(doneItems) {
-  const total = doneItems.length;
+// 프리미엄 지표 탭 — 참여 영상 표의 지표 열을 요약한 차트 정리본. entries: [{name, platform, cid, d}]
+function renderPremiumMetrics(entries) {
+  const total = entries.length;
   const isAdmin = document.body.dataset.viewerRole === 'admin';
   // 프리미엄 지표는 리포트(엑셀·CSV)로 따로 올린다 — 채널 ID(CID)로 채널과 맞춘다
   const bar = isAdmin ? `<div class="pm-metrics-bar">
-      <span class="pm-metrics-hint">공유·평균 시청·국가·연령대·성별은 리포트로 올립니다 · 채널 ID(CID) 기준으로 채널과 맞춥니다</span>
+      <span class="pm-metrics-hint">공유·평균 시청·국가·연령대·성별은 리포트로 올립니다 · 채널 ID(CID) 기준으로 채널과 맞추며, 값은 참여 영상 표의 각 행에도 들어갑니다</span>
       <button class="cd-btn cd-btn-edit" data-fn="openPmMetricsModal"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>프리미엄 지표 업로드</button>
     </div>` : '';
   if (!total) {
     return bar + `<div class="pm-empty">승인 완료된 영상이 없어 지표를 집계할 수 없습니다.</div>`;
   }
 
-  const rows = doneItems.map(({ i }) => CH_PREMIUM[i]).filter(Boolean);
+  const rows = entries.map(e => e.d).filter(Boolean);
   const provided = rows.length;
   if (!provided) {
     return bar + `<div class="pm-empty">${isAdmin ? '아직 올린 프리미엄 지표가 없습니다. [프리미엄 지표 업로드]로 리포트를 올려주세요.' : '프리미엄 지표를 준비 중입니다.'}</div>`;
@@ -1677,12 +1725,6 @@ function renderPremiumMetrics(doneItems) {
     color: k === '조회 불가' ? NO_DATA_COLOR : (COUNTRY_COLOR[k] || NO_DATA_COLOR),
   }));
 
-  const metricRows = doneItems.map(({ ch, i }) => `<tr>
-        <td>${platBadge(ch.platform)} ${escHtml(ch.name)}</td>
-        <td class="ch-cid-cell">${ch.cid ? `<span class="ch-cid">${escHtml(ch.cid)}</span>` : '<span class="ch-cid-none">-</span>'}</td>
-        ${premiumCells(i)}
-      </tr>`).join('');
-
   return bar + `
     <div class="pm-stat-grid">
       <div class="pm-stat pm-stat--a"><p class="pm-stat-lbl">데이터 제공 영상</p><p class="pm-stat-num">${provided}개</p><p class="pm-stat-sub">전체 ${total}개 중</p></div>
@@ -1695,13 +1737,6 @@ function renderPremiumMetrics(doneItems) {
       ${ageBarCard('주요 연령대', ageSegments)}
       ${donutCard('주요 성별', genSegments)}
       ${donutCard('주요 국가', ctySegments)}
-    </div>
-
-    <div class="vid-table-wrap pm-metric-wrap">
-      <table class="vid-table pm-metric-table">
-        <thead><tr><th>채널</th><th style="width:210px">CID</th><th class="pm-cell--num" style="width:70px">공유</th><th class="pm-cell--num" style="width:84px">평균 시청</th><th style="width:100px">국가</th><th style="width:84px">연령대</th><th style="width:72px">성별</th></tr></thead>
-        <tbody>${metricRows}</tbody>
-      </table>
     </div>`;
 }
 

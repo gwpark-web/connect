@@ -532,7 +532,9 @@ const fmtDur = s => `${s}초`;
     const chKey = str(b.chKey, 80); if (!chKey) return send(req, res, 400, { error: '채널 정보가 없습니다.' });
     const db = store.get();
     const before = (db.videos[key] || []).length;
-    db.videos[key] = (db.videos[key] || []).filter(r => r.chKey !== chKey);
+    // 채널 식별자(chKey)가 바뀌었어도(예: 나중에 CID 가 채워짐) 같은 플랫폼·이름의 게시물을 지운다
+    const dname = normName(b.name), dplat = PLATFORMS.includes(b.platform) ? b.platform : '';
+    db.videos[key] = (db.videos[key] || []).filter(r => !(r.chKey === chKey || (dname && dplat && rowPlat(r) === dplat && normName(r.name) === dname)));
     store.save();
     return send(req, res, 200, { removed: before - db.videos[key].length, rows: db.videos[key], pub: pubState(db, key) });
   }
@@ -638,7 +640,13 @@ const rowPlat = r => PLAT_ALIAS[String((r && (r['플랫폼'] || r.platform)) || 
 
 // 프리미엄 지표 한 줄 정리 — 공유(정수)·평균 시청(초)·도달(정수)·국가(2글자 코드)·연령대(25-34 형태)·성별(F/M). 읽을 수 없는 칸은 건너뛴다.
 const COUNTRY_ALIAS = { '한국': 'KR', '대한민국': 'KR', korea: 'KR', 'south korea': 'KR', '미국': 'US', usa: 'US', 'united states': 'US', '일본': 'JP', japan: 'JP', '중국': 'CN', china: 'CN', '대만': 'TW', taiwan: 'TW', '태국': 'TH', thailand: 'TH', '베트남': 'VN', vietnam: 'VN', '인도네시아': 'ID', indonesia: 'ID', '필리핀': 'PH', philippines: 'PH', '영국': 'GB', uk: 'GB', '독일': 'DE', germany: 'DE', '프랑스': 'FR', france: 'FR', '캐나다': 'CA', canada: 'CA', '호주': 'AU', australia: 'AU', '브라질': 'BR', brazil: 'BR', '인도': 'IN', india: 'IN', '멕시코': 'MX', mexico: 'MX' };
-function metricNum(v) { const s = String(v == null ? '' : v).replace(/[,\s]/g, ''); if (!/^\d+(\.\d+)?$/.test(s)) return null; return Math.round(+s); }
+// 숫자 칸 — '1,234'·'34초'·'0:34'(분:초)처럼 단위나 시간 표기가 붙어도 읽는다
+function metricNum(v) {
+  const t = String(v == null ? '' : v).trim();
+  const ms = t.match(/^(\d+):(\d{1,2})$/); if (ms) return +ms[1] * 60 + +ms[2];
+  const m = t.replace(/,/g, '').match(/-?\d+(\.\d+)?/);
+  return m ? Math.round(+m[0]) : null;
+}
 function cleanMetric(raw) {
   const o = {};
   const sh = metricNum(raw.shares); if (sh !== null) o.shares = sh;

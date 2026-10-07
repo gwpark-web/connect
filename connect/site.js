@@ -1397,6 +1397,7 @@ function vidApplyColumns(table) {
   const c = window._colsByKey[vidColsKey(table)] || {};
   table.dataset.hidePaid = c.paid === false ? '1' : '0';
   table.dataset.hideAdtag = c.adTag === false ? '1' : '0';
+  table.dataset.hidePremium = c.premium === false ? '1' : '0';
 }
 function vidApplyAllColumns() {
   document.querySelectorAll('.vid-table').forEach(vidApplyColumns);

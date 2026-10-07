@@ -4840,3 +4840,11 @@ body[data-viewer-role="admin"] span.admin-only { display: inline !important; }
 .vid-table-wrap { max-width: 100%; overscroll-behavior-x: contain; }
 .vid-table th, .vid-table td { padding-left: 4px; padding-right: 4px; }
 .vid-table td .ch-plat-icon { vertical-align: middle; }
+
+/* 프리미엄 3.결과 표: 지표 5개 열이 더해져도 넘치지 않게 — 영상 제목은 2줄까지 보여 주고, 지표 열은 [표시 설정]의 프리미엄 지표로 숨긴다 */
+.vid-table[data-hide-premium="1"] .col-premium { display: none; }
+#pmResultTable { min-width: 1060px; }
+#pmResultTable td .vid-table-link { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.35; text-align: left; }
+#pmResultTable td.col-premium { padding-left: 2px; padding-right: 2px; }
+#pmResultTable .pm-chip { padding: 1px 6px; font-size: 11px; }
+#pmResultTable th { font-size: 10.5px; }

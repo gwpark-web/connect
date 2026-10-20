@@ -3402,7 +3402,7 @@ document.addEventListener('click', function(e) {
     var el = g('sc-toast'); if (!el) return;
     el.textContent = msg; el.hidden = false;
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { el.hidden = true; }, 1800);
+    toastTimer = setTimeout(function () { el.hidden = true; }, 1800 + Math.min(msg.length, 60) * 40);
   }
 
   // 이벤트
@@ -3604,9 +3604,8 @@ document.addEventListener('click', function(e) {
   _syncSources.push({
     name: '넷플릭스',
     fn: async function() {
-      if (!Api.enabled || !Api.isLoggedIn()) return 0;
       var r = await Api.req('/api/netflix/korean');
-      if (!r.ok || !r.data || !r.data.items) return 0;
+      if (!r.ok || !r.data || !r.data.items) throw new Error(r.down ? '서버에 연결할 수 없음' : (r.error || '서버 오류 ' + r.status));
       var added = 0;
       r.data.items.forEach(function(n) {
         if (!n.title || !n.date) return;
@@ -3630,6 +3629,11 @@ document.addEventListener('click', function(e) {
   async function scSync() {
     var btn = g('sc-btn-sync');
     if (!btn || btn.disabled) return;
+    // 서버(관리자 로그인) 없이는 KOBIS·넷플릭스 모두 못 가져온다 — 목록을 비우기 전에 알려 준다
+    if (!Api.enabled || !Api.isLoggedIn()) {
+      scToast(Api.enabled ? '관리자로 로그인해야 갱신할 수 있습니다(우측 상단 로그인)' : '서버에 연결되지 않은 데모 모드라 갱신할 수 없습니다(터널 주소로 열거나 이 컴퓨터의 localhost 화면으로 여세요)');
+      return;
+    }
     btn.disabled = true;
     var orig = btn.innerHTML;
     btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin .6s linear infinite"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>갱신 중…';
@@ -3637,9 +3641,8 @@ document.addEventListener('click', function(e) {
     scItems = [];
     var report = [];
     for (var i = 0; i < _syncSources.length; i++) {
-      var n = 0;
-      try { n = await _syncSources[i].fn(); } catch(e) {}
-      report.push(_syncSources[i].name + ' ' + n + '건');
+      try { report.push(_syncSources[i].name + ' ' + await _syncSources[i].fn() + '건'); }
+      catch(e) { report.push(_syncSources[i].name + ' 실패(' + (e && e.message || '오류') + ')'); }
     }
     scSave(); scRender();
     scToast('불러왔습니다 — ' + report.join(' · '));

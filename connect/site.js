@@ -3208,6 +3208,8 @@ document.addEventListener('click', function(e) {
       ? '<a class="sc-link-kobis" href="' + KOBIS_POPUP_BASE + esc(it.movieCd) + '" target="_blank" rel="noopener">KOBIS</a>'
       : (it.source === 'Netflix' && /^https:\/\/www\.netflix\.com\//.test(it.url || '')
         ? '<a class="sc-link-kobis sc-link-netflix" href="' + esc(it.url) + '" target="_blank" rel="noopener">Netflix</a>'
+        : it.source === 'Disney' && /^https:\/\/www\.disneyplus\.com\//.test(it.url || '')
+        ? '<a class="sc-link-kobis sc-link-disney" href="' + esc(it.url) + '" target="_blank" rel="noopener">Disney+</a>'
         : it.source ? '<span class="sc-source-tag">' + esc(it.source) + '</span>' : '<span style="color:var(--gray-light)">—</span>');
     return '<tr class="sc-tr' + (urgent ? ' is-urgent' : '') + (CLOSED.indexOf(it.status) !== -1 ? ' is-closed' : '') + '" data-sc-id="' + it.id + '">' +
       '<td class="sc-dday-col">' + ddayStr + '<span class="sc-date">' + fmtDate(it.date) + '</span></td>' +
@@ -3363,7 +3365,8 @@ document.addEventListener('click', function(e) {
     var title = g('sc-iTitle').value.trim();
     var date = g('sc-iDate').value;
     if (!title) { scToast('작품명을 입력하세요'); g('sc-iTitle').focus(); return; }
-    if (!date) { scToast('개봉일을 선택하세요'); g('sc-iDate').focus(); return; }
+    var existing = scEditId ? scItems.find(function (x) { return x.id === scEditId; }) : null;
+    if (!date && !(existing && !existing.date)) { scToast('개봉일을 선택하세요'); g('sc-iDate').focus(); return; }   // 공개일 미정으로 들어온 작품은 날짜 없이도 저장
     var data = {
       title: title, platform: g('sc-iPlatform').value, type: g('sc-iType').value, date: date,
       country: g('sc-iCountry').value.trim(),
@@ -3619,6 +3622,32 @@ document.addEventListener('click', function(e) {
           date: n.date, company: '넷플릭스', movieCd: '',
           status: '미접촉', owner: '',
           url: n.url || '', memo: '', source: 'Netflix'
+        });
+        added++;
+      });
+      return added;
+    }
+  });
+
+  // 디즈니+ 소스 — '공개 예정' 줄의 신작 중 카테고리가 '시리즈'인 것(날짜가 월까지만 정해졌거나 미정이면 개봉일 없이 들어온다)
+  _syncSources.push({
+    name: '디즈니+',
+    fn: async function() {
+      var r = await Api.req('/api/disney/upcoming');
+      if (!r.ok || !r.data || !r.data.items) throw new Error(r.down ? '서버에 연결할 수 없음' : (r.error || '서버 오류 ' + r.status));
+      var added = 0;
+      var cutoff = scIso(new Date(Date.now() - 7 * 86400000));
+      r.data.items.forEach(function(n) {
+        if (!n.title) return;
+        if (n.date && n.date < cutoff) return;
+        if (scItems.some(function(it) { return it.source === 'Disney' && it.title === n.title; })) return;
+        scItems.push({
+          id: uid(), title: n.title, platform: '디즈니',
+          type: (n.genre || '').indexOf('드라마') !== -1 ? '드라마' : 'OTT',
+          filmCat: n.category || '시리즈', genre: n.genre || '', country: '',
+          date: n.date || '', company: '디즈니+', movieCd: '',
+          status: '미접촉', owner: '',
+          url: n.url || '', memo: n.date ? '' : '디즈니+ 공개 시기: ' + (n.when || '미정'), source: 'Disney'
         });
         added++;
       });

@@ -3064,10 +3064,16 @@ document.addEventListener('click', function(e) {
   }
   function scSave() { try { localStorage.setItem(STORE_KEY, JSON.stringify(scItems)); } catch (e) {} }
 
+  // 플랫폼 = 어디서 공개되는 작품인지(영화/넷플릭스/디즈니). 예전에 저장된 항목은 값이 없으므로 영화로 본다
+  function scPlat(it) { return it.platform || '영화'; }
+
+  function scPlatCls(it) { return { '영화': 'film', '넷플릭스': 'netflix', '디즈니': 'disney' }[scPlat(it)] || 'film'; }
+
   function scSortVal(it, key) {
     if (key === 'date') return it.date || 'zzzzz';
     if (key === 'lastContact') return it.lastContact || 'zzzzz';
     if (key === 'title') return (it.title || '').toLowerCase();
+    if (key === 'platform') return scPlat(it);
     if (key === 'type') return (it.type || '').toLowerCase();
     if (key === 'filmCat') return (it.filmCat || '').toLowerCase();
     if (key === 'genre') return (it.genre || '').toLowerCase();
@@ -3098,6 +3104,7 @@ document.addEventListener('click', function(e) {
   }
 
   function scFiltered() {
+    var platform = (g('sc-fPlatform') || {}).value || '';
     var type = (g('sc-fType') || {}).value || '';
     var filmCat = (g('sc-fFilmCat') || {}).value || '';
     var country = (g('sc-fCountry') || {}).value || '';
@@ -3107,6 +3114,7 @@ document.addEventListener('click', function(e) {
     var q = ((g('sc-fQuery') || {}).value || '').trim().toLowerCase();
     var list = scItems.filter(function (it) {
       if (it.date && dday(it.date) < -7) return false;
+      if (platform && scPlat(it) !== platform) return false;
       if (type && it.type !== type) return false;
       if (filmCat && it.filmCat !== filmCat) return false;
       if (country && (it.country || '') !== country) return false;
@@ -3198,12 +3206,15 @@ document.addEventListener('click', function(e) {
     var pri = scPriority(it);
     var sourceCell = it.movieCd
       ? '<a class="sc-link-kobis" href="' + KOBIS_POPUP_BASE + esc(it.movieCd) + '" target="_blank" rel="noopener">KOBIS</a>'
-      : (it.source ? '<span class="sc-source-tag">' + esc(it.source) + '</span>' : '<span style="color:var(--gray-light)">—</span>');
+      : (it.source === 'Netflix' && /^https:\/\/www\.netflix\.com\//.test(it.url || '')
+        ? '<a class="sc-link-kobis sc-link-netflix" href="' + esc(it.url) + '" target="_blank" rel="noopener">Netflix</a>'
+        : it.source ? '<span class="sc-source-tag">' + esc(it.source) + '</span>' : '<span style="color:var(--gray-light)">—</span>');
     return '<tr class="sc-tr' + (urgent ? ' is-urgent' : '') + (CLOSED.indexOf(it.status) !== -1 ? ' is-closed' : '') + '" data-sc-id="' + it.id + '">' +
       '<td class="sc-dday-col">' + ddayStr + '<span class="sc-date">' + fmtDate(it.date) + '</span></td>' +
       '<td style="text-align:center"><span class="sc-pri sc-pri--' + pri.cls + '">' + pri.label + '</span></td>' +
       '<td class="sc-title">' + esc(it.title) +
         (it.filmCat ? '<span class="sc-filmcat">' + esc(it.filmCat) + '</span>' : '') + '</td>' +
+      '<td><span class="sc-plat sc-plat--' + scPlatCls(it) + '">' + esc(scPlat(it)) + '</span></td>' +
       '<td><span class="sc-type-badge">' + esc(it.type || '—') + '</span></td>' +
       '<td class="sc-genre">' + esc(it.genre || '—') + '</td>' +
       '<td class="sc-country">' + esc(it.country || '—') + '</td>' +
@@ -3326,6 +3337,7 @@ document.addEventListener('click', function(e) {
     var it = id ? scItems.find(function (x) { return x.id === id; }) : null;
     g('sc-sheet-title').textContent = it ? '일정 편집' : '일정 추가';
     g('sc-iTitle').value = it ? it.title : '';
+    g('sc-iPlatform').value = it ? scPlat(it) : '영화';
     g('sc-iType').value = it ? it.type : '영화';
     g('sc-iCountry').value = it ? (it.country || '') : '';
     g('sc-iDate').value = it ? it.date : '';
@@ -3353,7 +3365,7 @@ document.addEventListener('click', function(e) {
     if (!title) { scToast('작품명을 입력하세요'); g('sc-iTitle').focus(); return; }
     if (!date) { scToast('개봉일을 선택하세요'); g('sc-iDate').focus(); return; }
     var data = {
-      title: title, type: g('sc-iType').value, date: date,
+      title: title, platform: g('sc-iPlatform').value, type: g('sc-iType').value, date: date,
       country: g('sc-iCountry').value.trim(),
       company: g('sc-iCompany').value.trim(),
       contact: g('sc-iContact').value.trim(),
@@ -3409,7 +3421,8 @@ document.addEventListener('click', function(e) {
     if (e.target.id === 'sc-btn-delete') { scDeleteItem(); return; }
     if (e.target.id === 'sc-sheet-scrim') { scCloseSheet(); return; }
     if (e.target.id === 'sc-reset-filters') {
-      var ft = g('sc-fType'), fs = g('sc-fStatus'), fq = g('sc-fQuery'), fcn = g('sc-fCountry');
+      var ft = g('sc-fType'), fs = g('sc-fStatus'), fq = g('sc-fQuery'), fcn = g('sc-fCountry'), fpl = g('sc-fPlatform');
+      if (fpl) fpl.value = '';
       if (ft) ft.value = ''; if (fs) fs.value = 'open'; if (fq) fq.value = ''; if (fcn) fcn.value = '';
       scRender(); return;
     }
@@ -3448,7 +3461,7 @@ document.addEventListener('click', function(e) {
   });
 
   document.addEventListener('input', function (e) {
-    if (['sc-fType','sc-fFilmCat','sc-fCountry','sc-fStatus','sc-fQuery'].indexOf(e.target.id) !== -1) scRender();
+    if (['sc-fPlatform','sc-fType','sc-fFilmCat','sc-fCountry','sc-fStatus','sc-fQuery'].indexOf(e.target.id) !== -1) scRender();
     if (e.target.id === 'sc-iTitle') scAcDebounce(e.target.value);
   });
 
@@ -3541,6 +3554,7 @@ document.addEventListener('click', function(e) {
       g('sc-iTitle').value  = item.dataset.mn;
       if (item.dataset.dt) g('sc-iDate').value = item.dataset.dt;
       if (item.dataset.co) g('sc-iCompany').value = item.dataset.co;
+      g('sc-iPlatform').value = '영화';
       g('sc-iType').value = '영화';
       g('sc-iUrl').value = '';
       // movieCd를 hidden input에 임시 저장 (저장 시 item에 반영)
@@ -3570,6 +3584,7 @@ document.addEventListener('click', function(e) {
         if (exists) return;
         scItems.push({
           id: uid(), title: title, type: '영화',
+          platform: '영화',
           filmCat: m.typeNm || '',
           genre: m.repGenreNm || '',
           country: m.repNationNm || '한국',
@@ -3585,6 +3600,33 @@ document.addEventListener('click', function(e) {
     }
   });
 
+  // 넷플릭스 소스 — 신작 중 '한국 작품'만(서버가 상세 페이지의 특징을 읽어 걸러 준다)
+  _syncSources.push({
+    name: '넷플릭스',
+    fn: async function() {
+      if (!Api.enabled || !Api.isLoggedIn()) return 0;
+      var r = await Api.req('/api/netflix/korean');
+      if (!r.ok || !r.data || !r.data.items) return 0;
+      var added = 0;
+      r.data.items.forEach(function(n) {
+        if (!n.title || !n.date) return;
+        if (n.date < scIso(new Date(Date.now() - 7 * 86400000))) return;   // 7일 넘게 지난 작품은 영업 대상이 아님(KOBIS와 같은 기준)
+        if (scItems.some(function(it) { return it.source === 'Netflix' && it.title === n.title; })) return;
+        var kind = n.kind || '';
+        scItems.push({
+          id: uid(), title: n.title, platform: '넷플릭스',
+          type: kind.indexOf('영화') !== -1 ? '영화' : (kind.indexOf('시리즈') !== -1 ? '드라마' : 'OTT'),
+          filmCat: '', genre: n.genre || '', country: '한국',
+          date: n.date, company: '넷플릭스', movieCd: '',
+          status: '미접촉', owner: '',
+          url: n.url || '', memo: '', source: 'Netflix'
+        });
+        added++;
+      });
+      return added;
+    }
+  });
+
   async function scSync() {
     var btn = g('sc-btn-sync');
     if (!btn || btn.disabled) return;
@@ -3593,12 +3635,14 @@ document.addEventListener('click', function(e) {
     btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin .6s linear infinite"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>갱신 중…';
     // 기존 리스트 전체 초기화 후 KOBIS 재수신
     scItems = [];
-    var totalAdded = 0;
+    var report = [];
     for (var i = 0; i < _syncSources.length; i++) {
-      try { totalAdded += await _syncSources[i].fn(); } catch(e) {}
+      var n = 0;
+      try { n = await _syncSources[i].fn(); } catch(e) {}
+      report.push(_syncSources[i].name + ' ' + n + '건');
     }
     scSave(); scRender();
-    scToast(totalAdded ? 'KOBIS ' + totalAdded + '건 불러왔습니다' : 'KOBIS 데이터가 없습니다');
+    scToast('불러왔습니다 — ' + report.join(' · '));
     btn.disabled = false;
     btn.innerHTML = orig;
   }

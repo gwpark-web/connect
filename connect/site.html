@@ -7,7 +7,7 @@
 <title>커넥트 스튜디오 — 광고주 플랫폼</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/bebas-neue@5/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
-<link href="style.css?v=20261007h" rel="stylesheet">
+<link href="style.css?v=20261021a" rel="stylesheet">
 <script>
   // 이모지 세로 보정값이 폰트마다 달라 Windows(Segoe UI Emoji)만 따로 표시한다
   if (/Win/i.test(navigator.userAgentData?.platform || navigator.platform || '')) {
@@ -2353,6 +2353,15 @@
       </div>
       <div class="sc-filters" hidden>
         <label class="sc-field">
+          <span>플랫폼</span>
+          <select id="sc-fPlatform">
+            <option value="">전체</option>
+            <option value="영화">영화</option>
+            <option value="넷플릭스">넷플릭스</option>
+            <option value="디즈니">디즈니</option>
+          </select>
+        </label>
+        <label class="sc-field">
           <span>유형</span>
           <select id="sc-fType">
             <option value="">전체</option>
@@ -2404,6 +2413,7 @@
                 <th><button class="adm-th-sort" data-sort-key="date">개봉일</button></th>
                 <th style="text-align:center"><button class="adm-th-sort" data-sort-key="priority">우선순위</button></th>
                 <th style="text-align:center"><button class="adm-th-sort" data-sort-key="title">작품명</button></th>
+                <th><button class="adm-th-sort" data-sort-key="platform">플랫폼</button></th>
                 <th><button class="adm-th-sort" data-sort-key="type">타입</button></th>
                 <th><button class="adm-th-sort" data-sort-key="genre">장르</button></th>
                 <th><button class="adm-th-sort" data-sort-key="country">국가</button></th>
@@ -2684,6 +2694,10 @@
           <div class="sc-ac-drop" id="sc-ac-drop" hidden></div>
         </label>
         <div class="sc-ff-row">
+          <label class="sc-ff">
+            <span>플랫폼</span>
+            <select id="sc-iPlatform"><option>영화</option><option>넷플릭스</option><option>디즈니</option></select>
+          </label>
           <label class="sc-ff">
             <span>유형</span>
             <select id="sc-iType"><option>영화</option><option>드라마</option><option>OTT</option></select>
@@ -2986,9 +3000,9 @@
 </div>
 
 <script src="emailjs.min.js"></script>
-<script src="api.js?v=20261007h"></script>
-<script src="xlsx.js?v=20261007h"></script>
-<script src="channels.js?v=20261007h"></script>
+<script src="api.js?v=20261021a"></script>
+<script src="xlsx.js?v=20261021a"></script>
+<script src="channels.js?v=20261021a"></script>
 <!-- ── 짤 회원 사이드패널 ── -->
 <!-- ── 수정 요청 로그 (관리자) ── -->
 <div class="sc-sheet" id="chRevSheet" hidden>
@@ -3322,6 +3336,6 @@
   </div>
 </div>
 
-<script src="site.js?v=20261007h"></script>
+<script src="site.js?v=20261021a"></script>
 </body>
 </html>

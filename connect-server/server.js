@@ -15,6 +15,7 @@ const auth = require('./lib/auth');
 const yt = require('./lib/youtube');
 const zeal = require('./lib/zeal');
 const identity = require('./lib/identity');
+const netflix = require('./lib/netflix');
 
 const PORT = +process.env.PORT || 4000;
 // 기본은 이 컴퓨터(127.0.0.1)에서만 접속된다. 같은 네트워크의 다른 기기에서도 쓰려면 .env 에 HOST=0.0.0.0 (강한 비밀번호 필수)
@@ -422,6 +423,13 @@ async function route(req, res) {
     let body = null; try { body = await r.json(); } catch (e) {}
     if (!body) return send(req, res, 502, { error: 'KOBIS 응답을 읽을 수 없습니다.' });
     return send(req, res, 200, body);
+  }
+
+  /* 넷플릭스 신작 중 한국 작품 — 영업 캘린더가 쓴다(키 불필요, 공개 페이지를 서버가 읽어 온다) */
+  if (p === '/api/netflix/korean' && m === 'GET') {
+    const user = need(req, res, 'admin'); if (!user) return;
+    try { return send(req, res, 200, await netflix.koreanReleases(url.searchParams.get('force') === '1')); }
+    catch (e) { return send(req, res, 502, { error: '넷플릭스 신작 목록을 읽을 수 없습니다.' }); }
   }
 
   /* 짤 회원 메모 */
